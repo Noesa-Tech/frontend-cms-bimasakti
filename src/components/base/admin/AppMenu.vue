@@ -45,12 +45,12 @@ const model = ref([
           {
             label: "Login",
             icon: "pi pi-fw pi-sign-in",
-            to: "/auth/login",
+            to: "/",
           },
           {
             label: "Error",
             icon: "pi pi-fw pi-times-circle",
-            to: "/auth/error",
+            to: "/login-gagal",
           },
           {
             label: "Access Denied",

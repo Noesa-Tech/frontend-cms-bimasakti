@@ -55,7 +55,7 @@ function isOutsideClicked(event) {
 </script>
 
 <template>
-  <div class="layout-wrapper" :class="containerClass">
+  <div v-if="$route.meta.requiresAuth" class="layout-wrapper" :class="containerClass">
     <app-topbar></app-topbar>
     <app-sidebar></app-sidebar>
     <div class="layout-main-container">
@@ -67,9 +67,7 @@ function isOutsideClicked(event) {
     <div class="layout-mask animate-fadein"></div>
   </div>
 
-  <!-- <div v-else>
-    <Navbar />
+  <div v-else>
     <router-view></router-view>
-    <Footer />
-  </div> -->
+  </div>
 </template>

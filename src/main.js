@@ -12,6 +12,8 @@ import "primeicons/primeicons.css";
 import AnimateOnScroll from "primevue/animateonscroll";
 import Aura from "@primevue/themes/aura";
 import { definePreset } from "@primevue/themes";
+import ToastService from "primevue/toastservice";
+import ConfirmationService from "primevue/confirmationservice";
 
 const MyPreset = definePreset(Aura, {
   semantic: {
@@ -35,6 +37,8 @@ const app = createApp(App);
 app.use(Toast);
 app.use(store);
 app.use(router);
+app.use(ConfirmationService);
+app.use(ToastService);
 app.directive("animateonscroll", AnimateOnScroll);
 app.mixin(mixins);
 app.use(PrimeVue, {
