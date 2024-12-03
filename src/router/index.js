@@ -29,6 +29,15 @@ const routes = [
     },
   },
   {
+    path: "/vendors",
+    name: "vendors",
+    component: () => import("@/views/vendors/Vendors.vue"),
+    meta: {
+      requiresAuth: true,
+      title: "Data Vendors",
+    },
+  },
+  {
     path: "/uikit/formlayout",
     name: "formlayout",
     component: () => import("@/views/uikit/FormLayout.vue"),

@@ -15,6 +15,8 @@ import { definePreset } from "@primevue/themes";
 import ToastService from "primevue/toastservice";
 import ConfirmationService from "primevue/confirmationservice";
 
+import Tooltip from "primevue/tooltip";
+
 const MyPreset = definePreset(Aura, {
   semantic: {
     primary: {
@@ -39,6 +41,7 @@ app.use(store);
 app.use(router);
 app.use(ConfirmationService);
 app.use(ToastService);
+app.directive("tooltip", Tooltip);
 app.directive("animateonscroll", AnimateOnScroll);
 app.mixin(mixins);
 app.use(PrimeVue, {
