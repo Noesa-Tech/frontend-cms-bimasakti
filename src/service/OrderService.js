@@ -47,7 +47,24 @@ export const OrderService = {
         name: "Hari Nurah Nahrani",
         email: "hari@gmail.com",
         phone: "6282117688166",
-        vendor: "PT. Anugrah Abadi",
+        vendor: {
+          id: 1000,
+          name: "PT. Air Conditioner",
+          services: [
+            {
+              id: 1,
+              title: "Service AC",
+            },
+            {
+              id: 2,
+              title: "Home Cleaning",
+            },
+          ],
+          location: "Jakarta Timur",
+          date: "2015-09-13",
+          status: 1,
+          code: "XDJEIS",
+        },
 
         location: {
           country: "Jawa Barat",
@@ -87,7 +104,24 @@ export const OrderService = {
         name: "Hari Nurah Nahrani",
         email: "hari@gmail.com",
         phone: "6282117688166",
-        vendor: "PT. Anugrah Abadi",
+        vendor: {
+          id: 1000,
+          name: "PT. Air Conditioner",
+          services: [
+            {
+              id: 1,
+              title: "Service AC",
+            },
+            {
+              id: 2,
+              title: "Home Cleaning",
+            },
+          ],
+          location: "Jakarta Timur",
+          date: "2015-09-13",
+          status: 1,
+          code: "XDJEIS",
+        },
         location: {
           country: "Jawa Barat",
           city: "Kota Bandung",
@@ -126,7 +160,24 @@ export const OrderService = {
         name: "Hari Nurah Nahrani",
         email: "hari@gmail.com",
         phone: "6282117688166",
-        vendor: "PT. Anugrah Abadi",
+        vendor: {
+          id: 1000,
+          name: "PT. Air Conditioner",
+          services: [
+            {
+              id: 1,
+              title: "Service AC",
+            },
+            {
+              id: 2,
+              title: "Home Cleaning",
+            },
+          ],
+          location: "Jakarta Timur",
+          date: "2015-09-13",
+          status: 1,
+          code: "XDJEIS",
+        },
         location: {
           country: "Jawa Barat",
           city: "Kota Bandung",
@@ -165,7 +216,24 @@ export const OrderService = {
         name: "Hari Nurah Nahrani",
         email: "hari@gmail.com",
         phone: "6282117688166",
-        vendor: "PT. Anugrah Abadi",
+        vendor: {
+          id: 1000,
+          name: "PT. Air Conditioner",
+          services: [
+            {
+              id: 1,
+              title: "Service AC",
+            },
+            {
+              id: 2,
+              title: "Home Cleaning",
+            },
+          ],
+          location: "Jakarta Timur",
+          date: "2015-09-13",
+          status: 1,
+          code: "XDJEIS",
+        },
 
         location: {
           country: "Jawa Barat",
@@ -205,7 +273,24 @@ export const OrderService = {
         name: "Hari Nurah Nahrani",
         email: "hari@gmail.com",
         phone: "6282117688166",
-        vendor: "PT. Anugrah Abadi",
+        vendor: {
+          id: 1000,
+          name: "PT. Air Conditioner",
+          services: [
+            {
+              id: 1,
+              title: "Service AC",
+            },
+            {
+              id: 2,
+              title: "Home Cleaning",
+            },
+          ],
+          location: "Jakarta Timur",
+          date: "2015-09-13",
+          status: 1,
+          code: "XDJEIS",
+        },
 
         location: {
           country: "Jawa Barat",

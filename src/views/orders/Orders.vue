@@ -20,7 +20,6 @@ const orderData = ref(null);
 const filters1 = ref(null);
 const loading1 = ref(null);
 const vendorsData = ref(null);
-const selectedVendor = ref(null);
 
 const statuses = reactive([1, 2, 3, 4, 5]);
 
@@ -127,7 +126,7 @@ const confirm2 = (event) => {
 const confirmNext = (event) => {
   confirm.require({
     target: event.currentTarget,
-    message: "Yakin ingin meneruskan pesanan ini kepada vendor 'PT Anugrah'?",
+    message: "Yakin ingin meneruskan pesanan ini kepada vendor 'PT Air Conditioner'?",
     icon: "pi pi-info-circle",
     rejectProps: {
       label: "Batal",
@@ -300,10 +299,18 @@ const togglePhone = (event) => {
       </Column>
       <Column sortable field="vendor" header="Vendor Pilihan" class="min-w-[15rem]">
         <template #body="{ data }">
-          <span v-if="data.vendor">{{ data.vendor }}</span>
-          <div v-else class="flex flex-col justify-center items-center">
-            <h6 class="text-center m-0">Vendor Belum Dipilih</h6>
-            <Select v-model="selectedVendor" :options="vendorsData" filter optionLabel="name" placeholder="Pilih Vendor" severity="primary" />
+          <div v-if="data.vendor">
+            <span class="font-semibold block mb-0">{{ data.vendor.name }}</span>
+            <InputGroup>
+              <InputText :value="data.vendor.code" readonly class="w-[15rem]"></InputText>
+              <InputGroupAddon>
+                <Button icon="pi pi-copy" severity="secondary" text />
+              </InputGroupAddon>
+            </InputGroup>
+          </div>
+          <div v-else class="">
+            <h6 class="m-0">Vendor Belum Dipilih</h6>
+            <Select v-model="data.vendor" :options="vendorsData" filter optionLabel="name" placeholder="Pilih Vendor" class="w-[15rem]" />
           </div>
         </template>
         <template #filter="{ filterModel }">
@@ -322,8 +329,8 @@ const togglePhone = (event) => {
         <template #body="{ data }">
           <div class="flex gap-4 items-center">
             <Button icon="pi pi-external-link" severity="info" text v-tooltip.bottom="'Detail Pesanan'" />
-            <Button icon="pi pi-times" severity="danger" text v-tooltip.bottom="'Batalkan'" @click="confirm2($event)" />
             <Button icon="pi pi-send" severity="success" text v-tooltip.bottom="'Teruskan Pesanan'" @click="confirmNext($event)" />
+            <Button icon="pi pi-times" severity="danger" text v-tooltip.bottom="'Batalkan'" @click="confirm2($event)" />
           </div>
         </template>
       </Column>
