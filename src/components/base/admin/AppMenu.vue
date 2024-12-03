@@ -11,14 +11,14 @@ const model = ref([
   {
     label: "Management",
     items: [
-      { label: "Layanan", icon: "pi pi-fw pi-server", to: "/dashboard" },
+      { label: "Layanan", icon: "pi pi-fw pi-server", to: "/layanan" },
       { label: "Vendor", icon: "pi pi-fw pi-user", to: "/vendors" },
       { label: "Customer", icon: "pi pi-fw pi-users", to: "/customers" },
     ],
   },
   {
     label: "Pemesanan",
-    items: [{ label: "Pesanan", icon: "pi pi-fw pi-book", to: "/orders" }],
+    items: [{ label: "Pesanan", icon: "pi pi-fw pi-book", to: "/pesanan" }],
   },
   {
     label: "Keuangan",

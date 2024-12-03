@@ -38,6 +38,15 @@ const routes = [
     },
   },
   {
+    path: "/pesanan",
+    name: "orders",
+    component: () => import("@/views/orders/Orders.vue"),
+    meta: {
+      requiresAuth: true,
+      title: "Data Pesanan",
+    },
+  },
+  {
     path: "/uikit/formlayout",
     name: "formlayout",
     component: () => import("@/views/uikit/FormLayout.vue"),
