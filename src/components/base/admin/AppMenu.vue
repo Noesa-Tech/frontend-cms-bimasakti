@@ -6,7 +6,7 @@ import AppMenuItem from "./AppMenuItem.vue";
 const model = ref([
   {
     label: "Home",
-    items: [{ label: "Dashboard", icon: "pi pi-fw pi-home", to: "/dashboard" }],
+    items: [{ label: "Dashboard", icon: "pi pi-fw pi-th-large", to: "/dashboard" }],
   },
   {
     label: "Management",
@@ -27,7 +27,7 @@ const model = ref([
   {
     label: "Pengaturan",
     items: [
-      { label: "CMS Landing Page", icon: "pi pi-fw pi-shop", to: "/pengaturan-landing-page" },
+      { label: "CMS Landing Page", icon: "pi pi-fw pi-desktop", to: "/pengaturan-landing-page" },
       { label: "Kontak", icon: "pi pi-fw pi-phone", to: "/pengaturan-kontak" },
       { label: "Review", icon: "pi pi-fw pi-star", to: "/pengaturan-review" },
       { label: "Pembayaran", icon: "pi pi-fw pi-credit-card", to: "/pengaturan-pembayaran" },

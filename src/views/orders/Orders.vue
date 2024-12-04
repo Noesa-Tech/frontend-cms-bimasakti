@@ -328,7 +328,14 @@ const togglePhone = (event) => {
       <Column sortable field="id" header="Action" bodyClass="text-center" style="min-width: 12rem">
         <template #body="{ data }">
           <div class="flex gap-4 items-center">
-            <Button icon="pi pi-external-link" severity="info" text v-tooltip.bottom="'Detail Pesanan'" />
+            <Button
+              icon="pi pi-external-link"
+              severity="info"
+              text
+              v-tooltip.bottom="'Detail Pesanan'"
+              as="router-link"
+              :to="{ name: 'order-detail', params: { id: data.id } }"
+            />
             <Button icon="pi pi-send" severity="success" text v-tooltip.bottom="'Teruskan Pesanan'" @click="confirmNext($event)" />
             <Button icon="pi pi-times" severity="danger" text v-tooltip.bottom="'Batalkan'" @click="confirm2($event)" />
           </div>
