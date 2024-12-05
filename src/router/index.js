@@ -29,12 +29,30 @@ const routes = [
     },
   },
   {
+    path: "/layanan",
+    name: "services",
+    component: () => import("@/views/services/Services.vue"),
+    meta: {
+      requiresAuth: true,
+      title: "Data Layanan",
+    },
+  },
+  {
     path: "/vendors",
     name: "vendors",
     component: () => import("@/views/vendors/Vendors.vue"),
     meta: {
       requiresAuth: true,
       title: "Data Vendors",
+    },
+  },
+  {
+    path: "/pelanggan",
+    name: "customers",
+    component: () => import("@/views/customers/Customers.vue"),
+    meta: {
+      requiresAuth: true,
+      title: "Data Pelanggan",
     },
   },
   {
@@ -51,8 +69,61 @@ const routes = [
     name: "order-detail",
     component: () => import("@/views/orders/order-detail/OrderDetail.vue"),
     meta: {
-      // requiresAuth: true,
+      requiresAuth: true,
       title: "Detail Pesanan",
+    },
+  },
+  {
+    path: "/invoice/:code/:id",
+    name: "invoice-vendor",
+    component: () => import("@/views/invoice/VendorInvoice.vue"),
+    meta: {
+      title: "Detail Pesanan",
+    },
+  },
+  {
+    path: "/laporan-keuangan",
+    name: "payment-report",
+    component: () => import("@/views/payment_report/PaymentReport.vue"),
+    meta: {
+      requiresAuth: true,
+      title: "Laporan Keuangan",
+    },
+  },
+  {
+    path: "/pengaturan/landing-page",
+    name: "settings-landing-page",
+    component: () => import("@/views/settings/landing_page/LandingPage.vue"),
+    meta: {
+      requiresAuth: true,
+      title: "Pengaturan Landing Page",
+    },
+  },
+  {
+    path: "/pengaturan/kontak",
+    name: "settings-kontak",
+    component: () => import("@/views/settings/contact/Contact.vue"),
+    meta: {
+      requiresAuth: true,
+      title: "Pengaturan Kontak",
+    },
+  },
+  {
+    path: "/pengaturan/ulasan",
+    name: "settings-review",
+    component: () => import("@/views/settings/review/Review.vue"),
+    meta: {
+      requiresAuth: true,
+      title: "Pengaturan Review",
+    },
+  },
+  {
+    path: "/pengaturan/pembayaran",
+    name: "settings-payment",
+    component: () => import("@/views/settings/payment/Payment.vue"),
+    meta: {
+      requiresAuth: true,
+      title: "Pengaturan Pembayaran",
     },
   },
   // {

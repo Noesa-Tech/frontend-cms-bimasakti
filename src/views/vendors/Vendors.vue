@@ -103,7 +103,8 @@ const toggle = (event) => {
 };
 </script>
 <template>
-  <div class="card">
+  <TopBreadcrumb :breadcrumbItems="[{ label: 'Data Vendor' }]" />
+  <div class="card mt-8">
     <div class="font-semibold text-xl mb-4">Data Vendor</div>
     <DataTable
       v-model:selection="selectedvendorsData"

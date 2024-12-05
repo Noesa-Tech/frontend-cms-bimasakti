@@ -7,6 +7,7 @@ export const OrderService = {
         name: "Hari Nurah Nahrani",
         email: "hari@gmail.com",
         phone: "6282117688166",
+        paymentMethod: "Transfer Bank",
         vendor: null,
 
         location: {
@@ -47,6 +48,7 @@ export const OrderService = {
         name: "Hari Nurah Nahrani",
         email: "hari@gmail.com",
         phone: "6282117688166",
+        paymentMethod: "Transfer Bank",
         vendor: {
           id: 1000,
           name: "PT. Air Conditioner",
@@ -104,6 +106,7 @@ export const OrderService = {
         name: "Hari Nurah Nahrani",
         email: "hari@gmail.com",
         phone: "6282117688166",
+        paymentMethod: "Transfer Bank",
         vendor: {
           id: 1000,
           name: "PT. Air Conditioner",
@@ -160,6 +163,7 @@ export const OrderService = {
         name: "Hari Nurah Nahrani",
         email: "hari@gmail.com",
         phone: "6282117688166",
+        paymentMethod: "Transfer Bank",
         vendor: {
           id: 1000,
           name: "PT. Air Conditioner",
@@ -216,6 +220,7 @@ export const OrderService = {
         name: "Hari Nurah Nahrani",
         email: "hari@gmail.com",
         phone: "6282117688166",
+        paymentMethod: "Transfer Bank",
         vendor: {
           id: 1000,
           name: "PT. Air Conditioner",
@@ -273,6 +278,7 @@ export const OrderService = {
         name: "Hari Nurah Nahrani",
         email: "hari@gmail.com",
         phone: "6282117688166",
+        paymentMethod: "Transfer Bank",
         vendor: {
           id: 1000,
           name: "PT. Air Conditioner",

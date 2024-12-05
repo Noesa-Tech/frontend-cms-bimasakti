@@ -13,7 +13,7 @@ const model = ref([
     items: [
       { label: "Layanan", icon: "pi pi-fw pi-server", to: "/layanan" },
       { label: "Vendor", icon: "pi pi-fw pi-user", to: "/vendors" },
-      { label: "Customer", icon: "pi pi-fw pi-users", to: "/customers" },
+      { label: "Pelanggan", icon: "pi pi-fw pi-users", to: "/pelanggan" },
     ],
   },
   {
@@ -27,10 +27,10 @@ const model = ref([
   {
     label: "Pengaturan",
     items: [
-      { label: "CMS Landing Page", icon: "pi pi-fw pi-desktop", to: "/pengaturan-landing-page" },
-      { label: "Kontak", icon: "pi pi-fw pi-phone", to: "/pengaturan-kontak" },
-      { label: "Review", icon: "pi pi-fw pi-star", to: "/pengaturan-review" },
-      { label: "Pembayaran", icon: "pi pi-fw pi-credit-card", to: "/pengaturan-pembayaran" },
+      { label: "CMS Landing Page", icon: "pi pi-fw pi-desktop", to: "/pengaturan/landing-page" },
+      { label: "Kontak", icon: "pi pi-fw pi-phone", to: "/pengaturan/kontak" },
+      { label: "Review", icon: "pi pi-fw pi-star", to: "/pengaturan/ulasan" },
+      { label: "Pembayaran", icon: "pi pi-fw pi-credit-card", to: "/pengaturan/pembayaran" },
     ],
   },
   // {

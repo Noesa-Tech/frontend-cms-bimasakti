@@ -13,6 +13,7 @@ import Popover from "primevue/popover";
 
 const op = ref();
 const opPhone = ref();
+const opCancelConfirm = ref();
 const confirm = useConfirm();
 const toast = useToast();
 const dt = ref();
@@ -22,6 +23,7 @@ const loading1 = ref(null);
 const vendorsData = ref(null);
 
 const statuses = reactive([1, 2, 3, 4, 5]);
+const paymentMethods = reactive(["Transfer Bank", "Virtual Account(VA)", "GoPay", "OVO"]);
 
 function getSeverity(status) {
   switch (status) {
@@ -86,6 +88,7 @@ function initFilters1() {
     // },
     date: { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.DATE_IS }] },
     status: { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.EQUALS }] },
+    paymentMethod: { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.EQUALS }] },
   };
 }
 
@@ -112,7 +115,7 @@ const confirm2 = (event) => {
       outlined: true,
     },
     acceptProps: {
-      label: "Hapus",
+      label: "Yakin",
       severity: "danger",
     },
     accept: () => {
@@ -152,9 +155,13 @@ const toggle = (event) => {
 const togglePhone = (event) => {
   opPhone.value.toggle(event);
 };
+const toggleConfirm = (event) => {
+  opCancelConfirm.value.toggle(event);
+};
 </script>
 <template>
-  <div class="card">
+  <TopBreadcrumb :breadcrumbItems="[{ label: 'Pesanan' }]" />
+  <div class="card mt-8">
     <div class="font-semibold text-xl mb-4">Data Pesanan</div>
     <DataTable
       ref="dt"
@@ -287,7 +294,7 @@ const togglePhone = (event) => {
           <Tag :value="getStatusName(data.status)" :severity="getSeverity(data.status)" class="whitespace-nowrap" />
         </template>
         <template #filter="{ filterModel }">
-          <Select v-model="filterModel.value" :options="statuses" placeholder="Select One" showClear>
+          <Select v-model="filterModel.value" :options="statuses" placeholder="Pilih" showClear>
             <template #value="slotProps">
               <Tag v-if="slotProps.value" :value="getStatusName(slotProps.value)" :severity="getSeverity(slotProps.value)" />
             </template>
@@ -295,6 +302,14 @@ const togglePhone = (event) => {
               <Tag :value="getStatusName(slotProps.option)" :severity="getSeverity(slotProps.option)" />
             </template>
           </Select>
+        </template>
+      </Column>
+      <Column sortable field="paymentMethod" header="Metode Pembayaran" class="min-w-[15rem]">
+        <template #body="{ data }">
+          {{ data.paymentMethod }}
+        </template>
+        <template #filter="{ filterModel }">
+          <Select v-model="filterModel.value" :options="paymentMethods" placeholder="Pilih" showClear />
         </template>
       </Column>
       <Column sortable field="vendor" header="Vendor Pilihan" class="min-w-[15rem]">
@@ -337,7 +352,20 @@ const togglePhone = (event) => {
               :to="{ name: 'order-detail', params: { id: data.id } }"
             />
             <Button icon="pi pi-send" severity="success" text v-tooltip.bottom="'Teruskan Pesanan'" @click="confirmNext($event)" />
-            <Button icon="pi pi-times" severity="danger" text v-tooltip.bottom="'Batalkan'" @click="confirm2($event)" />
+            <Button icon="pi pi-times" severity="danger" text v-tooltip.bottom="'Batalkan'" @click="toggleConfirm($event)" />
+            <Popover ref="opCancelConfirm" class="p-0 min-w-[20rem]">
+              <h6 class="mb-2">Pembatalan Pesanan</h6>
+              <div class="flex flex-col gap-4">
+                <div class="flex flex-col gap-2">
+                  <label for="message">Beri alasan</label>
+                  <Textarea id="message" />
+                </div>
+                <div class="flex gap-2 justify-end">
+                  <Button label="Batal" severity="secondary" text @click="toggleConfirm($event)" />
+                  <Button label="Submit" @click="confirm2($event)" />
+                </div>
+              </div>
+            </Popover>
           </div>
         </template>
       </Column>
