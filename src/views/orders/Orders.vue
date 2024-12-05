@@ -158,6 +158,7 @@ const togglePhone = (event) => {
 const toggleConfirm = (event) => {
   opCancelConfirm.value.toggle(event);
 };
+const expandedRows = ref({});
 </script>
 <template>
   <TopBreadcrumb :breadcrumbItems="[{ label: 'Pesanan' }]" />
@@ -165,6 +166,7 @@ const toggleConfirm = (event) => {
     <div class="font-semibold text-xl mb-4">Data Pesanan</div>
     <DataTable
       ref="dt"
+      v-model:expandedRows="expandedRows"
       :value="orderData"
       :paginator="true"
       :rows="10"
@@ -195,6 +197,7 @@ const toggleConfirm = (event) => {
       </template>
       <template #empty> No customers found. </template>
       <template #loading> Loading customers data. Please wait. </template>
+      <Column expander class="w-[5rem]" />
       <Column sortable field="noInvoice" header="Invoice" class="min-w-[15rem]">
         <template #body="{ data }">
           {{ data.noInvoice }}
@@ -288,7 +291,12 @@ const toggleConfirm = (event) => {
           <InputText v-model="filterModel.value" type="text" placeholder="Cari Layanan" />
         </template> -->
       </Column>
-
+      <Column sortable field="total" header="Total Harga" class="min-w-[15rem]">
+        <template #body="{ data }"> Rp{{ formatPrice(200000) }} </template>
+        <template #filter="{ filterModel }">
+          <InputText v-model="filterModel.value" type="text" placeholder="Cari Nama" />
+        </template>
+      </Column>
       <Column sortable header="Status" field="status" :filterMenuStyle="{ width: '14rem' }" class="min-w-[20rem]">
         <template #body="{ data }">
           <Tag :value="getStatusName(data.status)" :severity="getSeverity(data.status)" class="whitespace-nowrap" />
@@ -340,7 +348,7 @@ const toggleConfirm = (event) => {
           <DatePicker v-model="filterModel.value" dateFormat="mm/dd/yy" placeholder="mm/dd/yyyy" />
         </template>
       </Column>
-      <Column sortable field="id" header="Action" bodyClass="text-center" style="min-width: 12rem">
+      <Column sortable field="id" header="Action" bodyClass="text-center" class="min-w-[10rem]">
         <template #body="{ data }">
           <div class="flex gap-4 items-center">
             <Button
@@ -369,6 +377,56 @@ const toggleConfirm = (event) => {
           </div>
         </template>
       </Column>
+      <template #expansion="slotProps">
+        <div class="pl-[2.8rem] flex flex-col gap-4">
+          <div v-for="(item, index) in slotProps.data.items" :key="index" class="">
+            <DataTable :value="item.category" class="max-w-fit">
+              <template #header>
+                <div class="flex justify-between gap-4 items-center">
+                  <h6 class="m-0">{{ index + 1 }}. Layanan {{ item.label }}</h6>
+                  <Button label="Simpan" icon="pi pi-save" />
+                </div>
+              </template>
+              <Column field="label" header="Jenis" class="min-w-[20rem]" sortable></Column>
+              <Column field="qty" header="Qty" class="min-w-[20rem]" sortable>
+                <template #body="{ data }">
+                  <Inplace>
+                    <template #display>{{ formatPrice(data.qty) }} <span class="pi pi-pencil"></span> </template>
+                    <template #content="{ closeCallback }">
+                      <span class="inline-flex items-center gap-2">
+                        <InputNumber v-model="data.qty" autofocus inputId="integeronly" :min="0" :max="100" />
+                        <Button icon="pi pi-times" text severity="danger" @click="closeCallback" />
+                      </span>
+                    </template>
+                  </Inplace>
+                </template>
+              </Column>
+              <Column field="price" header="Harga Satuan" class="min-w-[20rem]" sortable>
+                <template #body="{ data }">
+                  <Inplace>
+                    <template #display>Rp{{ formatPrice(data.price) }} <span class="pi pi-pencil"></span> </template>
+                    <template #content="{ closeCallback }">
+                      <span class="inline-flex items-center gap-2">
+                        <InputNumber v-model="data.price" autofocus inputId="integeronly" />
+                        <Button icon="pi pi-check" outlined severity="success" @click="closeCallback" />
+                      </span>
+                    </template>
+                  </Inplace>
+                </template>
+              </Column>
+              <Column field="subTotal" header="Sub Total" class="min-w-[20rem]" sortable>
+                <template #body="{ data }"> Rp{{ formatPrice(data.qty * data.price) }} </template>
+              </Column>
+              <ColumnGroup type="footer">
+                <Row>
+                  <Column footer="Totals:" :colspan="3" footerStyle="text-align:right" />
+                  <Column :footer="'Rp' + formatPrice(200000)" />
+                </Row>
+              </ColumnGroup>
+            </DataTable>
+          </div>
+        </div>
+      </template>
     </DataTable>
   </div>
   <Toast />
