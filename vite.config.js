@@ -10,6 +10,9 @@ export default defineConfig({
       '@': '/src',
     }
   },
+  build: {
+    target: 'es2015',
+  },
   plugins: [
     vue(),
     Components({

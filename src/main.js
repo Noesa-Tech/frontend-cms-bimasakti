@@ -16,6 +16,8 @@ import ToastService from "primevue/toastservice";
 import ConfirmationService from "primevue/confirmationservice";
 
 import Tooltip from "primevue/tooltip";
+import "core-js/stable";
+// import "regenerator-runtime/runtime";
 
 const MyPreset = definePreset(Aura, {
   semantic: {

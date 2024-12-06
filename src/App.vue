@@ -3,7 +3,7 @@ import { useLayout } from "@/components/base/admin/composables/layout";
 
 const { layoutConfig, layoutState, isSidebarActive, resetMenu } = useLayout();
 
-const outsideClickListener = ref(null);
+const outsideClickListener = ref<((event: MouseEvent) => void) | null>(null);
 
 watch(isSidebarActive, (newVal) => {
   if (newVal) {
@@ -25,7 +25,7 @@ const containerClass = computed(() => {
 
 function bindOutsideClickListener() {
   if (!outsideClickListener.value) {
-    outsideClickListener.value = (event) => {
+    outsideClickListener.value = (event: MouseEvent) => {
       if (isOutsideClicked(event)) {
         resetMenu();
       }
@@ -36,20 +36,24 @@ function bindOutsideClickListener() {
 
 function unbindOutsideClickListener() {
   if (outsideClickListener.value) {
-    document.removeEventListener("click", outsideClickListener);
+    document.removeEventListener("click", outsideClickListener.value);
     outsideClickListener.value = null;
   }
 }
 
-function isOutsideClicked(event) {
+function isOutsideClicked(event: MouseEvent): boolean {
   const sidebarEl = document.querySelector(".layout-sidebar");
   const topbarEl = document.querySelector(".layout-menu-button");
 
+  if (!sidebarEl || !topbarEl) {
+    return true; 
+  }
+
+  const target = event.target as Node | null;
+
   return !(
-    sidebarEl.isSameNode(event.target) ||
-    sidebarEl.contains(event.target) ||
-    topbarEl.isSameNode(event.target) ||
-    topbarEl.contains(event.target)
+    (sidebarEl.isSameNode(target) || sidebarEl.contains(target)) ||
+    (topbarEl.isSameNode(target) || topbarEl.contains(target))
   );
 }
 </script>
@@ -60,14 +64,18 @@ function isOutsideClicked(event) {
     <app-sidebar></app-sidebar>
     <div class="layout-main-container">
       <div class="layout-main">
-        <router-view></router-view>
+        <keep-alive>
+          <router-view></router-view>
+        </keep-alive>
       </div>
       <app-footer></app-footer>
     </div>
     <div class="layout-mask animate-fadein"></div>
   </div>
-
+  
   <div v-else>
+    <keep-alive>
     <router-view></router-view>
+  </keep-alive>
   </div>
 </template>
