@@ -1,0 +1,23 @@
+name: 🚀 Build & Deploy CMS BIMASAKTI HOMES
+
+on:
+  push:
+    tags: 
+      - 'v*'
+
+jobs:
+  web-deploy:
+    name: 🎉 Deploy
+    runs-on: ubuntu-latest
+    steps:
+      - name: 🚚 Get latest code
+        uses: actions/checkout@v4
+
+      - name: 📂 Sync files
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.4
+        with:
+          server: 203.175.9.138
+          username: ${{ secrets.ftp_username }}
+          password: ${{ secrets.ftp_password }}
+          server-dir: ./public_html/cms-bimasakti/
+          local-dir: dist/
