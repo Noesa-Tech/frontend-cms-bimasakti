@@ -1,7 +1,19 @@
-<script setup>
-const email = ref("");
-const password = ref("");
-const checked = ref(false);
+<script setup lang="ts">
+import { AuthStore } from '@/store/auth'
+
+const $auth = AuthStore()
+const router = useRouter();
+
+const query = reactive({
+  email: "johndoe@gmail.com",
+  password : "password"
+})
+const checked = ref<boolean>(false);
+
+async function onSubmit(){
+  await $auth.login(query);
+  router.push("/dashboard");
+}
 </script>
 
 <template>
@@ -16,12 +28,13 @@ const checked = ref(false);
             <div class="text-surface-900 dark:text-surface-0 text-3xl font-medium mb-4 text-center">Dashboard Admin</div>
             <span class="text-muted-color font-medium">Login untuk melanjutkan</span>
           </div>
+          <form @submit.prevent="onSubmit">
           <div>
             <label for="email1" class="block text-surface-900 dark:text-surface-0 text-xl font-medium mb-2">Email</label>
-            <InputText id="email1" type="text" placeholder="Alamat email" class="w-full md:w-[30rem] mb-8" v-model="email" />
+            <InputText id="email1" type="text" placeholder="Alamat email" class="w-full md:w-[30rem] mb-8" v-model="query.email" />
 
             <label for="password1" class="block text-surface-900 dark:text-surface-0 font-medium text-xl mb-2">Password</label>
-            <Password id="password1" v-model="password" placeholder="Password" :toggleMask="true" class="mb-4" fluid :feedback="false"></Password>
+            <Password id="password1" v-model="query.password" placeholder="Password" :toggleMask="true" class="mb-4" fluid :feedback="false"></Password>
 
             <div class="flex items-center justify-between mt-2 mb-8 gap-8">
               <div class="flex items-center">
@@ -30,8 +43,9 @@ const checked = ref(false);
               </div>
               <span class="font-medium no-underline ml-2 text-right cursor-pointer text-primary">Lupa Password?</span>
             </div>
-            <Button label="Login" class="w-full" as="router-link" :to="{ name: 'dashboard' }"></Button>
+            <Button type="submit" :loading="$auth.isLoading" label="Login" class="w-full"></Button>
           </div>
+        </form>
         </div>
       </div>
     </div>

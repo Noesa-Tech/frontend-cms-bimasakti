@@ -1,4 +1,5 @@
 import { createRouter, createWebHistory } from "vue-router";
+import { AuthStore } from '@/store/auth'
 import NProgress from 'nprogress';
 import 'nprogress/nprogress.css';
 
@@ -308,5 +309,16 @@ router.beforeEach((to, from, next) => {
 router.afterEach(() => {
   NProgress.done();
 });
+
+
+router.beforeEach((to, from, next) => {
+  const $auth = AuthStore()
+  console.log($auth.isAuthenticated)
+  if (to.meta.requiresAuth && !$auth.isAuthenticated) {
+    next({ name: 'login' })
+  } else {
+    next()
+  }
+})
 
 export default router;
