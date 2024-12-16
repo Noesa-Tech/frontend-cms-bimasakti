@@ -1,6 +1,46 @@
 const mixins = {
   methods: {
     /**
+     * Copies the given value to the clipboard
+     * @param {string} value - The value to copy to the clipboard
+     */
+    copyToClipboard(value) {
+      if (!value) {
+        console.error("No value provided to copy");
+        return;
+      }
+
+      if (navigator.clipboard) {
+        // Use modern clipboard API
+        navigator.clipboard
+          .writeText(value)
+          .then(() => {
+            console.log(`Copied to clipboard: ${value}`);
+          })
+          .catch((err) => {
+            console.error("Failed to copy to clipboard:", err);
+          });
+      } else {
+        // Fallback for older browsers
+        const textArea = document.createElement("textarea");
+        textArea.value = value;
+        textArea.style.position = "fixed"; // Prevent scrolling to the bottom
+        document.body.appendChild(textArea);
+        textArea.focus();
+        textArea.select();
+
+        try {
+          document.execCommand("copy");
+          console.log(`Copied to clipboard: ${value}`);
+        } catch (err) {
+          console.error("Failed to copy to clipboard:", err);
+        } finally {
+          document.body.removeChild(textArea);
+        }
+      }
+    },
+
+    /**
      *
      * @param {*} el
      */

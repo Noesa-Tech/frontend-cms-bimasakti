@@ -11,27 +11,10 @@
 @import "tailwindcss/utilities";
 
 @layer base {
-  html {
-    @apply text-surface-700;
-    @apply bg-surface-50;
-  }
-  .p-button:not(.p-button-primary):not(.p-button-text):not(.p-button-info):not(.p-button-success):not(.p-button-warning):not(.p-button-danger):not(
-      .p-button-outlined
-    ):not(.p-button-link) {
-    @apply text-surface-0;
-  }
 
-  /* .p-button:not(.p-button-primary):not(.p-button-text):not(.p-button-outlined):not(.p-button-raised)
-    :not(.p-button-rounded):not(.p-button-secondary):not(.p-button-success):not(.p-button-info)
-    :not(.p-button-warn):not(.p-button-help):not(.p-button-danger):not(.p-button-contrast) {
-    @apply text-surface-0;
-  } */
-
-  .p-checkbox.p-checkbox-checked .p-checkbox-icon {
-    @apply text-white;
-  }
-  .p-checkbox.p-checkbox-checked:hover .p-checkbox-icon {
-    @apply text-white !important;
+  .inplace-custom-display .p-inplace-display, .btn {
+    margin: 0 !important;
+    padding: 0 !important;
   }
 }
 
