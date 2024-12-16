@@ -129,6 +129,25 @@ const routes = [
       title: "Pengaturan Pembayaran",
     },
   },
+  // VENDOR 
+  {
+    path: "/vendor/login",
+    name: "vendor-login",
+    component: () => import("@/views/vendors/vendor/VendorLogin.vue"),
+    meta: {
+      requiresAuth: false,
+      title: "Vendor Login",
+    },
+  },
+  {
+    path: "/vendor/order/:id",
+    name: "vendor-order",
+    component: () => import("@/views/vendors/vendor/VendorOrder.vue"),
+    meta: {
+      requiresAuth: false,
+      title: "Pesanan Detail",
+    },
+  },
   // {
   //   path: "/uikit/formlayout",
   //   name: "formlayout",

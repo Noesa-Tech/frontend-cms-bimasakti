@@ -26,6 +26,7 @@ declare module 'vue' {
     Divider: typeof import('primevue/divider')['default']
     ElectricityService: typeof import('./src/components/icons/services/ElectricityService.vue')['default']
     EmptyWidget: typeof import('./src/components/esentials/EmptyWidget.vue')['default']
+    FileUpload: typeof import('primevue/fileupload')['default']
     FloorAndCarpet: typeof import('./src/components/icons/FloorAndCarpet.vue')['default']
     Footer: typeof import('./src/components/base/Footer.vue')['default']
     HewanPeliharaan: typeof import('./src/components/icons/upcoming-features/hewan-peliharaan.vue')['default']
