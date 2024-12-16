@@ -19,6 +19,7 @@ import { createPinia } from 'pinia'
 import piniaPersistedstate from 'pinia-plugin-persistedstate'
 import Tooltip from "primevue/tooltip";
 import "core-js/stable";
+import Ripple from "primevue/ripple";
 // import "regenerator-runtime/runtime";
 
 const MyPreset = definePreset(Aura, {
@@ -53,6 +54,7 @@ app.use(ConfirmationService);
 app.use(ToastService);
 app.directive("tooltip", Tooltip);
 app.directive("animateonscroll", AnimateOnScroll);
+app.directive("ripple", Ripple);
 app.mixin(mixins);
 app.use(PrimeVue, {
   theme: {
