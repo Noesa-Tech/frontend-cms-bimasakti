@@ -10,10 +10,8 @@ Api.defaults.headers.common['Access-Control-Allow-Origin'] = '*'
 // Request interceptor
 Api.interceptors.request.use(
   (req) => {
-    if (localStorage.getItem('noesa-token')) {
-      req.headers.Authorization = `Bearer ${localStorage.getItem(
-        'noesa-token'
-      )}`
+    if (localStorage.getItem('AuthStore')) {
+      req.headers.Authorization = `Bearer ${JSON.parse(localStorage.getItem('AuthStore')).token}`
     }
     return req
   },

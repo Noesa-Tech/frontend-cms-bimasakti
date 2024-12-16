@@ -12,7 +12,8 @@ export const AuthStore = defineStore('AuthStore', {
         items: [] as Array<any>,
         isLoading: false as boolean,
         users: {} as Record<string, any>,
-        isAuthenticated : false as boolean
+        isAuthenticated : false as boolean,
+        token: null as any
     }),
     actions: {
         async login(data: Login) {
@@ -21,6 +22,7 @@ export const AuthStore = defineStore('AuthStore', {
                 const res = await api.post('/auth/login', data)
                 this.users = res.data.user
                 this.isAuthenticated = true
+                this.token = res.data.access_token
             } catch (err) {
             } finally {
                 this.isLoading = false
@@ -28,6 +30,6 @@ export const AuthStore = defineStore('AuthStore', {
         },
     },
     persist: {
-        paths: ['users', 'isAuthenticated'],
+        paths: ['users', 'isAuthenticated','token'],
     },
 })

@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import AddVendor from "./AddVendor.vue";
 import EditVendor from "./EditVendor.vue";
 import { VendorService } from "@/service/VendorService";
@@ -12,20 +12,50 @@ import { useToast } from "primevue/usetoast";
 import ConfirmPopup from "primevue/confirmpopup";
 import Popover from "primevue/popover";
 
+import { VendorStore } from '@/store/vendor'
+import { ServiceStore } from '@/store/service'
+import { LocationStore } from '@/store/location'
+
 const op = ref();
+const $vendor = VendorStore()
+const $service = ServiceStore()
+const $location = LocationStore()
 const confirm = useConfirm();
 const toast = useToast();
-const visibleAdd = ref(false);
-const visibleEdit = ref(false);
+
+const visibleAdd = ref<boolean>(false);
+const visibleEdit = ref<boolean>(false);
 const dt = ref();
-const vendorsData = ref(null);
-const selectedvendorsData = ref();
-const filters1 = ref(null);
-const loading1 = ref(null);
+const selectedvendorsData = ref<any>(null);
+const filters1 = ref({
+    global: { value: null, matchMode: FilterMatchMode.CONTAINS },
+    name: { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
+    location: { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
+    date: { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.DATE_IS }] },
+    status: { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.EQUALS }] },
+})
+
+const items = computed(() => {
+  return $vendor.vendors.map((item: any) => ({
+    id: item.id,
+    name: item.name,
+    location: item.address,
+    date: item.created_at,
+    status: item.deleted_at,
+    services: item.vendor_service
+  }));
+});
+
+const allCity = computed(() => {
+  return $location.city.map((item: any) => ({
+    code: item.id,
+    name: item.nama,
+  }));
+});
 
 const statuses = reactive([1, 2]);
 
-function getSeverity(status) {
+function getSeverity(status:any) {
   switch (status) {
     case 1:
       return "danger";
@@ -34,48 +64,37 @@ function getSeverity(status) {
   }
 }
 
-function getStatusName(status) {
-  switch (status) {
-    case 1:
-      return "Active";
-    case 2:
-      return "Unactive";
+function getStatusName(status:any) {
+  if(status){
+    return "Unactive";
+  }else{
+    return "Active";
   }
 }
 
-onBeforeMount(() => {
-  VendorService.getVendors().then((data) => {
-    vendorsData.value = data;
-    loading1.value = false;
-    vendorsData.value.forEach((vendors) => (vendors.date = new Date(vendors.date)));
-  });
-
-  initFilters1();
-});
-
-function initFilters1() {
-  filters1.value = {
-    global: { value: null, matchMode: FilterMatchMode.CONTAINS },
-    name: { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
-    location: { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
-    date: { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.DATE_IS }] },
-    status: { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.EQUALS }] },
-  };
+async function fetchVendor(){
+  await $vendor.fetchVendor()
 }
 
-function formatDate(value) {
-  return value.toLocaleDateString("en-US", {
+onMounted(async () => {
+  await $location.fetchCity(0)
+  await $service.fetchService()
+  await $vendor.fetchVendor()
+});
+
+function formatDate(value: any) {
+  const date = new Date(value);
+  return date.toLocaleDateString("en-US", {
     day: "2-digit",
     month: "2-digit",
     year: "numeric",
   });
 }
-
 const exportCSV = () => {
   dt.value.exportCSV();
 };
 
-const confirm2 = (event) => {
+const confirm2 = (event:any) => {
   confirm.require({
     target: event.currentTarget,
     message: "Yakin ingin menhapus data ini?",
@@ -90,7 +109,8 @@ const confirm2 = (event) => {
       severity: "danger",
     },
     accept: () => {
-      toast.add({ severity: "info", summary: "Confirmed", detail: "Record deleted", life: 3000 });
+      console.log('ok')
+      toast.add({ severity: 'success', summary: 'Success Message', detail: 'Message Content', life: 3000 });
     },
     reject: () => {
       toast.add({ severity: "error", summary: "Rejected", detail: "You have rejected", life: 3000 });
@@ -98,9 +118,10 @@ const confirm2 = (event) => {
   });
 };
 
-const toggle = (event) => {
+const toggle = (event:any) => {
   op.value.toggle(event);
 };
+
 </script>
 <template>
   <TopBreadcrumb :breadcrumbItems="[{ label: 'Data Vendor' }]" />
@@ -109,19 +130,18 @@ const toggle = (event) => {
     <DataTable
       v-model:selection="selectedvendorsData"
       ref="dt"
-      :value="vendorsData"
+      :loading="$vendor.isLoading"
+      :value="items"
       :paginator="true"
       :rows="10"
       dataKey="id"
       :rowHover="true"
       v-model:filters="filters1"
       filterDisplay="menu"
-      :loading="loading1"
-      :filters="filters1"
       :globalFilterFields="['name', 'location', 'services', 'date', 'status']"
       showGridlines
       scrollable
-    >
+      >
       <template #header>
         <div class="flex flex-col md:flex-row justify-between gap-4">
           <Button type="button" icon="pi pi-plus" label="Tambah Vendor" class="md:order-1 order-2" @click="visibleAdd = true" />
@@ -150,7 +170,9 @@ const toggle = (event) => {
       </Column>
       <Column sortable header="Lokasi" filterField="location" style="min-width: 12rem">
         <template #body="{ data }">
+          <div class="truncate-text">
           {{ data.location }}
+        </div>
         </template>
         <template #filter="{ filterModel }">
           <InputText v-model="filterModel.value" type="text" placeholder="Cari Kota" />
@@ -168,7 +190,7 @@ const toggle = (event) => {
           <Popover ref="op">
             <ul class="list-disc list-inside flex flex-col gap-4">
               <li v-for="(item, index) in data.services" :key="index">
-                {{ item.title }}
+                {{ item.service.name }}
               </li>
             </ul>
           </Popover>
@@ -205,7 +227,7 @@ const toggle = (event) => {
         <template #body="{ data }">
           <div class="flex gap-4 items-center">
             <Button icon="pi pi-pencil" severity="info" text v-tooltip="'Ubah'" @click="visibleEdit = true" />
-            <Button icon="pi pi-trash" severity="danger" text v-tooltip="'Hapus'" @click="confirm2($event)" />
+            <Button icon="pi pi-trash" severity="danger" text v-tooltip="'Hapus'" @click="confirm2(data.id)" />
           </div>
         </template>
       </Column>
@@ -214,9 +236,18 @@ const toggle = (event) => {
   <Toast />
   <ConfirmPopup></ConfirmPopup>
   <Dialog v-model:visible="visibleAdd" maximizable modal header="Tambah Vendor" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
-    <AddVendor />
+    <AddVendor :city="allCity" :service="$service.serviceAll" @on-close="visibleAdd = false" @on-save="visibleAdd = false, fetchVendor()"/>
   </Dialog>
   <Dialog v-model:visible="visibleEdit" maximizable modal header="Ubah Vendor" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
     <EditVendor />
   </Dialog>
 </template>
+
+<style scoped>
+.truncate-text {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 350px; 
+}
+</style>
