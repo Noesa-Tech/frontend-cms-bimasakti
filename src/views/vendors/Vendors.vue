@@ -16,13 +16,14 @@ import { VendorStore } from '@/store/vendor'
 import { ServiceStore } from '@/store/service'
 import { LocationStore } from '@/store/location'
 
-const op = ref();
+const popovers = ref<Record<number, HTMLElement | null>>({}); 
 const $vendor = VendorStore()
 const $service = ServiceStore()
 const $location = LocationStore()
 const confirm = useConfirm();
 const toast = useToast();
 
+const selectedId = ref<number | null>(null)
 const visibleAdd = ref<boolean>(false);
 const visibleEdit = ref<boolean>(false);
 const dt = ref();
@@ -77,6 +78,16 @@ async function fetchVendor(){
 }
 
 onMounted(async () => {
+
+  toast .add({})
+
+  toast.add({
+    severity: 'success',
+    summary: 'Mounted Success',
+    detail: 'This toast appears after mounting',
+    life: 3000
+  });
+
   await $location.fetchCity(0)
   await $service.fetchService()
   await $vendor.fetchVendor()
@@ -90,7 +101,7 @@ function formatDate(value: any) {
     year: "numeric",
   });
 }
-const exportCSV = () => {
+const exportCSV = (e:any) => {
   dt.value.exportCSV();
 };
 
@@ -109,7 +120,6 @@ const confirm2 = (event:any) => {
       severity: "danger",
     },
     accept: () => {
-      console.log('ok')
       toast.add({ severity: 'success', summary: 'Success Message', detail: 'Message Content', life: 3000 });
     },
     reject: () => {
@@ -118,18 +128,26 @@ const confirm2 = (event:any) => {
   });
 };
 
-const toggle = (event:any) => {
-  op.value.toggle(event);
+const toggle = (event: any, vendorId: number) => {
+  const popoverRef = popovers.value[vendorId];
+  if (popoverRef) {
+    (popoverRef as any).toggle(event);
+  }
 };
 
+const setPopoverRef = (vendorId: number, el: HTMLElement | null) => {
+  popovers.value[vendorId] = el;
+};
 </script>
 <template>
+   <Toast />
   <TopBreadcrumb :breadcrumbItems="[{ label: 'Data Vendor' }]" />
   <div class="card mt-8">
     <div class="font-semibold text-xl mb-4">Data Vendor</div>
     <DataTable
       v-model:selection="selectedvendorsData"
       ref="dt"
+      :key="items.length"
       :loading="$vendor.isLoading"
       :value="items"
       :paginator="true"
@@ -157,8 +175,8 @@ const toggle = (event:any) => {
           </div>
         </div>
       </template>
-      <template #empty> No customers found. </template>
-      <template #loading> Loading customers data. Please wait. </template>
+      <template #empty> No vendors found. </template>
+      <template #loading> Loading vendors data. Please wait. </template>
       <Column frozen selectionMode="multiple"></Column>
       <Column sortable field="name" header="Nama Vendor" class="min-w-[15rem]">
         <template #body="{ data }">
@@ -186,8 +204,8 @@ const toggle = (event:any) => {
       </Column>
       <Column sortable header="Layanan" filterField="services" dataType="string" style="min-width: 10rem">
         <template #body="{ data }">
-          <Button @click="toggle" :label="data.services.length + ' Layanan'" severity="info" outlined icon="pi pi-angle-down" iconPos="right" />
-          <Popover ref="op">
+          <Button @click="toggle($event, data.id)" :label="data.services.length + ' Layanan'" severity="info" outlined icon="pi pi-angle-down" iconPos="right" />
+          <Popover :ref="el => setPopoverRef(data.id, el as any)">
             <ul class="list-disc list-inside flex flex-col gap-4">
               <li v-for="(item, index) in data.services" :key="index">
                 {{ item.service.name }}
@@ -226,20 +244,19 @@ const toggle = (event:any) => {
       <Column sortable field="id" header="Action" bodyClass="text-center" style="min-width: 12rem">
         <template #body="{ data }">
           <div class="flex gap-4 items-center">
-            <Button icon="pi pi-pencil" severity="info" text v-tooltip="'Ubah'" @click="visibleEdit = true" />
+            <Button icon="pi pi-pencil" severity="info" text v-tooltip="'Ubah'" @click="selectedId = data.id,  visibleEdit = true" />
             <Button icon="pi pi-trash" severity="danger" text v-tooltip="'Hapus'" @click="confirm2(data.id)" />
           </div>
         </template>
       </Column>
     </DataTable>
   </div>
-  <Toast />
   <ConfirmPopup></ConfirmPopup>
   <Dialog v-model:visible="visibleAdd" maximizable modal header="Tambah Vendor" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
     <AddVendor :city="allCity" :service="$service.serviceAll" @on-close="visibleAdd = false" @on-save="visibleAdd = false, fetchVendor()"/>
   </Dialog>
   <Dialog v-model:visible="visibleEdit" maximizable modal header="Ubah Vendor" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
-    <EditVendor />
+    <EditVendor :city="allCity" :service="$service.serviceAll" :vendorId="selectedId" @on-close="visibleEdit = false" @on-save="visibleEdit = false,fetchVendor()" />
   </Dialog>
 </template>
 
@@ -249,5 +266,9 @@ const toggle = (event:any) => {
   overflow: hidden;
   text-overflow: ellipsis;
   max-width: 350px; 
+}
+
+.p-toast {
+  z-index: 9999 !important;  /* Ensures toast appears above other elements */
 }
 </style>

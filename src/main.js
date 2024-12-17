@@ -7,7 +7,6 @@ import "./assets/tailwind.css";
 import "./assets/styles.scss";
 import router from "./router";
 import mixins from "./mixins";
-// import store from "./store";
 import "primeicons/primeicons.css";
 import AnimateOnScroll from "primevue/animateonscroll";
 import Aura from "@primevue/themes/aura";
@@ -20,7 +19,6 @@ import piniaPersistedstate from 'pinia-plugin-persistedstate'
 import Tooltip from "primevue/tooltip";
 import "core-js/stable";
 import Ripple from "primevue/ripple";
-// import "regenerator-runtime/runtime";
 
 const MyPreset = definePreset(Aura, {
   semantic: {
@@ -46,7 +44,6 @@ const pinia = createPinia()
 pinia.use(piniaPersistedstate)
 
 app.use(Toast);
-// app.use(store);
 app.use(router);
 app.use(pinia)
 pinia.use(piniaPersistedstate) 
