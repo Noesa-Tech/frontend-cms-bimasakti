@@ -16,6 +16,18 @@
     margin: 0 !important;
     padding: 0 !important;
   }
+
+  .accordion-table{
+    /* box-shadow: none !important;
+    background: transparent !important; */
+    border: none !important;
+  }
+  .accordion-subheader{
+    padding-left: 3rem !important;
+  }
+  .accordion-content{
+    padding-left: 2rem !important;
+  }
 }
 
 /* Primary and Surface Palettes */
