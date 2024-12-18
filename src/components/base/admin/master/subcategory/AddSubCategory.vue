@@ -3,7 +3,7 @@ import Select from "primevue/select";
 import { useToast } from 'primevue/usetoast';
 import { VendorStore } from '@/store/vendor'
 import { ServiceStore } from '@/store/service'
-
+import { CategoryService } from "@/service/CategoryService";
 
 const toast = useToast();
 const props = defineProps({
@@ -15,15 +15,13 @@ const props = defineProps({
 
 const emit = defineEmits(["on-close", "on-save"]);
 
-const $service = ServiceStore()
-const $vendor = VendorStore()
 const statuses = reactive([0, 1]);
-
+const categoryData = ref([]);
 
 const query = reactive({
     name: "",
     price: 0,
-    service: null,
+    category: null,
     status: null,
 })
 
@@ -66,12 +64,10 @@ function getStatusName(status: number) {
     }
 }
 
-const items = computed(() => {
-    return $service.serviceAll || [];
-});
-
 onMounted(async () => {
-    await $service.fetchService()
+    CategoryService.getCategory().then((data: any) => {
+        categoryData.value = data;
+    });
 })
 
 
@@ -84,18 +80,27 @@ onMounted(async () => {
         <InputText v-model="query.name" id="name" aria-describedby="name-help" placeholder="Nama Sub Kategori" />
     </div>
     <div class="flex flex-col gap-2 mb-4">
-        <label for="desc">Layanan</label>
-        <Select v-model="query.service" :options="items" placeholder="Pilih Layanan">
+        <label for="desc">Kategori</label>
+        <Select v-model="query.category" :options="categoryData" placeholder="Pilih Layanan">
             <template #value="slotProps">
-                <div v-if="slotProps.value != null" class="flex gap-4 items-center">
-                    <img :src="slotProps.value.image_url" alt="" class="h-4">
-                    <p class="m-0">{{ slotProps.value.name }}</p>
+                <div v-if="slotProps.value != null" class="flex gap-4 items-center ">
+                    <img :alt="slotProps.value.service.name" :src="slotProps.value.service.image_url"
+                        class=" align-middle w-10" />
+                    <div>
+                        <h6 class="m-0">{{ slotProps.value.name }}</h6>
+                        <p class="m-0 text-muted-color text-sm">{{ slotProps.value.service.name }}</p>
+                    </div>
                 </div>
+
             </template>
             <template #option="slotProps">
-                <div class="flex gap-4 items-center">
-                    <img :src="slotProps.option.image_url" alt="" class="h-4">
-                    <p class="m-0">{{ slotProps.option.name }}</p>
+                <div class="flex gap-4 items-center ">
+                    <img :alt="slotProps.option.service.name" :src="slotProps.option.service.image_url"
+                        class=" align-middle w-10" />
+                    <div>
+                        <h6 class="m-0">{{ slotProps.option.name }}</h6>
+                        <p class="m-0 text-muted-color text-sm">{{ slotProps.option.service.name }}</p>
+                    </div>
                 </div>
             </template>
         </Select>
