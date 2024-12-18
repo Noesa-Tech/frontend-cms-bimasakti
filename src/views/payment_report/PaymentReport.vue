@@ -1,5 +1,303 @@
-<script setup></script>
+<script setup lang="ts">
+
+import Accordion from 'primevue/accordion';
+import AccordionPanel from 'primevue/accordionpanel';
+import AccordionHeader from 'primevue/accordionheader';
+import AccordionContent from 'primevue/accordioncontent';
+
+import { PaymentReportService } from "@/service/PaymentReportService";
+import { FilterMatchMode, FilterOperator } from "@primevue/core/api";
+import DatePicker from "primevue/datepicker";
+import Select from "primevue/select";
+import { ServiceStore } from '@/store/service'
+
+const $service = ServiceStore()
+const paymentReportData = ref(null);
+const isLoading = ref<boolean>(false);
+const dt = ref();
+const filters = ref<any>({});
+const reactiveKey = ref<number>(0);
+const ladderStatus = ref<number[]>([1, 0])
+
+
+async function fetchAllService() {
+  await $service.fetchService()
+  reactiveKey.value += 1;
+}
+
+const serviceItems = computed(() => {
+  return $service.serviceAll || [];
+});
+
+function getSeverityLadder(status: number) {
+  switch (status) {
+    case 0:
+      return "danger";
+    case 1:
+      return "success";
+
+  }
+}
+
+function getStatusNameLadder(status: number) {
+  switch (status) {
+    case 0:
+      return "Tidak Butuh";
+    case 1:
+      return "Butuh";
+
+  }
+}
+
+onMounted(async () => {
+  await $service.fetchService()
+})
+
+onBeforeMount(() => {
+  PaymentReportService.getPaymentReportService().then((data: any) => {
+    paymentReportData.value = data;
+    isLoading.value = false;
+  });
+  initFilter();
+});
+
+function initFilter() {
+  filters.value = {
+    global: { value: null, matchMode: FilterMatchMode.CONTAINS },
+    'customer.name': { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
+    'customer.phone': { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
+    'customer.email': { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
+    'vendor.name': { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
+    'service.name': { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
+    'property.name': { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
+    paymentMethod: { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
+    description: { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
+    date: { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.DATE_IS }] },
+    useLadder: { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.EQUALS }] },
+  };
+}
+
+function formatDate(value: any) {
+  const date = new Date(value);
+  return date.toLocaleDateString("en-US", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+  });
+}
+
+const exportCSV = (event: any) => {
+  dt.value.exportCSV();
+};
+
+</script>
 <template>
   <TopBreadcrumb :breadcrumbItems="[{ label: 'Laporan Keuangan' }]" />
-  <div class="card mt-8">PEMBAYARAN GOES HERE</div>
+  <div class="grid grid-cols-12 gap-8 mt-8">
+    <div class="col-span-12 lg:col-span-6  xl:col-span-4">
+      <div class="card mb-0">
+        <div class="flex justify-between mb-4">
+          <div>
+            <span class="block text-muted-color font-medium mb-4">Transaksi Berhasil</span>
+            <div class="text-surface-900 dark:text-surface-0 font-medium text-xl">960</div>
+          </div>
+          <div class="flex items-center justify-center bg-blue-100 dark:bg-blue-400/10 rounded-border"
+            style="width: 2.5rem; height: 2.5rem">
+            <i class="pi pi-shopping-cart text-blue-500 !text-xl"></i>
+          </div>
+        </div>
+        <span class="text-primary font-medium">24 baru </span>
+        <span class="text-muted-color">dari kunjungan terakhir</span>
+      </div>
+    </div>
+    <div class="col-span-12 lg:col-span-6 xl:col-span-4">
+      <div class="card mb-0">
+        <div class="flex justify-between mb-4">
+          <div>
+            <span class="block text-muted-color font-medium mb-4">Pendapatan</span>
+            <div class="text-surface-900 dark:text-surface-0 font-medium text-xl">Rp{{ formatPrice(53450000) }}</div>
+          </div>
+          <div class="flex items-center justify-center bg-orange-100 dark:bg-orange-400/10 rounded-border"
+            style="width: 2.5rem; height: 2.5rem">
+            <i class="pi pi-dollar text-orange-500 !text-xl"></i>
+          </div>
+        </div>
+        <span class="text-primary font-medium">%12+ </span>
+        <span class="text-muted-color">dari bulan lalu</span>
+      </div>
+    </div>
+    <div class="col-span-12 lg:col-span-6 xl:col-span-4">
+      <div class="card mb-0">
+        <div class="flex justify-between mb-4">
+          <div>
+            <span class="block text-muted-color font-medium mb-4">Pelanggan</span>
+            <div class="text-surface-900 dark:text-surface-0 font-medium text-xl">890</div>
+          </div>
+          <div class="flex items-center justify-center bg-cyan-100 dark:bg-cyan-400/10 rounded-border"
+            style="width: 2.5rem; height: 2.5rem">
+            <i class="pi pi-users text-cyan-500 !text-xl"></i>
+          </div>
+        </div>
+        <span class="text-primary font-medium">12 </span>
+        <span class="text-muted-color">Pelanggan baru</span>
+      </div>
+    </div>
+
+  </div>
+  <div class="card mt-8">
+    <div class="font-semibold text-xl mb-4">Laporan Keuangan</div>
+    <DataTable ref="dt" :value="paymentReportData" rowGroupMode="rowspan" groupRowsBy="customer.name" :paginator="true"
+      :rows="10" dataKey="id" v-model:filters="filters" filterDisplay="menu" :loading="isLoading"
+      :globalFilterFields="['customer.name', 'customer.phone', 'customer.email', 'service.name', 'property.name', 'paymentMethod', 'price', 'useLadder', 'date']"
+      showGridlines>
+      <template #header>
+        <div class="flex items-center gap-4 justify-end md:order-2 order-1">
+          <div class="hidden md:flex"><Button type="button" icon="pi pi-download" outlined label="Unduh"
+              @click="exportCSV($event)" /></div>
+          <div class="flex md:hidden"><Button type="button" icon="pi pi-download" outlined /></div>
+          <IconField class="w-full md:w-auto">
+            <InputIcon>
+              <i class="pi pi-search" />
+            </InputIcon>
+            <InputText v-model="filters['global'].value" placeholder="Pencarian" fluid />
+          </IconField>
+        </div>
+      </template>
+      <template #empty> Tidak ada data Kategori. </template>
+      <template #loading> Memuat data Kategori. Mohon tunggu. </template>
+      <Column field="customer.name" header="Pelanggan" sortable>
+        <template #body="{ data }">
+          <div class="flex flex-col text-start w-full">
+            <h6 class="m-0">{{ data.customer.name }}</h6>
+            <p class="m-0 text-sm text-muted-color">+62-{{ data.customer.phone }}</p>
+            <p class="m-0 text-sm text-muted-color">{{ data.customer.email }}</p>
+          </div>
+        </template>
+        <template #filter="{ filterModel }">
+          <InputText v-model="filterModel.value" type="text" placeholder="Cari Pelanggan" />
+        </template>
+      </Column>
+      <Column field="service.name" header="Layanan" class="min-w-[32rem]" sortable>
+        <template #body="{ data }">
+          <Accordion value="0">
+            <AccordionPanel value="1" class="accordion-table">
+              <AccordionHeader>
+                <div class="flex items-center justify-start gap-4">
+                  <img :src="data.service.image_url" :alt="data.service.name" class="h-6">
+                  <span>{{ data.service.name }}</span>
+                </div>
+              </AccordionHeader>
+              <AccordionContent>
+                <Divider />
+                <Accordion value="0">
+                  <AccordionPanel v-for="subtab in data.service.problem" :key="subtab.name" :value="subtab.name">
+                    <AccordionHeader class="accordion-subheader">
+                      {{ subtab.name }}
+                    </AccordionHeader>
+                    <AccordionContent class="accordion-content">
+                      <!-- <Divider /> -->
+                      <div class="flex flex-col items-start text-start gap-2">
+                        <ol v-for="(item, index) in subtab.sub_problem" :key="index" class=" list-decimal list-inside">
+                          <li>{{ item.name }} (x{{ item.qty }}) • Rp{{ formatPrice(item.price) }}</li>
+                        </ol>
+                      </div>
+                    </AccordionContent>
+                  </AccordionPanel>
+                </Accordion>
+              </AccordionContent>
+            </AccordionPanel>
+          </Accordion>
+        </template>
+        <template #filter="{ filterModel }">
+          <InputText v-model="filterModel.value" type="text" placeholder="Cari Layanan" />
+        </template>
+      </Column>
+      <Column field="property.name" header="Jenis Property" class="min-w-[15rem]" sortable>
+        <template #body="{ data }">
+          <div>
+            <p class="m-0">
+              {{ data.property.name }}
+            </p>
+            <p class="m-0 text-sm text-muted-color">Rp{{ formatPrice(data.property.price) }}</p>
+          </div>
+        </template>
+        <template #filter="{ filterModel }">
+          <InputText v-model="filterModel.value" type="text" placeholder="Cari Property" />
+        </template>
+      </Column>
+      <Column header="Butuh Tangga" field="useLadder" :filterMenuStyle="{ width: '14rem' }" class="min-w-[15rem]"
+        sortable>
+        <template #body="{ data }">
+          <div>
+            <p class="m-0">
+              {{ getStatusNameLadder(data.useLadder) }}
+            </p>
+            <p class="m-0 text-sm text-muted-color">Rp{{ formatPrice(50000) }}</p>
+          </div>
+        </template>
+        <template #filter="{ filterModel }">
+          <Select v-model="filterModel.value" :options="ladderStatus" placeholder="Pilih" showClear>
+            <template #value="slotProps">
+              <Tag v-if="slotProps.value != null" :value="getStatusNameLadder(slotProps.value)"
+                :severity="getSeverityLadder(slotProps.value)" />
+            </template>
+            <template #option="slotProps">
+              <Tag :value="getStatusNameLadder(slotProps.option)" :severity="getSeverityLadder(slotProps.option)" />
+            </template>
+          </Select>
+        </template>
+      </Column>
+      <Column field="vendor.name" header="Vendor" class="min-w-[15rem]" sortable>
+        <template #body="{ data }">
+          <div class="flex flex-col text-start w-full">
+            <p class="m-0">{{ data.vendor.name }}</p>
+            <p class="m-0 text-sm text-muted-color">{{ data.vendor.code }}</p>
+          </div>
+        </template>
+        <template #filter="{ filterModel }">
+          <InputText v-model="filterModel.value" type="text" placeholder="Cari Vendor" />
+        </template>
+      </Column>
+      <Column header="Status" field="status" sortable>
+        <template #body="{ data }">
+          <Tag value="Selesai" severity="success" class="whitespace-nowrap" />
+        </template>
+
+      </Column>
+      <Column header="Total Harga" filterField="price" dataType="text" class="min-w-[12rem]" sortable>
+        <template #body="{ data }">
+          Rp{{ formatPrice(data.total) }}
+        </template>
+        <template #filter="{ filterModel }">
+          <InputNumber v-model="filterModel.value" type="text" placeholder="Cari Harga" inputId="currency-indonesia"
+            mode="currency" currency="IDR" locale="id-ID" :minFractionDigits="0" />
+        </template>
+      </Column>
+      <Column header="Metode Pembayaran" filterField="paymentMethod" dataType="text" class="min-w-[12rem]" sortable>
+        <template #body="{ data }">
+          {{ data.paymentMethod }}
+        </template>
+        <template #filter="{ filterModel }">
+          <InputText v-model="filterModel.value" type="text" placeholder="Cari Metode Pembayaran" />
+
+        </template>
+      </Column>
+      <Column header="Tanggal Transaksi" filterField="date" dataType="date" class="min-w-[12rem]" sortable>
+        <template #body="{ data }">
+          {{ formatDate(data.date) }}
+        </template>
+        <template #filter="{ filterModel }">
+          <DatePicker v-model="filterModel.value" dateFormat="mm/dd/yy" placeholder="mm/dd/yyyy" />
+        </template>
+      </Column>
+      <Column field="id" header="Action" bodyClass="text-center" class="min-w-[10rem]" sortable>
+        <template #body="{ data }">
+          <div class="flex gap-4 items-center">
+            <Button icon="pi pi-external-link" severity="info" text v-tooltip.bottom="'Detail Pesanan'" as="router-link"
+              :to="{ name: 'order-detail', params: { id: data.id } }" />
+          </div>
+        </template>
+      </Column>
+    </DataTable>
+  </div>
 </template>

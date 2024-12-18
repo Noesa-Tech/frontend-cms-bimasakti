@@ -7,6 +7,7 @@ export {}
 /* prettier-ignore */
 declare module 'vue' {
   export interface GlobalComponents {
+    Accordion: typeof import('primevue/accordion')['default']
     ACService: typeof import('./src/components/icons/services/ACService.vue')['default']
     AddBenefits: typeof import('./src/components/base/admin/master/benefits/AddBenefits.vue')['default']
     AddCategory: typeof import('./src/components/base/admin/master/category/AddCategory.vue')['default']

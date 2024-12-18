@@ -1,164 +1,164 @@
 <script setup>
-  import { OrderService } from "@/service/OrderService";
-  import { VendorService } from "@/service/VendorService";
-  import { FilterMatchMode, FilterOperator } from "@primevue/core/api";
-  import { onBeforeMount, reactive, ref } from "vue";
-  import DatePicker from "primevue/datepicker";
-  import Select from "primevue/select";
-  import MultiSelect from "primevue/multiselect";
-  import { useConfirm } from "primevue/useconfirm";
-  import { useToast } from "primevue/usetoast";
-  import ConfirmPopup from "primevue/confirmpopup";
-  import Popover from "primevue/popover";
+import { OrderService } from "@/service/OrderService";
+import { VendorService } from "@/service/VendorService";
+import { FilterMatchMode, FilterOperator } from "@primevue/core/api";
+import { onBeforeMount, reactive, ref } from "vue";
+import DatePicker from "primevue/datepicker";
+import Select from "primevue/select";
+import MultiSelect from "primevue/multiselect";
+import { useConfirm } from "primevue/useconfirm";
+import { useToast } from "primevue/usetoast";
+import ConfirmPopup from "primevue/confirmpopup";
+import Popover from "primevue/popover";
 
-  const op = ref();
-  const opPhone = ref();
-  const opCancelConfirm = ref();
-  const confirm = useConfirm();
-  const toast = useToast();
-  const dt = ref();
-  const orderData = ref(null);
-  const filters1 = ref(null);
-  const loading1 = ref(null);
-  const vendorsData = ref(null);
+const op = ref();
+const opPhone = ref();
+const opCancelConfirm = ref();
+const confirm = useConfirm();
+const toast = useToast();
+const dt = ref();
+const orderData = ref(null);
+const filters1 = ref(null);
+const loading1 = ref(null);
+const vendorsData = ref(null);
 
-  const statuses = reactive([1, 2, 3, 4, 5]);
-  const paymentMethods = reactive(["Transfer Bank", "Virtual Account(VA)", "GoPay", "OVO"]);
+const statuses = reactive([1, 2, 3, 4, 5]);
+const paymentMethods = reactive(["Transfer Bank", "Virtual Account(VA)", "GoPay", "OVO"]);
 
-  function getSeverity(status) {
-    switch (status) {
-      case 1:
-        return "contrast";
-      case 2:
-        return "secondary";
-      case 3:
-        return "warn";
-      case 4:
-        return "info";
-      case 5:
-        return "success";
-      case 6:
-        return "danger";
-    }
+function getSeverity(status) {
+  switch (status) {
+    case 1:
+      return "contrast";
+    case 2:
+      return "secondary";
+    case 3:
+      return "warn";
+    case 4:
+      return "info";
+    case 5:
+      return "success";
+    case 6:
+      return "danger";
   }
+}
 
-  function getStatusName(status) {
-    switch (status) {
-      case 1:
-        return "Menunggu Pembayaran";
-      case 2:
-        return "Diproses";
-      case 3:
-        return "Jasa Menuju Alamat";
-      case 4:
-        return "Memulai Pekerjaan";
-      case 5:
-        return "Selesai";
-      case 6:
-        return "Dibatalkan";
-    }
+function getStatusName(status) {
+  switch (status) {
+    case 1:
+      return "Menunggu Pembayaran";
+    case 2:
+      return "Diproses";
+    case 3:
+      return "Jasa Menuju Alamat";
+    case 4:
+      return "Memulai Pekerjaan";
+    case 5:
+      return "Selesai";
+    case 6:
+      return "Dibatalkan";
   }
+}
 
-  onBeforeMount(() => {
-    OrderService.getOrders().then((data) => {
-      orderData.value = data;
-      loading1.value = false;
-      orderData.value.forEach((order) => (order.date = new Date(order.date)));
-    });
-    VendorService.getVendors().then((data) => {
-      vendorsData.value = data;
-      loading1.value = false;
-      vendorsData.value.forEach((vendors) => (vendors.date = new Date(vendors.date)));
-    });
-
-    initFilters1();
+onBeforeMount(() => {
+  OrderService.getOrders().then((data) => {
+    orderData.value = data;
+    loading1.value = false;
+    orderData.value.forEach((order) => (order.date = new Date(order.date)));
+  });
+  VendorService.getVendors().then((data) => {
+    vendorsData.value = data;
+    loading1.value = false;
+    vendorsData.value.forEach((vendors) => (vendors.date = new Date(vendors.date)));
   });
 
-  function initFilters1() {
-    filters1.value = {
-      global: { value: null, matchMode: FilterMatchMode.CONTAINS },
-      noInvoice: { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
-      name: { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
-      email: { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
-      phone: { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
-      vendor: { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
-      // "location.address,  location.village,  location.distric,  location.city, location.country": {
-      //   operator: FilterOperator.AND,
-      //   constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }],
-      // },
-      date: { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.DATE_IS }] },
-      status: { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.EQUALS }] },
-      paymentMethod: { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.EQUALS }] },
-    };
-  }
+  initFilters1();
+});
 
-  function formatDate(value) {
-    return value.toLocaleDateString("en-US", {
-      day: "2-digit",
-      month: "2-digit",
-      year: "numeric",
-    });
-  }
+function initFilters1() {
+  filters1.value = {
+    global: { value: null, matchMode: FilterMatchMode.CONTAINS },
+    noInvoice: { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
+    name: { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
+    email: { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
+    phone: { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
+    vendor: { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
+    // "location.address,  location.village,  location.distric,  location.city, location.country": {
+    //   operator: FilterOperator.AND,
+    //   constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }],
+    // },
+    date: { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.DATE_IS }] },
+    status: { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.EQUALS }] },
+    paymentMethod: { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.EQUALS }] },
+  };
+}
 
-  const exportCSV = () => {
-    dt.value.exportCSV();
-  };
+function formatDate(value) {
+  return value.toLocaleDateString("en-US", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+  });
+}
 
-  const confirm2 = (event) => {
-    confirm.require({
-      target: event.currentTarget,
-      message: "Yakin ingin membatalkan pesanan ini?",
-      icon: "pi pi-info-circle",
-      rejectProps: {
-        label: "Batal",
-        severity: "secondary",
-        outlined: true,
-      },
-      acceptProps: {
-        label: "Yakin",
-        severity: "danger",
-      },
-      accept: () => {
-        toast.add({ severity: "info", summary: "Confirmed", detail: "Pesanan dibatalkan", life: 3000 });
-      },
-      reject: () => {
-        toast.add({ severity: "error", summary: "Rejected", detail: "You have rejected", life: 3000 });
-      },
-    });
-  };
-  const confirmNext = (event) => {
-    confirm.require({
-      target: event.currentTarget,
-      message: "Yakin ingin meneruskan pesanan ini kepada vendor 'PT Air Conditioner'?",
-      icon: "pi pi-info-circle",
-      rejectProps: {
-        label: "Batal",
-        severity: "secondary",
-        outlined: true,
-      },
-      acceptProps: {
-        label: "Teruskan",
-        severity: "success",
-      },
-      accept: () => {
-        toast.add({ severity: "info", summary: "Confirmed", detail: "Pesanan sudah diteruskan", life: 3000 });
-      },
-      // reject: () => {
-      //   toast.add({ severity: "error", summary: "Rejected", detail: "You have rejected", life: 3000 });
-      // },
-    });
-  };
+const exportCSV = () => {
+  dt.value.exportCSV();
+};
 
-  const toggle = (event) => {
-    op.value.toggle(event);
-  };
-  const togglePhone = (event) => {
-    opPhone.value.toggle(event);
-  };
-  const toggleConfirm = (event) => {
-    opCancelConfirm.value.toggle(event);
-  };
-  const expandedRows = ref({});
+const confirm2 = (event) => {
+  confirm.require({
+    target: event.currentTarget,
+    message: "Yakin ingin membatalkan pesanan ini?",
+    icon: "pi pi-info-circle",
+    rejectProps: {
+      label: "Batal",
+      severity: "secondary",
+      outlined: true,
+    },
+    acceptProps: {
+      label: "Yakin",
+      severity: "danger",
+    },
+    accept: () => {
+      toast.add({ severity: "info", summary: "Confirmed", detail: "Pesanan dibatalkan", life: 3000 });
+    },
+    reject: () => {
+      toast.add({ severity: "error", summary: "Rejected", detail: "You have rejected", life: 3000 });
+    },
+  });
+};
+const confirmNext = (event) => {
+  confirm.require({
+    target: event.currentTarget,
+    message: "Yakin ingin meneruskan pesanan ini kepada vendor 'PT Air Conditioner'?",
+    icon: "pi pi-info-circle",
+    rejectProps: {
+      label: "Batal",
+      severity: "secondary",
+      outlined: true,
+    },
+    acceptProps: {
+      label: "Teruskan",
+      severity: "success",
+    },
+    accept: () => {
+      toast.add({ severity: "info", summary: "Confirmed", detail: "Pesanan sudah diteruskan", life: 3000 });
+    },
+    // reject: () => {
+    //   toast.add({ severity: "error", summary: "Rejected", detail: "You have rejected", life: 3000 });
+    // },
+  });
+};
+
+const toggle = (event) => {
+  op.value.toggle(event);
+};
+const togglePhone = (event) => {
+  opPhone.value.toggle(event);
+};
+const toggleConfirm = (event) => {
+  opCancelConfirm.value.toggle(event);
+};
+const expandedRows = ref({});
 </script>
 <template>
   <TopBreadcrumb :breadcrumbItems="[{ label: 'Pesanan' }]" />
@@ -169,8 +169,9 @@
       :globalFilterFields="['noInvoice', 'name', 'email', 'items', 'phone', 'location', 'vendor', 'date', 'status']"
       showGridlines scrollable>
       <template #header>
-        <div class="flex flex-col md:flex-row items-center justify-between gap-4">
-          <h4 class="m-0 p-0"></h4>
+        <div class="flex flex-col md:flex-row justify-between gap-4">
+          <Button type="button" icon="pi pi-plus" label="Tambah Pesanan" class="md:order-1 order-2" as="router-link"
+            :to="{ name: 'orders-add' }" />
           <div class="flex items-center gap-4 md:order-2 order-1">
             <div class="hidden md:flex"><Button type="button" icon="pi pi-download" outlined label="Unduh"
                 @click="exportCSV($event)" /></div>
