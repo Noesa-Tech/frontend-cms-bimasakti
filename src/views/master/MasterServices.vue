@@ -15,6 +15,9 @@ const statuses = reactive([1, 0]);
 const filters = ref<any>({});
 const reactiveKey = ref<number>(0);
 
+const visibleEdit = ref<boolean>(false);
+const visibleAdd = ref<boolean>(false);
+
 function getSeverity(status: any) {
   return status ? "danger" : "success";
 }
@@ -23,7 +26,7 @@ function getStatusName(status: any) {
   return status ? "Tidak Tersedia" : "Tersedia";
 }
 
-async function fetchAllService(){
+async function fetchAllService() {
   await $service.fetchService()
   reactiveKey.value += 1;
 }
@@ -32,8 +35,8 @@ const items = computed(() => {
   return $service.serviceAll || [];
 });
 
-onMounted(async() => {
- await $service.fetchService()
+onMounted(async () => {
+  await $service.fetchService()
 })
 
 onBeforeMount(() => {
@@ -93,7 +96,8 @@ const confirm2 = (event: any) => {
       :globalFilterFields="['name', 'description', 'status', 'updated_at']" showGridlines scrollable>
       <template #header>
         <div class="flex flex-col md:flex-row justify-between gap-4">
-          <Button type="button" icon="pi pi-plus" label="Tambah Layanan" class="md:order-1 order-2" />
+          <Button type="button" icon="pi pi-plus" label="Tambah Layanan" class="md:order-1 order-2"
+            @click="visibleAdd = true" />
           <div class="flex items-center gap-4 md:order-2 order-1">
             <div class="hidden md:flex"><Button type="button" icon="pi pi-download" outlined label="Unduh"
                 @click="exportCSV()" /></div>
@@ -116,12 +120,12 @@ const confirm2 = (event: any) => {
         </template>
       </Column>
 
-      <Column sortable field="name" header="Nama Layanan" class="min-w-[15rem]">
+      <Column sortable field="name" header="Layanan" class="min-w-[15rem]">
         <template #body="{ data }">
           {{ data.name }}
         </template>
         <template #filter="{ filterModel }">
-          <InputText v-model="filterModel.value" type="text" placeholder="Cari Nama" />
+          <InputText v-model="filterModel.value" type="text" placeholder="Cari Layanan" />
         </template>
       </Column>
       <Column sortable field="description" header="Deskripsi" class="min-w-[15rem]">
@@ -131,18 +135,18 @@ const confirm2 = (event: any) => {
           </span>
         </template>
         <template #filter="{ filterModel }">
-          <InputText v-model="filterModel.value" type="text" placeholder="Cari Nama" />
+          <InputText v-model="filterModel.value" type="text" placeholder="Cari Deskripsi" />
         </template>
       </Column>
       <Column sortable header="Status" field="status" :filterMenuStyle="{ width: '14rem' }">
         <template #body="{ data }">
-          <Tag :value="getStatusName(data.deleted_at)" :severity="getSeverity(data.deleted_at)" class="whitespace-nowrap" />
+          <Tag :value="getStatusName(data.deleted_at)" :severity="getSeverity(data.deleted_at)"
+            class="whitespace-nowrap" />
         </template>
         <template #filter="{ filterModel }">
           <Select v-model="filterModel.value" :options="statuses" placeholder="Pilih" showClear>
             <template #value="slotProps">
-              <Tag v-if="slotProps.value" :value="getStatusName(slotProps.value)"
-                :severity="getSeverity(slotProps.value)" />
+              <Tag :value="getStatusName(slotProps.value)" :severity="getSeverity(slotProps.value)" />
             </template>
             <template #option="slotProps">
               <Tag :value="getStatusName(slotProps.option)" :severity="getSeverity(slotProps.option)" />
@@ -162,14 +166,19 @@ const confirm2 = (event: any) => {
       <Column sortable field="id" header="Action" bodyClass="text-center" class="min-w-[10rem]">
         <template #body="{ data }">
           <div class="flex gap-4 items-center">
-            <Button icon="pi pi-pencil" severity="info" text v-tooltip.bottom="'Ubah'" as="router-link"
-              :to="{ name: 'order-detail', params: { id: data.id } }" />
+            <Button icon="pi pi-pencil" severity="info" text v-tooltip.bottom="'Ubah'" @click="visibleEdit = true" />
 
-            <Button icon="pi pi-times" severity="danger" text v-tooltip.bottom="'Hapus'" @click="confirm2($event)" />
+            <Button icon="pi pi-trash" severity="danger" text v-tooltip.bottom="'Hapus'" @click="confirm2($event)" />
           </div>
         </template>
       </Column>
     </DataTable>
   </div>
   <ConfirmPopup></ConfirmPopup>
+  <Dialog v-model:visible="visibleAdd" maximizable modal header="Tambah Layanan" class=" sm:w-1/2 w-full ">
+    <AddService :serviceId="1" @on-close="visibleAdd = false" @on-save="visibleAdd = false" />
+  </Dialog>
+  <Dialog v-model:visible="visibleEdit" maximizable modal header="Ubah Layanan" class=" sm:w-1/2 w-full ">
+    <EditService :serviceId="1" @on-close="visibleEdit = false" @on-save="visibleEdit = false" />
+  </Dialog>
 </template>

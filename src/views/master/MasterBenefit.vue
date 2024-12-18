@@ -15,6 +15,8 @@ const filters = ref<any>({});
 const isLoading = ref<boolean>(false);
 const benefitData = ref(null);
 const statuses = reactive([1, 0]);
+const visibleEdit = ref<boolean>(false);
+const visibleAdd = ref<boolean>(false);
 
 function getSeverity(status: number) {
   switch (status) {
@@ -35,11 +37,6 @@ function getStatusName(status: number) {
 
   }
 }
-
-onMounted(() => {
-  console.log(toast);
-  toast.add({ severity: "info", summary: "Confirmed", detail: "Pesanan dibatalkan", life: 3000 });
-})
 
 onBeforeMount(() => {
   BenefitService.getBenefit().then((data: any) => {
@@ -87,10 +84,8 @@ const confirm2 = (event: any) => {
       severity: "danger",
     },
     accept: () => {
-      toast.add({ severity: "info", summary: "Confirmed", detail: "Pesanan dibatalkan", life: 3000 });
     },
     reject: () => {
-      toast.add({ severity: "error", summary: "Rejected", detail: "You have rejected", life: 3000 });
     },
   });
 };
@@ -101,10 +96,11 @@ const confirm2 = (event: any) => {
     <div class="font-semibold text-xl mb-4">Data Benefit</div>
     <DataTable ref="dt" :value="benefitData" rowGroupMode="rowspan" groupRowsBy="service.name" :paginator="true"
       :rows="10" dataKey="id" :rowHover="true" v-model:filters="filters" filterDisplay="menu" :loading="isLoading"
-      :globalFilterFields="['service.name','name', 'status', 'updated_at']" showGridlines>
+      :globalFilterFields="['service.name', 'name', 'status', 'updated_at']" showGridlines>
       <template #header>
         <div class="flex flex-col md:flex-row justify-between gap-4">
-          <Button type="button" icon="pi pi-plus" label="Tambah Benefit" class="md:order-1 order-2" />
+          <Button type="button" icon="pi pi-plus" label="Tambah Benefit" class="md:order-1 order-2"
+            @click="visibleAdd = true" />
           <div class="flex items-center gap-4 md:order-2 order-1">
             <div class="hidden md:flex"><Button type="button" icon="pi pi-download" outlined label="Unduh"
                 @click="exportCSV($event)" /></div>
@@ -128,15 +124,15 @@ const confirm2 = (event: any) => {
           </div>
         </template>
         <template #filter="{ filterModel }">
-          <InputText v-model="filterModel.value" type="text" placeholder="Cari Nama" />
+          <InputText v-model="filterModel.value" type="text" placeholder="Cari Layanan" />
         </template>
       </Column>
-      <Column field="name" header="Nama Benefit" class="min-w-[15rem]">
+      <Column field="name" header="Benefit" class="min-w-[15rem]">
         <template #body="{ data }">
           {{ data.name }}
         </template>
         <template #filter="{ filterModel }">
-          <InputText v-model="filterModel.value" type="text" placeholder="Cari Nama" />
+          <InputText v-model="filterModel.value" type="text" placeholder="Cari Benefit" />
         </template>
       </Column>
       <Column header="Status" field="status" :filterMenuStyle="{ width: '14rem' }">
@@ -146,8 +142,7 @@ const confirm2 = (event: any) => {
         <template #filter="{ filterModel }">
           <Select v-model="filterModel.value" :options="statuses" placeholder="Pilih" showClear>
             <template #value="slotProps">
-              <Tag v-if="slotProps.value" :value="getStatusName(slotProps.value)"
-                :severity="getSeverity(slotProps.value)" />
+              <Tag :value="getStatusName(slotProps.value)" :severity="getSeverity(slotProps.value)" />
             </template>
             <template #option="slotProps">
               <Tag :value="getStatusName(slotProps.option)" :severity="getSeverity(slotProps.option)" />
@@ -167,86 +162,19 @@ const confirm2 = (event: any) => {
       <Column field="id" header="Action" bodyClass="text-center" class="min-w-[10rem]">
         <template #body="{ data }">
           <div class="flex gap-4 items-center">
-            <Button icon="pi pi-pencil" severity="info" text v-tooltip.bottom="'Ubah'" as="router-link"
-              :to="{ name: 'order-detail', params: { id: data.id } }" />
+            <Button icon="pi pi-pencil" severity="info" text v-tooltip.bottom="'Ubah'" @click="visibleEdit = true" />
 
-            <Button icon="pi pi-times" severity="danger" text v-tooltip.bottom="'Hapus'" @click="confirm2($event)" />
+            <Button icon="pi pi-trash" severity="danger" text v-tooltip.bottom="'Hapus'" @click="confirm2($event)" />
           </div>
         </template>
       </Column>
     </DataTable>
-    <!-- <DataTable ref="dt" rowGroupMode="subheader" groupRowsBy="service.id" :value="benefitData"
-      :paginator="true" :rows="10" dataKey="id" :rowHover="true" v-model:filters="filters" filterDisplay="menu"
-      :loading="isLoading" :globalFilterFields="['name', 'status', 'updated_at']" showGridlines scrollable sortMode="single" sortField="service.name" :sortOrder="1">
-      
-      <template #header>
-        <div class="flex flex-col md:flex-row justify-between gap-4">
-          <Button type="button" icon="pi pi-plus" label="Tambah Benefit" class="md:order-1 order-2" />
-          <div class="flex items-center gap-4 md:order-2 order-1">
-            <div class="hidden md:flex"><Button type="button" icon="pi pi-download" outlined label="Unduh"
-                @click="exportCSV($event)" /></div>
-            <div class="flex md:hidden"><Button type="button" icon="pi pi-download" outlined /></div>
-            <IconField class="w-full md:w-auto">
-              <InputIcon>
-                <i class="pi pi-search" />
-              </InputIcon>
-              <InputText v-model="filters['global'].value" placeholder="Pencarian" fluid />
-            </IconField>
-          </div>
-        </div>
-      </template>
-      <template #empty> Tidak ada data Benefit. </template>
-      <template #loading> Memuat data Benefit. Mohon tunggu. </template>
-      <template #groupheader="slotProps">
-        <div class="flex items-center gap-2">
-          <img :alt="slotProps.data.service.name" :src="slotProps.data.service.image_url" class="w-10" />
-          <span>{{ slotProps.data.service.name }}</span>
-        </div>
-      </template>
-      <Column field="name" header="Nama Benefit" class="min-w-[15rem]">
-        <template #body="{ data }">
-          {{ data.name }}
-        </template>
-        <template #filter="{ filterModel }">
-          <InputText v-model="filterModel.value" type="text" placeholder="Cari Nama" />
-        </template>
-      </Column>
-      <Column header="Status" field="status" :filterMenuStyle="{ width: '14rem' }">
-        <template #body="{ data }">
-          <Tag :value="getStatusName(data.status)" :severity="getSeverity(data.status)" class="whitespace-nowrap" />
-        </template>
-        <template #filter="{ filterModel }">
-          <Select v-model="filterModel.value" :options="statuses" placeholder="Pilih" showClear>
-            <template #value="slotProps">
-              <Tag v-if="slotProps.value" :value="getStatusName(slotProps.value)"
-                :severity="getSeverity(slotProps.value)" />
-            </template>
-            <template #option="slotProps">
-              <Tag :value="getStatusName(slotProps.option)" :severity="getSeverity(slotProps.option)" />
-            </template>
-          </Select>
-        </template>
-      </Column>
-
-      <Column header="Terakhir Update" filterField="updated_at" dataType="date" class="min-w-[12rem]">
-        <template #body="{ data }">
-          {{ formatDate(data.updated_at) }}
-        </template>
-        <template #filter="{ filterModel }">
-          <DatePicker v-model="filterModel.value" dateFormat="mm/dd/yy" placeholder="mm/dd/yyyy" />
-        </template>
-      </Column>
-      <Column field="id" header="Action" bodyClass="text-center" class="min-w-[10rem]">
-        <template #body="{ data }">
-          <div class="flex gap-4 items-center">
-            <Button icon="pi pi-pencil" severity="info" text v-tooltip.bottom="'Ubah'" as="router-link"
-              :to="{ name: 'order-detail', params: { id: data.id } }" />
-
-            <Button icon="pi pi-times" severity="danger" text v-tooltip.bottom="'Hapus'" @click="confirm2($event)" />
-          </div>
-        </template>
-      </Column>
-    </DataTable> -->
   </div>
   <ConfirmPopup></ConfirmPopup>
+  <Dialog v-model:visible="visibleAdd" maximizable modal header="Tambah Benefit" class=" sm:w-1/2 w-full ">
+    <AddBenefits :benefitsId="1" @on-close="visibleAdd = false" @on-save="visibleAdd = false" />
+  </Dialog>
+  <Dialog v-model:visible="visibleEdit" maximizable modal header="Ubah Benefit" class=" sm:w-1/2 w-full ">
+    <EditBenefits :benefitsId="1" @on-close="visibleEdit = false" @on-save="visibleEdit = false" />
+  </Dialog>
 </template>
