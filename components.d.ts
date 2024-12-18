@@ -52,7 +52,6 @@ declare module 'vue' {
     Row: typeof import('primevue/row')['default']
     Salon: typeof import('./src/components/icons/upcoming-features/salon.vue')['default']
     SecurityService: typeof import('./src/components/icons/services/SecurityService.vue')['default']
-    Skeleton: typeof import('primevue/skeleton')['default']
     SolarService: typeof import('./src/components/icons/services/SolarService.vue')['default']
     Tag: typeof import('primevue/tag')['default']
     Textarea: typeof import('primevue/textarea')['default']
