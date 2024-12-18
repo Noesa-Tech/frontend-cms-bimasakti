@@ -3,7 +3,6 @@ import Select from "primevue/select";
 import { useToast } from 'primevue/usetoast';
 import { VendorStore } from '@/store/vendor'
 
-const toast = useToast();
 const props = defineProps({
   city: {
     type: Array as PropType<{ code: any; name: any }[]>,
@@ -55,7 +54,6 @@ async function onSave(){
     </div>
   </div>
   <div class="flex justify-end gap-2 mt-6">
-    <Toast />
     <Button type="button" label="Batal" text severity="secondary" @click="emit('on-close')"></Button>
     <Button type="button" label="Simpan" @click="onSave()"></Button>
   </div>

@@ -1,5 +1,6 @@
 import api from '@/api/api'
 import { defineStore } from 'pinia'
+import * as toast from '@/composables/toast'
 
 export const VendorStore = defineStore('VendorStore', {
     state: () => ({
@@ -32,6 +33,9 @@ export const VendorStore = defineStore('VendorStore', {
             this.isLoading = true
             try {
                 const res = await api.post('/auth/vendor', data)
+
+                // @ts-ignore
+                toast.success('success', res.message)
             } catch (err) {
             } finally {
                 this.isLoading = false
@@ -40,7 +44,22 @@ export const VendorStore = defineStore('VendorStore', {
         async update(vendorId:Number, data:any) {
             this.isLoading = true
             try {
-                await api.post(`/auth/vendor/${vendorId}`, data)
+                const res = await api.post(`/auth/vendor/${vendorId}`, data)
+
+                 // @ts-ignore
+                 toast.success('success', res.message)
+            } catch (err) {
+            } finally {
+                this.isLoading = false
+            }
+        },
+        async delete(vendorId:Number) {
+            this.isLoading = true
+            try {
+                const res = await api.delete(`/auth/vendor/${vendorId}`)
+
+                 // @ts-ignore
+                toast.success('success', res.message)
             } catch (err) {
             } finally {
                 this.isLoading = false

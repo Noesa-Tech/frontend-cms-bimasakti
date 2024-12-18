@@ -1,14 +1,10 @@
 <script setup lang="ts">
 import AddVendor from "./AddVendor.vue";
 import EditVendor from "./EditVendor.vue";
-import { VendorService } from "@/service/VendorService";
 import { FilterMatchMode, FilterOperator } from "@primevue/core/api";
-import { onBeforeMount, reactive, ref } from "vue";
 import DatePicker from "primevue/datepicker";
 import Select from "primevue/select";
-import MultiSelect from "primevue/multiselect";
 import { useConfirm } from "primevue/useconfirm";
-import { useToast } from "primevue/usetoast";
 import ConfirmPopup from "primevue/confirmpopup";
 import Popover from "primevue/popover";
 
@@ -21,8 +17,8 @@ const $vendor = VendorStore()
 const $service = ServiceStore()
 const $location = LocationStore()
 const confirm = useConfirm();
-const toast = useToast();
 
+const reactiveKey = ref<number>(0);
 const selectedId = ref<number | null>(null)
 const visibleAdd = ref<boolean>(false);
 const visibleEdit = ref<boolean>(false);
@@ -43,6 +39,7 @@ const items = computed(() => {
     location: item.address,
     date: item.created_at,
     status: item.deleted_at,
+    city : item.city,
     services: item.vendor_service
   }));
 });
@@ -75,19 +72,10 @@ function getStatusName(status:any) {
 
 async function fetchVendor(){
   await $vendor.fetchVendor()
+  reactiveKey.value += 1;
 }
 
 onMounted(async () => {
-
-  toast .add({})
-
-  toast.add({
-    severity: 'success',
-    summary: 'Mounted Success',
-    detail: 'This toast appears after mounting',
-    life: 3000
-  });
-
   await $location.fetchCity(0)
   await $service.fetchService()
   await $vendor.fetchVendor()
@@ -105,10 +93,10 @@ const exportCSV = (e:any) => {
   dt.value.exportCSV();
 };
 
-const confirm2 = (event:any) => {
+const confirm2 = (vendorId:any) => {
   confirm.require({
-    target: event.currentTarget,
-    message: "Yakin ingin menhapus data ini?",
+    target: vendorId.currentTarget,
+    message: "Yakin ingin menghapus data ini?",
     icon: "pi pi-info-circle",
     rejectProps: {
       label: "Batal",
@@ -119,11 +107,11 @@ const confirm2 = (event:any) => {
       label: "Hapus",
       severity: "danger",
     },
-    accept: () => {
-      toast.add({ severity: 'success', summary: 'Success Message', detail: 'Message Content', life: 3000 });
+    accept: async() => {
+      await $vendor.delete(vendorId)
+      await $vendor.fetchVendor()
     },
     reject: () => {
-      toast.add({ severity: "error", summary: "Rejected", detail: "You have rejected", life: 3000 });
     },
   });
 };
@@ -140,14 +128,13 @@ const setPopoverRef = (vendorId: number, el: HTMLElement | null) => {
 };
 </script>
 <template>
-   <Toast />
   <TopBreadcrumb :breadcrumbItems="[{ label: 'Data Vendor' }]" />
   <div class="card mt-8">
     <div class="font-semibold text-xl mb-4">Data Vendor</div>
     <DataTable
       v-model:selection="selectedvendorsData"
       ref="dt"
-      :key="items.length"
+      :key="reactiveKey"
       :loading="$vendor.isLoading"
       :value="items"
       :paginator="true"
@@ -186,10 +173,10 @@ const setPopoverRef = (vendorId: number, el: HTMLElement | null) => {
           <InputText v-model="filterModel.value" type="text" placeholder="Search by name" />
         </template>
       </Column>
-      <Column sortable header="Lokasi" filterField="location" style="min-width: 12rem">
+      <Column sortable header="Lokasi" filterField="location">
         <template #body="{ data }">
-          <div class="truncate-text">
-          {{ data.location }}
+          <div>
+          {{ data.city?.nama }}
         </div>
         </template>
         <template #filter="{ filterModel }">
@@ -266,9 +253,5 @@ const setPopoverRef = (vendorId: number, el: HTMLElement | null) => {
   overflow: hidden;
   text-overflow: ellipsis;
   max-width: 350px; 
-}
-
-.p-toast {
-  z-index: 9999 !important;  /* Ensures toast appears above other elements */
 }
 </style>

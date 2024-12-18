@@ -1,5 +1,5 @@
 import axios from 'axios'
-import { useToast } from 'vue-toastification'
+import eventBus from '@/composables/eventBus';
 
 const Api = axios.create({
   baseURL: 'https://api-bimasakti.noesatech.com/api/v1',
@@ -10,8 +10,10 @@ Api.defaults.headers.common['Access-Control-Allow-Origin'] = '*'
 // Request interceptor
 Api.interceptors.request.use(
   (req) => {
-    if (localStorage.getItem('AuthStore')) {
-      req.headers.Authorization = `Bearer ${JSON.parse(localStorage.getItem('AuthStore')).token}`
+    const authStore = localStorage.getItem('AuthStore');
+    if (authStore) {
+      const parsedAuthStore = JSON.parse(authStore);
+      req.headers.Authorization = `Bearer ${parsedAuthStore.token}`;
     }
     return req
   },
@@ -24,22 +26,19 @@ Api.interceptors.request.use(
 // Response interceptor
 Api.interceptors.response.use(
   (response) => {
-    const toast = useToast()
     if (response.status === 200) {
       if (response.data.status) {
         return response.data
       }
-
       if (!response.data.status) {
-        const toast = useToast()
         if (Array.isArray(response.data.message)) {
-          response.data.message.forEach((msg) => {
-            toast.error(msg)
+          response.data.message.forEach((msg : any) => {
+            eventBus.showToast = { type: 'error', message: msg };
           })
 
           return
         } else {
-          return toast.error(response.data.message)
+          eventBus.showToast = { type: 'error', message: response.data.message };
         }
 
         return Promise.reject(response.data.message)
@@ -47,21 +46,19 @@ Api.interceptors.response.use(
     }
   },
   (error) => {
-    const toast = useToast()
-
     // Handle error responses
     // For example, you can check for specific error codes or network errors
     if (error.response) {
       if (error.response.status > 400) {
-        toast.error(error.response.data.message)
+        eventBus.showToast = { type: 'error', message: error.response.data.message };
         return Promise.reject(error.response.data.message)
       }
 
       if (error.response.status === 400) {
         for (const fieldName in error.response.data.data) {
-          toast.error(error.response.data.data[fieldName][0])
+          eventBus.showToast = { type: 'error', message: error.response.data.data[fieldName][0] };
         }
-
+        
         return Promise.reject(error.response.data.message)
       }
     } else if (error.request) {
@@ -69,7 +66,7 @@ Api.interceptors.response.use(
       return Promise.reject(error.request)
     } else {
       // Other errors
-      toast.error(error.message)
+      eventBus.showToast = { type: 'error', message: error.message };
       return Promise.reject(error.message)
     }
   }

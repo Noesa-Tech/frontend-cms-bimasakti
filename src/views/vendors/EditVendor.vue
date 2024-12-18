@@ -72,7 +72,7 @@ watch(() => props.vendorId, fetchDetailVendor, { immediate: true });
     </div>
   </div>
   <div class="flex justify-end gap-2 mt-6">
-    <Toast />
+
     <Button type="button" label="Batal" text severity="secondary" @click="emit('on-close')"></Button>
     <Button type="button" label="Simpan" @click="onSave()"></Button>
   </div>

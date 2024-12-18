@@ -1,5 +1,7 @@
 <script setup lang="ts">
 import { useLayout } from "@/components/base/admin/composables/layout";
+import eventBus from '@/composables/eventBus';
+import * as toast from '@/composables/toast'
 
 const { layoutConfig, layoutState, isSidebarActive, resetMenu } = useLayout();
 
@@ -46,7 +48,7 @@ function isOutsideClicked(event: MouseEvent): boolean {
   const topbarEl = document.querySelector(".layout-menu-button");
 
   if (!sidebarEl || !topbarEl) {
-    return true; 
+    return true;
   }
 
   const target = event.target as Node | null;
@@ -56,9 +58,19 @@ function isOutsideClicked(event: MouseEvent): boolean {
     (topbarEl.isSameNode(target) || topbarEl.contains(target))
   );
 }
+
+// LISTEN TOAST UNTUK HANDLE API ERROR
+watch(() => eventBus.showToast, (newToast) => {
+  if (newToast) {
+    if (newToast.type === "error") {
+      toast.error('error', newToast.message)
+    }
+  }
+});
 </script>
 
 <template>
+   <Toast />
   <div v-if="$route.meta.requiresAuth" class="layout-wrapper" :class="containerClass">
     <app-topbar></app-topbar>
     <app-sidebar></app-sidebar>
@@ -72,11 +84,35 @@ function isOutsideClicked(event: MouseEvent): boolean {
     </div>
     <div class="layout-mask animate-fadein"></div>
   </div>
-  
+
   <div v-else>
     <keep-alive>
-    <router-view></router-view>
-  </keep-alive>
+      <router-view></router-view>
+    </keep-alive>
   </div>
-  <Toast />
 </template>
+
+<style>
+.p-toast.p-component.p-toast-top-right {
+  position: fixed;
+  top: 10px;
+  right: 10px;
+  z-index: 9999;
+  max-width: 100%;
+  margin-top: 0;
+}
+
+@media (max-width: 768px) {
+  .p-toast.p-component.p-toast-top-right {
+    top: 5%;
+    right: 5%;
+  }
+}
+
+@media (max-width: 480px) {
+  .p-toast.p-component.p-toast-top-right {
+    top: 3%;
+    right: 3%;
+  }
+}
+</style>

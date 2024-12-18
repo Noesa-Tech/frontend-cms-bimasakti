@@ -37,7 +37,7 @@ const MyPreset = definePreset(Aura, {
   },
 });
 
-const app = createApp(App);
+export const app = createApp(App);
 
 const pinia = createPinia()
 pinia.use(piniaPersistedstate)
@@ -48,6 +48,7 @@ pinia.use(piniaPersistedstate)
 app.use(ConfirmationService);
 app.use(ToastService);
 app.component('Toast', Toast);
+app.config.globalProperties.toast = useToast();
 app.directive("tooltip", Tooltip);
 app.directive("animateonscroll", AnimateOnScroll);
 app.directive("ripple", Ripple);
