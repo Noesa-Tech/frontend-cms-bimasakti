@@ -95,6 +95,15 @@ const routes = [
     },
   },
   {
+    path: "/pesanan/tambah",
+    name: "orders-add",
+    component: () => import("@/views/orders/order_add/OrderAdd.vue"),
+    meta: {
+      requiresAuth: true,
+      title: "Tambah Pesanan",
+    },
+  },
+  {
     path: "/pesanan/:id",
     name: "order-detail",
     component: () => import("@/views/orders/order-detail/OrderDetail.vue"),

@@ -71,9 +71,13 @@
     });
   }
 
-  const exportCSV = () => {
-    dt.value.exportCSV();
-  };
+function formatDate(value) {
+  return value.toLocaleDateString("en-US", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+  });
+}
 
   const confirm2 = (event:any) => {
     confirm.require({
@@ -149,8 +153,9 @@ const setPopoverRef = (orderId: number, el: HTMLElement | null) => {
       :globalFilterFields="['noInvoice', 'name', 'email', 'items', 'phone', 'location', 'vendor', 'date', 'status']"
       showGridlines scrollable>
       <template #header>
-        <div class="flex flex-col md:flex-row items-center justify-between gap-4">
-          <h4 class="m-0 p-0"></h4>
+        <div class="flex flex-col md:flex-row justify-between gap-4">
+          <Button type="button" icon="pi pi-plus" label="Tambah Pesanan" class="md:order-1 order-2" as="router-link"
+            :to="{ name: 'orders-add' }" />
           <div class="flex items-center gap-4 md:order-2 order-1">
             <div class="hidden md:flex"><Button type="button" icon="pi pi-download" outlined label="Unduh"
                 @click="exportCSV()" /></div>
