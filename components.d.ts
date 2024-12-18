@@ -7,7 +7,6 @@ export {}
 /* prettier-ignore */
 declare module 'vue' {
   export interface GlobalComponents {
-    Accordion: typeof import('primevue/accordion')['default']
     ACService: typeof import('./src/components/icons/services/ACService.vue')['default']
     AddBenefits: typeof import('./src/components/base/admin/master/benefits/AddBenefits.vue')['default']
     AddCategory: typeof import('./src/components/base/admin/master/category/AddCategory.vue')['default']
@@ -18,7 +17,6 @@ declare module 'vue' {
     AppSidebar: typeof import('./src/components/base/admin/AppSidebar.vue')['default']
     AppTopbar: typeof import('./src/components/base/admin/AppTopbar.vue')['default']
     Aquarium: typeof import('./src/components/icons/upcoming-features/aquarium.vue')['default']
-    Badge: typeof import('primevue/badge')['default']
     Bathroom: typeof import('./src/components/icons/Bathroom.vue')['default']
     Breadcrumb: typeof import('primevue/breadcrumb')['default']
     Button: typeof import('primevue/button')['default']
@@ -27,7 +25,6 @@ declare module 'vue' {
     CleaningService: typeof import('./src/components/icons/services/CleaningService.vue')['default']
     Column: typeof import('primevue/column')['default']
     ColumnGroup: typeof import('primevue/columngroup')['default']
-    copy: typeof import('./src/components/base/admin/master/services/EditService copy.vue')['default']
     DataTable: typeof import('primevue/datatable')['default']
     Dialog: typeof import('primevue/dialog')['default']
     Divider: typeof import('primevue/divider')['default']
@@ -37,7 +34,6 @@ declare module 'vue' {
     EditSubCategory: typeof import('./src/components/base/admin/master/subcategory/EditSubCategory.vue')['default']
     ElectricityService: typeof import('./src/components/icons/services/ElectricityService.vue')['default']
     EmptyWidget: typeof import('./src/components/esentials/EmptyWidget.vue')['default']
-    FileUpload: typeof import('primevue/fileupload')['default']
     FloorAndCarpet: typeof import('./src/components/icons/FloorAndCarpet.vue')['default']
     Footer: typeof import('./src/components/base/Footer.vue')['default']
     HewanPeliharaan: typeof import('./src/components/icons/upcoming-features/hewan-peliharaan.vue')['default']
@@ -59,7 +55,6 @@ declare module 'vue' {
     PembuatanPerawatanTaman: typeof import('./src/components/icons/upcoming-features/pembuatan-perawatan-taman.vue')['default']
     PerbaikanAlatListrik: typeof import('./src/components/icons/upcoming-features/perbaikan-alat-listrik.vue')['default']
     PerbaikanSaluran: typeof import('./src/components/icons/upcoming-features/perbaikan-saluran.vue')['default']
-    ProgressBar: typeof import('primevue/progressbar')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
     Row: typeof import('primevue/row')['default']
