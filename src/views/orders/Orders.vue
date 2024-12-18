@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
   import { OrderService } from "@/service/OrderService";
   import { VendorService } from "@/service/VendorService";
   import { FilterMatchMode, FilterOperator } from "@primevue/core/api";
@@ -11,88 +11,59 @@
   import ConfirmPopup from "primevue/confirmpopup";
   import Popover from "primevue/popover";
 
-  const op = ref();
+  import { OrderStore } from '@/store/order'
+
+  const popovers = ref<Record<number, HTMLElement | null>>({}); 
   const opPhone = ref();
   const opCancelConfirm = ref();
   const confirm = useConfirm();
   const toast = useToast();
   const dt = ref();
-  const orderData = ref(null);
-  const filters1 = ref(null);
-  const loading1 = ref(null);
-  const vendorsData = ref(null);
+  const $order = OrderStore()
 
-  const statuses = reactive([1, 2, 3, 4, 5]);
-  const paymentMethods = reactive(["Transfer Bank", "Virtual Account(VA)", "GoPay", "OVO"]);
-
-  function getSeverity(status) {
-    switch (status) {
-      case 1:
-        return "contrast";
-      case 2:
-        return "secondary";
-      case 3:
-        return "warn";
-      case 4:
-        return "info";
-      case 5:
-        return "success";
-      case 6:
-        return "danger";
-    }
-  }
-
-  function getStatusName(status) {
-    switch (status) {
-      case 1:
-        return "Menunggu Pembayaran";
-      case 2:
-        return "Diproses";
-      case 3:
-        return "Jasa Menuju Alamat";
-      case 4:
-        return "Memulai Pekerjaan";
-      case 5:
-        return "Selesai";
-      case 6:
-        return "Dibatalkan";
-    }
-  }
-
-  onBeforeMount(() => {
-    OrderService.getOrders().then((data) => {
-      orderData.value = data;
-      loading1.value = false;
-      orderData.value.forEach((order) => (order.date = new Date(order.date)));
-    });
-    VendorService.getVendors().then((data) => {
-      vendorsData.value = data;
-      loading1.value = false;
-      vendorsData.value.forEach((vendors) => (vendors.date = new Date(vendors.date)));
-    });
-
-    initFilters1();
-  });
-
-  function initFilters1() {
-    filters1.value = {
+  const reactiveKey = ref<number>(0);
+  const filters1 = ref<any>({
       global: { value: null, matchMode: FilterMatchMode.CONTAINS },
       noInvoice: { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
       name: { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
       email: { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
       phone: { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
       vendor: { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
-      // "location.address,  location.village,  location.distric,  location.city, location.country": {
-      //   operator: FilterOperator.AND,
-      //   constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }],
-      // },
       date: { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.DATE_IS }] },
       status: { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.EQUALS }] },
       paymentMethod: { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.EQUALS }] },
-    };
+  });
+
+  const statuses = reactive([1, 2, 3, 4, 5]);
+  const paymentMethods = reactive(["Transfer Bank", "Virtual Account(VA)", "GoPay", "OVO"]);
+
+  function getSeverity(status: string) {
+    if(status === "order_confirmed"){
+      return "contrast";
+    }else if(status === "in_process"){
+      return "warn";
+    }else if(status === "on_the_way"){
+      return "info";
+    }else if(status === "work_started"){
+      return "help";
+    }else if(status === "waiting_for_payment"){
+      return "secondary";
+    }else if(status === "completed"){
+      return "success";
+    }else{
+      "unknown"
+    }
   }
 
-  function formatDate(value) {
+  const items = computed(() => {
+    return $order.allOrder || []
+  });
+
+  onMounted(async() => {
+    await $order.fetchOrder()
+  })
+
+  function formatDate(value:any) {
     return value.toLocaleDateString("en-US", {
       day: "2-digit",
       month: "2-digit",
@@ -104,7 +75,7 @@
     dt.value.exportCSV();
   };
 
-  const confirm2 = (event) => {
+  const confirm2 = (event:any) => {
     confirm.require({
       target: event.currentTarget,
       message: "Yakin ingin membatalkan pesanan ini?",
@@ -126,7 +97,7 @@
       },
     });
   };
-  const confirmNext = (event) => {
+  const confirmNext = (event:any) => {
     confirm.require({
       target: event.currentTarget,
       message: "Yakin ingin meneruskan pesanan ini kepada vendor 'PT Air Conditioner'?",
@@ -141,17 +112,25 @@
         severity: "success",
       },
       accept: () => {
-        toast.add({ severity: "info", summary: "Confirmed", detail: "Pesanan sudah diteruskan", life: 3000 });
+        
       },
-      // reject: () => {
-      //   toast.add({ severity: "error", summary: "Rejected", detail: "You have rejected", life: 3000 });
-      // },
+      reject: () => {
+        
+      },
     });
   };
 
-  const toggle = (event) => {
-    op.value.toggle(event);
-  };
+  const toggle = (event: any, orderId: number) => {
+  const popoverRef = popovers.value[orderId];
+  if (popoverRef) {
+    (popoverRef as any).toggle(event);
+  }
+};
+
+const setPopoverRef = (orderId: number, el: HTMLElement | null) => {
+  popovers.value[orderId] = el;
+};
+
   const togglePhone = (event) => {
     opPhone.value.toggle(event);
   };
@@ -164,8 +143,9 @@
   <TopBreadcrumb :breadcrumbItems="[{ label: 'Pesanan' }]" />
   <div class="card mt-8">
     <div class="font-semibold text-xl mb-4">Data Pesanan</div>
-    <DataTable ref="dt" v-model:expandedRows="expandedRows" :value="orderData" :paginator="true" :rows="10" dataKey="id"
-      :rowHover="true" v-model:filters="filters1" filterDisplay="menu" :loading="loading1" :filters="filters1"
+    <!-- :filters="filters1" -->
+    <DataTable ref="dt" :key="reactiveKey" v-model:expandedRows="expandedRows" :value="items" :paginator="true" :rows="10" dataKey="id"
+      :rowHover="true" v-model:filters="filters1" filterDisplay="menu" :loading="$order.isLoading"
       :globalFilterFields="['noInvoice', 'name', 'email', 'items', 'phone', 'location', 'vendor', 'date', 'status']"
       showGridlines scrollable>
       <template #header>
@@ -173,7 +153,7 @@
           <h4 class="m-0 p-0"></h4>
           <div class="flex items-center gap-4 md:order-2 order-1">
             <div class="hidden md:flex"><Button type="button" icon="pi pi-download" outlined label="Unduh"
-                @click="exportCSV($event)" /></div>
+                @click="exportCSV()" /></div>
             <div class="flex md:hidden"><Button type="button" icon="pi pi-download" outlined /></div>
             <IconField class="w-full md:w-auto">
               <InputIcon>
@@ -184,12 +164,12 @@
           </div>
         </div>
       </template>
-      <template #empty> No customers found. </template>
-      <template #loading> Loading customers data. Please wait. </template>
+      <template #empty> No order found. </template>
+      <template #loading> Loading order data. Please wait. </template>
       <Column expander class="w-[5rem]" />
       <Column sortable field="noInvoice" header="Invoice" class="min-w-[15rem]">
         <template #body="{ data }">
-          {{ data.noInvoice }}
+          {{ data.invoice }}
         </template>
         <template #filter="{ filterModel }">
           <InputText v-model="filterModel.value" type="text" placeholder="Cari Invoice" />
@@ -197,7 +177,7 @@
       </Column>
       <Column sortable field="name" header="Nama Pemesan" class="min-w-[15rem]">
         <template #body="{ data }">
-          {{ data.name }}
+          {{ data.user.name }}
         </template>
         <template #filter="{ filterModel }">
           <InputText v-model="filterModel.value" type="text" placeholder="Cari Nama" />
@@ -205,7 +185,7 @@
       </Column>
       <Column sortable field="email" header="Email" class="min-w-[15rem]">
         <template #body="{ data }">
-          {{ data.email }}
+          {{ data.user.email }}
         </template>
         <template #filter="{ filterModel }">
           <InputText v-model="filterModel.value" type="text" placeholder="Cari Email" />
@@ -213,7 +193,7 @@
       </Column>
       <Column sortable field="phone" header="Nomor Hp" class="min-w-[15rem]">
         <template #body="{ data }">
-          <Button :label="'+' + data.phone" text @click="togglePhone" iconPos="right" icon="pi pi-angle-down" />
+          <Button :label="data.user.phone" text @click="togglePhone" iconPos="right" icon="pi pi-angle-down" />
           <Popover ref="opPhone">
             <div class="flex flex-col gap-4 w-[25rem]">
               <div>
@@ -221,7 +201,7 @@
                 <Divider />
               </div>
               <InputGroup>
-                <InputText :value="'+' + data.phone" readonly class="w-[25rem]"></InputText>
+                <InputText :value="data.user.phone" readonly class="w-[25rem]"></InputText>
                 <InputGroupAddon>
                   <Button icon="pi pi-phone" />
                 </InputGroupAddon>
@@ -246,8 +226,9 @@
       <Column sortable header="Lokasi" filterField="location" class="min-w-[20rem]">
         <template #body="{ data }">
           <p>
-            {{ data.location.address }},{{ data.location.village }},{{ data.location.distric }},{{ data.location.city
-            }},{{ data.location.country }}
+            {{ data.location }}
+            <!-- {{ data.location.address }},{{ data.location.village }},{{ data.location.distric }},{{ data.location.city
+            }},{{ data.location.country }} -->
           </p>
         </template>
         <template #filter="{ filterModel }">
@@ -262,58 +243,57 @@
       </Column>
       <Column sortable header="Layanan" filterField="items" class="min-w-[12rem]">
         <template #body="{ data }">
-          <Button @click="toggle" :label="data.items.length + ' Layanan'" severity="info" outlined
+          <Button @click="toggle($event, data.id)" :label="data.order_service.length + ' Layanan'" severity="info" outlined
             icon="pi pi-angle-down" iconPos="right" />
-          <Popover ref="op" class="p-0 min-w-[20rem]">
+          <Popover :ref="el => setPopoverRef(data.id, el as any)" class="p-0 min-w-[20rem]">
             <div class="flex flex-col gap-6">
-              <div v-for="(item, index) in data.items" :key="index">
+              <div>
                 <div class="flex items-start gap-1 mb-2">
-                  <p class="m-0 font-semibold">{{ index + 1 }}.</p>
-                  <p class="m-0 font-semibold">{{ item.label }}</p>
+                  <p class="m-0 font-semibold">{{ data.service.name }}</p>
                 </div>
                 <div class="flex flex-col gap-2 pl-4">
-                  <li v-for="(category, index) in item.category" :key="index">{{ category.label }} (x{{ category.qty }})
+                  <li v-for="(category, index) in data.order_service" :key="index">{{ category.service_sub_problem.name }} (x{{ category.qty }})
                   </li>
                 </div>
               </div>
             </div>
           </Popover>
         </template>
-        <!-- <template #filter="{ filterModel }">
-          <InputText v-model="filterModel.value" type="text" placeholder="Cari Layanan" />
-        </template> -->
       </Column>
       <Column sortable field="total" header="Total Harga" class="min-w-[15rem]">
-        <template #body="{ data }"> Rp{{ formatPrice(200000) }} </template>
+        <template #body="{ data }">
+          <span v-if="data.total_fee">Rp{{ formatPrice(data.total_fee) }}</span>
+          <span v-else>Harga belum ditentukan</span>
+        </template>
         <template #filter="{ filterModel }">
           <InputText v-model="filterModel.value" type="text" placeholder="Cari Nama" />
         </template>
       </Column>
       <Column sortable header="Status" field="status" :filterMenuStyle="{ width: '14rem' }" class="min-w-[20rem]">
         <template #body="{ data }">
-          <Tag :value="getStatusName(data.status)" :severity="getSeverity(data.status)" class="whitespace-nowrap" />
+          <Tag :value="data.status" :severity="getSeverity(data.status)" class="whitespace-nowrap" />
         </template>
         <template #filter="{ filterModel }">
           <Select v-model="filterModel.value" :options="statuses" placeholder="Pilih" showClear>
             <template #value="slotProps">
-              <Tag v-if="slotProps.value" :value="getStatusName(slotProps.value)"
+              <Tag v-if="slotProps.value" :value="slotProps.value"
                 :severity="getSeverity(slotProps.value)" />
             </template>
             <template #option="slotProps">
-              <Tag :value="getStatusName(slotProps.option)" :severity="getSeverity(slotProps.option)" />
+              <Tag :value="slotProps.option" :severity="getSeverity(slotProps.option)" />
             </template>
           </Select>
         </template>
       </Column>
       <Column sortable field="paymentMethod" header="Metode Pembayaran" class="min-w-[15rem]">
         <template #body="{ data }">
-          {{ data.paymentMethod }}
+          Bank Transfer
         </template>
         <template #filter="{ filterModel }">
           <Select v-model="filterModel.value" :options="paymentMethods" placeholder="Pilih" showClear />
         </template>
       </Column>
-      <Column sortable field="vendor" header="Vendor Pilihan" class="min-w-[15rem]">
+      <!-- <Column sortable field="vendor" header="Vendor Pilihan" class="min-w-[15rem]">
         <template #body="{ data }">
           <div v-if="data.vendor">
             <span class="font-semibold block mb-0">{{ data.vendor.name }}</span>
@@ -333,10 +313,10 @@
         <template #filter="{ filterModel }">
           <InputText v-model="filterModel.value" type="text" placeholder="Cari Vendor" />
         </template>
-      </Column>
+      </Column> -->
       <Column sortable header="Tanggal Pesanan" filterField="date" dataType="date" class="min-w-[20rem]">
         <template #body="{ data }">
-          {{ formatDate(data.date) }}
+          {{ data.created_at }}
         </template>
         <template #filter="{ filterModel }">
           <DatePicker v-model="filterModel.value" dateFormat="mm/dd/yy" placeholder="mm/dd/yyyy" />
@@ -369,16 +349,20 @@
       </Column>
       <template #expansion="slotProps">
         <div class="pl-[2.8rem] flex flex-col gap-4">
-          <div v-for="(item, index) in slotProps.data.items" :key="index" class="">
+          <div v-for="(item, index) in slotProps.data.order_service" :key="index" class="">
             <DataTable :value="item.category" class="max-w-fit">
               <template #header>
                 <div class="flex justify-between gap-4 items-center">
-                  <h6 class="m-0">{{ index + 1 }}. Layanan {{ item.label }}</h6>
+                  <h6 class="m-0">{{ index + 1 }}. Layanan {{ item.service_sub_problem.name }}</h6>
                   <Button label="Simpan" icon="pi pi-save" />
                 </div>
               </template>
-              <Column field="label" header="Jenis" class="min-w-[20rem]" sortable></Column>
-              <Column field="qty" header="Qty" class="min-w-[20rem]" sortable>
+              <Column field="label" header="Jenis" class="min-w-[20rem]" sortable>
+                <template #body="slotProps">
+                 usedhjbeb tes tes tes
+                  </template>
+              </Column>
+              <!-- <Column field="qty" header="Qty" class="min-w-[20rem]" sortable>
                 <template #body="{ data }">
                   <Inplace>
                     <template #display>{{ formatPrice(data.qty) }} <span class="pi pi-pencil"></span> </template>
@@ -390,8 +374,8 @@
                     </template>
                   </Inplace>
                 </template>
-              </Column>
-              <Column field="price" header="Harga Satuan" class="min-w-[20rem]" sortable>
+              </Column> -->
+              <!-- <Column field="price" header="Harga Satuan" class="min-w-[20rem]" sortable>
                 <template #body="{ data }">
                   <Inplace>
                     <template #display>Rp{{ formatPrice(data.price) }} <span class="pi pi-pencil"></span> </template>
@@ -412,7 +396,7 @@
                   <Column footer="Totals:" :colspan="3" footerStyle="text-align:right" />
                   <Column :footer="'Rp' + formatPrice(200000)" />
                 </Row>
-              </ColumnGroup>
+              </ColumnGroup> -->
             </DataTable>
           </div>
         </div>
