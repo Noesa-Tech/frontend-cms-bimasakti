@@ -32,12 +32,39 @@ const routes = [
     },
   },
   {
-    path: "/layanan",
-    name: "services",
-    component: () => import("@/views/services/Services.vue"),
+    path: "/master/layanan",
+    name: "master-services",
+    component: () => import("@/views/master/MasterServices.vue"),
     meta: {
       requiresAuth: true,
       title: "Data Layanan",
+    },
+  },
+  {
+    path: "/master/benefit",
+    name: "master-benefit",
+    component: () => import("@/views/master/MasterBenefit.vue"),
+    meta: {
+      requiresAuth: true,
+      title: "Data Layanan",
+    },
+  },
+  {
+    path: "/master/kategori",
+    name: "master-category",
+    component: () => import("@/views/master/MasterCategory.vue"),
+    meta: {
+      requiresAuth: true,
+      title: "Data Kategori",
+    },
+  },
+  {
+    path: "/master/sub-kategori",
+    name: "master-subcategory",
+    component: () => import("@/views/master/MasterSubCategory.vue"),
+    meta: {
+      requiresAuth: true,
+      title: "Data Sub Kategori",
     },
   },
   {

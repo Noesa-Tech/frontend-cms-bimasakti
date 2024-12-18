@@ -78,4 +78,5 @@ function isOutsideClicked(event: MouseEvent): boolean {
     <router-view></router-view>
   </keep-alive>
   </div>
+  <Toast />
 </template>

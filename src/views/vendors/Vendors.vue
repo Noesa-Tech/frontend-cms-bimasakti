@@ -252,10 +252,10 @@ const setPopoverRef = (vendorId: number, el: HTMLElement | null) => {
     </DataTable>
   </div>
   <ConfirmPopup></ConfirmPopup>
-  <Dialog v-model:visible="visibleAdd" maximizable modal header="Tambah Vendor" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
+  <Dialog v-model:visible="visibleAdd" maximizable modal header="Tambah Vendor"  class=" w-[25rem]" >
     <AddVendor :city="allCity" :service="$service.serviceAll" @on-close="visibleAdd = false" @on-save="visibleAdd = false, fetchVendor()"/>
   </Dialog>
-  <Dialog v-model:visible="visibleEdit" maximizable modal header="Ubah Vendor" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
+  <Dialog v-model:visible="visibleEdit" maximizable modal header="Ubah Vendor"  class=" w-[25rem]" >
     <EditVendor :city="allCity" :service="$service.serviceAll" :vendorId="selectedId" @on-close="visibleEdit = false" @on-save="visibleEdit = false,fetchVendor()" />
   </Dialog>
 </template>

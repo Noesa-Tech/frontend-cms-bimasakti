@@ -1,8 +1,6 @@
 import { createApp } from "vue";
 import App from "./App.vue";
 import PrimeVue from "primevue/config";
-import Toast from "vue-toastification";
-import "vue-toastification/dist/index.css";
 import "./assets/tailwind.css";
 import "./assets/styles.scss";
 import router from "./router";
@@ -14,11 +12,12 @@ import { definePreset } from "@primevue/themes";
 import ToastService from "primevue/toastservice";
 import ConfirmationService from "primevue/confirmationservice";
 import { createPinia } from 'pinia'
-
 import piniaPersistedstate from 'pinia-plugin-persistedstate'
 import Tooltip from "primevue/tooltip";
 import "core-js/stable";
 import Ripple from "primevue/ripple";
+import Toast from 'primevue/toast';
+
 
 const MyPreset = definePreset(Aura, {
   semantic: {
@@ -43,12 +42,12 @@ const app = createApp(App);
 const pinia = createPinia()
 pinia.use(piniaPersistedstate)
 
-app.use(Toast);
 app.use(router);
 app.use(pinia)
-pinia.use(piniaPersistedstate) 
+pinia.use(piniaPersistedstate)
 app.use(ConfirmationService);
 app.use(ToastService);
+app.component('Toast', Toast);
 app.directive("tooltip", Tooltip);
 app.directive("animateonscroll", AnimateOnScroll);
 app.directive("ripple", Ripple);
