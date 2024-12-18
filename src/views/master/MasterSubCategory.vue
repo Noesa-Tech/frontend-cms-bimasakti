@@ -1,23 +1,22 @@
 <script setup lang="ts">
-import { ServicesService } from "@/service/ServicesService";
+import { SubCategoryService } from "@/service/SubCategoryService";
 import { FilterMatchMode, FilterOperator } from "@primevue/core/api";
 import { onBeforeMount, reactive, ref } from "vue";
 import DatePicker from "primevue/datepicker";
 import Select from "primevue/select";
-import MultiSelect from "primevue/multiselect";
 import { useConfirm } from "primevue/useconfirm";
-import { useToast } from "primevue/usetoast";
+import { useToast } from 'primevue/usetoast';
 import ConfirmPopup from "primevue/confirmpopup";
-import Popover from "primevue/popover";
 
 const confirm = useConfirm();
 const toast = useToast();
 const dt = ref();
 const filters = ref<any>({});
 const isLoading = ref<boolean>(false);
-const serviceData = ref(null);
+const subCategoryData = ref(null);
 const statuses = reactive([1, 0]);
-const paymentMethods = reactive(["Transfer Bank", "Virtual Account(VA)", "GoPay", "OVO"]);
+const visibleEdit = ref<boolean>(false);
+const visibleAdd = ref<boolean>(false);
 
 function getSeverity(status: number) {
   switch (status) {
@@ -40,8 +39,8 @@ function getStatusName(status: number) {
 }
 
 onBeforeMount(() => {
-  ServicesService.getServices().then((data: any) => {
-    serviceData.value = data;
+  SubCategoryService.getSubCategory().then((data: any) => {
+    subCategoryData.value = data;
     isLoading.value = false;
   });
   initFilter();
@@ -50,8 +49,9 @@ onBeforeMount(() => {
 function initFilter() {
   filters.value = {
     global: { value: null, matchMode: FilterMatchMode.CONTAINS },
+    'service_problem.name': { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
     name: { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
-    description: { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
+    price: { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
     updated_at: { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.DATE_IS }] },
     status: { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.EQUALS }] },
   };
@@ -73,7 +73,7 @@ const exportCSV = (event: any) => {
 const confirm2 = (event: any) => {
   confirm.require({
     target: event.currentTarget,
-    message: "Yakin ingin menghapus layanan ini?",
+    message: "Yakin ingin menghapus sub kategori ini?",
     icon: "pi pi-info-circle",
     rejectProps: {
       label: "Batal",
@@ -85,28 +85,24 @@ const confirm2 = (event: any) => {
       severity: "danger",
     },
     accept: () => {
-      toast.add({ severity: "info", summary: "Confirmed", detail: "Pesanan dibatalkan", life: 3000 });
     },
     reject: () => {
-      toast.add({ severity: "error", summary: "Rejected", detail: "You have rejected", life: 3000 });
     },
   });
 };
-
-
-
-
 </script>
 <template>
-  <TopBreadcrumb :breadcrumbItems="[{ label: 'Master' },{ label: 'Sub Kategori' }]" />
+  <TopBreadcrumb :breadcrumbItems="[{ label: 'Master' }, { label: 'Sub Kategori' }]" />
   <div class="card mt-8">
     <div class="font-semibold text-xl mb-4">Data Sub Kategori</div>
-    <DataTable ref="dt" :value="serviceData" :paginator="true" :rows="10" dataKey="id" :rowHover="true"
-      v-model:filters="filters" filterDisplay="menu" :loading="isLoading" 
-      :globalFilterFields="['name', 'description', 'status', 'updated_at']" showGridlines scrollable>
+    <DataTable ref="dt" :value="subCategoryData" rowGroupMode="rowspan" groupRowsBy="service_problem.name"
+      :paginator="true" :rows="10" dataKey="id" :rowHover="true" v-model:filters="filters" filterDisplay="menu"
+      :loading="isLoading" :globalFilterFields="['service_problem.name', 'name', 'price', 'status', 'updated_at']"
+      showGridlines>
       <template #header>
         <div class="flex flex-col md:flex-row justify-between gap-4">
-          <Button type="button" icon="pi pi-plus" label="Tambah Layanan" class="md:order-1 order-2" />
+          <Button type="button" icon="pi pi-plus" label="Tambah Sub Kategori" class="md:order-1 order-2"
+            @click="visibleAdd = true" />
           <div class="flex items-center gap-4 md:order-2 order-1">
             <div class="hidden md:flex"><Button type="button" icon="pi pi-download" outlined label="Unduh"
                 @click="exportCSV($event)" /></div>
@@ -120,27 +116,32 @@ const confirm2 = (event: any) => {
           </div>
         </div>
       </template>
-      <template #empty> Tidak ada data layanan. </template>
-      <template #loading> Memuat data layanan. Mohon tunggu. </template>
-      <Column sortable field="name" header="Nama Layanan" class="min-w-[15rem]">
+      <template #empty> Tidak ada data Sub Kategori. </template>
+      <template #loading> Memuat data Sub Kategori. Mohon tunggu. </template>
+      <Column field="service_problem.name" header="Kategori">
+        <template #body="{ data }">
+          <div class="flex gap-4 items-center ">
+            <img :alt="data.service_problem.service.name" :src="data.service_problem.service.image_url"
+              class=" align-middle w-10" />
+            <div>
+              <h6 class="m-0">{{ data.service_problem.name }}</h6>
+              <p class="m-0 text-muted-color text-sm">{{ data.service_problem.service.name }}</p>
+            </div>
+          </div>
+        </template>
+        <template #filter="{ filterModel }">
+          <InputText v-model="filterModel.value" type="text" placeholder="Cari Kategori" />
+        </template>
+      </Column>
+      <Column field="name" header="Sub Kategori" class="min-w-[15rem]">
         <template #body="{ data }">
           {{ data.name }}
         </template>
         <template #filter="{ filterModel }">
-          <InputText v-model="filterModel.value" type="text" placeholder="Cari Nama" />
+          <InputText v-model="filterModel.value" type="text" placeholder="Cari Sub Kategori" />
         </template>
       </Column>
-      <Column sortable field="description" header="Deskripsi" class="min-w-[15rem]">
-        <template #body="{ data }">
-          <span class="line-clamp-2" v-tooltip.bottom="data.description">
-            {{ data.description }}
-          </span>
-        </template>
-        <template #filter="{ filterModel }">
-          <InputText v-model="filterModel.value" type="text" placeholder="Cari Nama" />
-        </template>
-      </Column>
-      <Column sortable header="Status" field="status" :filterMenuStyle="{ width: '14rem' }">
+      <Column header="Status" field="status" :filterMenuStyle="{ width: '14rem' }">
         <template #body="{ data }">
           <Tag :value="getStatusName(data.status)" :severity="getSeverity(data.status)" class="whitespace-nowrap" />
         </template>
@@ -156,8 +157,16 @@ const confirm2 = (event: any) => {
           </Select>
         </template>
       </Column>
-
-      <Column sortable header="Terakhir Update" filterField="updated_at" dataType="date" class="min-w-[20rem]">
+      <Column header="Harga" filterField="price" dataType="text" class="min-w-[12rem]">
+        <template #body="{ data }">
+          Rp{{ formatPrice(data.price) }}
+        </template>
+        <template #filter="{ filterModel }">
+          <InputNumber v-model="filterModel.value" type="text" placeholder="Cari Harga" inputId="currency-indonesia"
+            mode="currency" currency="IDR" locale="id-ID" :minFractionDigits="0" />
+        </template>
+      </Column>
+      <Column header="Terakhir Update" filterField="updated_at" dataType="date" class="min-w-[12rem]">
         <template #body="{ data }">
           {{ formatDate(data.updated_at) }}
         </template>
@@ -165,17 +174,23 @@ const confirm2 = (event: any) => {
           <DatePicker v-model="filterModel.value" dateFormat="mm/dd/yy" placeholder="mm/dd/yyyy" />
         </template>
       </Column>
-      <Column sortable field="id" header="Action" bodyClass="text-center" class="min-w-[10rem]">
+      <Column field="id" header="Action" bodyClass="text-center" class="min-w-[10rem]">
         <template #body="{ data }">
           <div class="flex gap-4 items-center">
-            <Button icon="pi pi-pencil" severity="info" text v-tooltip.bottom="'Ubah'" as="router-link"
-              :to="{ name: 'order-detail', params: { id: data.id } }" />
+            <Button icon="pi pi-pencil" severity="info" text v-tooltip.bottom="'Ubah'" @click="visibleEdit = true" />
 
-            <Button icon="pi pi-times" severity="danger" text v-tooltip.bottom="'Hapus'" @click="confirm2($event)" />
+            <Button icon="pi pi-trash" severity="danger" text v-tooltip.bottom="'Hapus'" @click="confirm2($event)" />
           </div>
         </template>
       </Column>
     </DataTable>
+
   </div>
   <ConfirmPopup></ConfirmPopup>
+  <Dialog v-model:visible="visibleAdd" maximizable modal header="Tambah Sub Kategori" class=" sm:w-1/2 w-full ">
+    <AddSubCategory :categoryId="1" @on-close="visibleAdd = false" @on-save="visibleAdd = false" />
+  </Dialog>
+  <Dialog v-model:visible="visibleEdit" maximizable modal header="Ubah Sub Kategori" class=" sm:w-1/2 w-full ">
+    <EditSubCategory :categoryId="1" @on-close="visibleEdit = false" @on-save="visibleEdit = false" />
+  </Dialog>
 </template>
