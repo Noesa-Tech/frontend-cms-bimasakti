@@ -12,18 +12,25 @@ const $service = ServiceStore()
 
 const dt = ref();
 const statuses = reactive([1, 0]);
-const filters = ref<any>({});
+const filters = ref<any>({
+  global: { value: null, matchMode: FilterMatchMode.CONTAINS },
+  name: { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
+  description: { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
+  updated_at: { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.DATE_IS }] },
+  status: { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.EQUALS }] },
+});
 const reactiveKey = ref<number>(0);
+const selectedRow = ref<any>(null)
 
 const visibleEdit = ref<boolean>(false);
 const visibleAdd = ref<boolean>(false);
 
-function getSeverity(status: any) {
-  return status ? "danger" : "success";
+function getSeverity(e: number) {
+  return e < 1 ? "danger" : "success";
 }
 
-function getStatusName(status: any) {
-  return status ? "Tidak Tersedia" : "Tersedia";
+function getStatusName(e: number) {
+  return e < 1 ? "Tidak Tersedia" : "Tersedia";
 }
 
 async function fetchAllService() {
@@ -39,20 +46,6 @@ onMounted(async () => {
   await $service.fetchService()
 })
 
-onBeforeMount(() => {
-  initFilter();
-});
-
-function initFilter() {
-  filters.value = {
-    global: { value: null, matchMode: FilterMatchMode.CONTAINS },
-    name: { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
-    description: { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
-    updated_at: { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.DATE_IS }] },
-    status: { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.EQUALS }] },
-  };
-}
-
 function formatDate(value: any) {
   const date = new Date(value);
   return date.toLocaleDateString("en-US", {
@@ -66,9 +59,9 @@ const exportCSV = () => {
   dt.value.exportCSV();
 };
 
-const confirm2 = (event: any) => {
+const confirmDelete = (e: any) => {
   confirm.require({
-    target: event.currentTarget,
+    target: e.currentTarget,
     message: "Yakin ingin menghapus layanan ini?",
     icon: "pi pi-info-circle",
     rejectProps: {
@@ -80,7 +73,9 @@ const confirm2 = (event: any) => {
       label: "Yakin",
       severity: "danger",
     },
-    accept: () => {
+    accept: async() => {
+      await $service.delete(e)
+      await $service.fetchService()
     },
     reject: () => {
     },
@@ -114,12 +109,6 @@ const confirm2 = (event: any) => {
       <template #empty> Tidak ada data layanan. </template>
       <template #loading> Memuat data layanan. Mohon tunggu. </template>
 
-      <Column header="No" bodyClass="text-center" class="min-w-[5rem]">
-        <template #body="{ index }">
-          {{ index + 1 }}
-        </template>
-      </Column>
-
       <Column sortable field="name" header="Layanan" class="min-w-[15rem]">
         <template #body="{ data }">
           {{ data.name }}
@@ -140,7 +129,7 @@ const confirm2 = (event: any) => {
       </Column>
       <Column sortable header="Status" field="status" :filterMenuStyle="{ width: '14rem' }">
         <template #body="{ data }">
-          <Tag :value="getStatusName(data.deleted_at)" :severity="getSeverity(data.deleted_at)"
+          <Tag :value="getStatusName(data.status)" :severity="getSeverity(data.status)"
             class="whitespace-nowrap" />
         </template>
         <template #filter="{ filterModel }">
@@ -166,9 +155,9 @@ const confirm2 = (event: any) => {
       <Column sortable field="id" header="Action" bodyClass="text-center" class="min-w-[10rem]">
         <template #body="{ data }">
           <div class="flex gap-4 items-center">
-            <Button icon="pi pi-pencil" severity="info" text v-tooltip.bottom="'Ubah'" @click="visibleEdit = true" />
+            <Button icon="pi pi-pencil" severity="info" text v-tooltip.bottom="'Ubah'" @click="selectedRow = data ,visibleEdit = true" />
 
-            <Button icon="pi pi-trash" severity="danger" text v-tooltip.bottom="'Hapus'" @click="confirm2($event)" />
+            <Button icon="pi pi-trash" severity="danger" text v-tooltip.bottom="'Hapus'" @click="confirmDelete(data.id)" />
           </div>
         </template>
       </Column>
@@ -176,9 +165,9 @@ const confirm2 = (event: any) => {
   </div>
   <ConfirmPopup></ConfirmPopup>
   <Dialog v-model:visible="visibleAdd" maximizable modal header="Tambah Layanan" class=" sm:w-1/2 w-full ">
-    <AddService :serviceId="1" @on-close="visibleAdd = false" @on-save="visibleAdd = false" />
+    <AddService @on-close="visibleAdd = false" @on-save="visibleAdd = false, fetchAllService()" />
   </Dialog>
   <Dialog v-model:visible="visibleEdit" maximizable modal header="Ubah Layanan" class=" sm:w-1/2 w-full ">
-    <EditService :serviceId="1" @on-close="visibleEdit = false" @on-save="visibleEdit = false" />
+    <EditService :service="selectedRow" @on-close="visibleEdit = false" @on-save="visibleEdit = false, fetchAllService()" />
   </Dialog>
 </template>

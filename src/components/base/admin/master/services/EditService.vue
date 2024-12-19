@@ -1,49 +1,34 @@
 <script setup lang="ts">
 import Select from "primevue/select";
-import { useToast } from 'primevue/usetoast';
-import { VendorStore } from '@/store/vendor'
+import { ServiceStore } from '@/store/service'
 
-const toast = useToast();
 const props = defineProps({
-    serviceId: {
-        type: [Number, null] as PropType<number | null>,
+    service: {
+        type: Object as PropType<Record<string, any>>,
         required: true,
     },
 });
 
 const emit = defineEmits(["on-close", "on-save"]);
 
-const $vendor = VendorStore()
+const $service = ServiceStore()
 const statuses = reactive([0, 1]);
-const src = ref(null);
+const src = ref<any>(null);
 
-
-const query = reactive({
-    image: null,
-    name: "",
-    description: "",
-    status: null,
+const query = reactive<Record<string, any>>({
+    name: props.service.name,
+    description: props.service.description,
+    status: props.service.status,
 })
 
 async function onSave() {
-    //   const payload = {
-    //     ...query,
-    //     _method: "PATCH",
-    //     service_id: JSON.stringify(query.service_id),
-    //   };
+      const payload = {
+        ...query,
+        _method: "PATCH",
+      };
 
-    //   $vendor.update(props.vendorId as number, payload)
+    await $service.updateServcice(props.service.id as number, payload)
     emit('on-save')
-}
-
-async function fetchDetailVendor() {
-    //   await $vendor.fetchDetail(props.vendorId as number)
-
-    //   query.name = $vendor.detail.name || "";
-    //   query.city_id = $vendor.detail.city_id || null;
-
-    //   // @ts-ignore
-    //   query.service_id =  $vendor.detail.vendor_service.map(item => item.service_id);
 }
 
 function getSeverity(status: number) {
@@ -66,6 +51,8 @@ function getStatusName(status: number) {
 
 function onFileSelect(event: any) {
     const file = event.files[0];
+    query.image = file
+
     const reader = new FileReader();
 
     reader.onload = async (e) => {
@@ -75,7 +62,15 @@ function onFileSelect(event: any) {
     reader.readAsDataURL(file);
 }
 
-// watch(() => props.vendorId, fetchDetailVendor, { immediate: true });
+watch(
+  () => props.service,
+  (newValue) => {
+    if (newValue?.image_url) {
+      src.value = newValue.image_url
+    }
+  },
+  { immediate: true }
+)
 </script>
 
 <template>
@@ -115,6 +110,6 @@ function onFileSelect(event: any) {
 
     <div class="flex justify-end gap-2 mt-8">
         <Button type="button" label="Batal" text severity="secondary" @click="emit('on-close')"></Button>
-        <Button type="button" label="Simpan" @click="onSave()"></Button>
+        <Button type="button" label="Simpan" :loading="$service.isLoading" @click="onSave()"></Button>
     </div>
 </template>

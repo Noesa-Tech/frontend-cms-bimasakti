@@ -1,21 +1,12 @@
 <script setup lang="ts">
 import Select from "primevue/select";
-import { useToast } from 'primevue/usetoast';
-import { VendorStore } from '@/store/vendor'
-
-const toast = useToast();
-const props = defineProps({
-    serviceId: {
-        type: [Number, null] as PropType<number | null>,
-        required: true,
-    },
-});
+import { ServiceStore } from '@/store/service'
 
 const emit = defineEmits(["on-close", "on-save"]);
 
-const $vendor = VendorStore()
+const $service = ServiceStore()
 const statuses = reactive([0, 1]);
-const src = ref(null);
+const src = ref<string>("");
 
 
 const query = reactive({
@@ -26,24 +17,8 @@ const query = reactive({
 })
 
 async function onSave() {
-    //   const payload = {
-    //     ...query,
-    //     _method: "PATCH",
-    //     service_id: JSON.stringify(query.service_id),
-    //   };
-
-    //   $vendor.update(props.vendorId as number, payload)
+    await $service.addService(query)
     emit('on-save')
-}
-
-async function fetchDetailVendor() {
-    //   await $vendor.fetchDetail(props.vendorId as number)
-
-    //   query.name = $vendor.detail.name || "";
-    //   query.city_id = $vendor.detail.city_id || null;
-
-    //   // @ts-ignore
-    //   query.service_id =  $vendor.detail.vendor_service.map(item => item.service_id);
 }
 
 function getSeverity(status: number) {
@@ -66,16 +41,17 @@ function getStatusName(status: number) {
 
 function onFileSelect(event: any) {
     const file = event.files[0];
-    const reader = new FileReader();
+    query.image = file
 
+    const reader = new FileReader();
     reader.onload = async (e) => {
-        src.value = e.target?.result;
+        if (typeof e.target?.result === "string") {
+            src.value = e.target.result;
+        }
     };
 
     reader.readAsDataURL(file);
 }
-
-// watch(() => props.vendorId, fetchDetailVendor, { immediate: true });
 </script>
 
 <template>
@@ -85,11 +61,11 @@ function onFileSelect(event: any) {
             <div v-if="src" class="relative">
                 <img :src="src" alt="Image" class="shadow-md rounded-xl w-full sm:w-64" />
                 <div class="absolute right-0 top-0">
-                    <Button icon="pi pi-times" rounded outlined @click="src = null" />
+                    <Button icon="pi pi-times" rounded outlined @click="src = ''" />
                 </div>
             </div>
             <FileUpload mode="basic" @select="onFileSelect" customUpload severity="secondary" class="p-button-outlined"
-                :maxFileSize="1000000" :chooseLabel="src ? 'Ubah Foto' : 'Pilih Foto'" chooseIcon="pi pi-image" />
+                :maxFileSize="2000000" :chooseLabel="src ? 'Ubah Foto' : 'Pilih Foto'" chooseIcon="pi pi-image" />
         </div>
     </div>
     <div class="flex flex-col gap-2 mb-4">
@@ -115,6 +91,6 @@ function onFileSelect(event: any) {
 
     <div class="flex justify-end gap-2 mt-8">
         <Button type="button" label="Batal" text severity="secondary" @click="emit('on-close')"></Button>
-        <Button type="button" label="Simpan" @click="onSave()"></Button>
+        <Button type="button" label="Simpan" :loading="$service.isLoading" @click="onSave()"></Button>
     </div>
 </template>
