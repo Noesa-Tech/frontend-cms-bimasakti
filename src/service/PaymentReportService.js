@@ -44,13 +44,7 @@ export const PaymentReportService = {
           email: 'exmple@email.com',
           phone: '82118849939',
         },
-        location: {
-          country: "Jawa Barat",
-          city: "Kota Bandung",
-          distric: "Ciheulang",
-          village: "Sekeloa Selatan",
-          address: "Jl. Sekeloa II, No. 50, RT/11 RW/11",
-        },
+        location: "Jl. Sekeloa II, No. 50, RT/11 RW/11, Sekeloa Selatan, Ciheulang, Kota Bandung, Jawa Barat",
         paymentMethod: 'Transfer Bank',
         vendor: {
           id: 1,
@@ -87,13 +81,7 @@ export const PaymentReportService = {
           email: 'exmple@email.com',
           phone: '82118849939',
         },
-        location: {
-          country: "Jawa Barat",
-          city: "Kota Bandung",
-          distric: "Ciheulang",
-          village: "Sekeloa Selatan",
-          address: "Jl. Sekeloa II, No. 50, RT/11 RW/11",
-        },
+        location: "Jl. Sekeloa II, No. 50, RT/11 RW/11, Sekeloa Selatan, Ciheulang, Kota Bandung, Jawa Barat",
         paymentMethod: 'Transfer Bank',
         vendor: {
           id: 1,
@@ -134,13 +122,7 @@ export const PaymentReportService = {
           email: 'exmple@email.com',
           phone: '82118849939',
         },
-        location: {
-          country: "Jawa Barat",
-          city: "Kota Bandung",
-          distric: "Ciheulang",
-          village: "Sekeloa Selatan",
-          address: "Jl. Sekeloa II, No. 50, RT/11 RW/11",
-        },
+        location: "Jl. Sekeloa II, No. 50, RT/11 RW/11, Sekeloa Selatan, Ciheulang, Kota Bandung, Jawa Barat",
         paymentMethod: 'Transfer Bank',
         vendor: {
           id: 1,
@@ -177,13 +159,7 @@ export const PaymentReportService = {
           email: 'exmple@email.com',
           phone: '82118849939',
         },
-        location: {
-          country: "Jawa Barat",
-          city: "Kota Bandung",
-          distric: "Ciheulang",
-          village: "Sekeloa Selatan",
-          address: "Jl. Sekeloa II, No. 50, RT/11 RW/11",
-        },
+        location: "Jl. Sekeloa II, No. 50, RT/11 RW/11, Sekeloa Selatan, Ciheulang, Kota Bandung, Jawa Barat",
         paymentMethod: 'Transfer Bank',
         vendor: {
           id: 1,
