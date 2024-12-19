@@ -242,7 +242,7 @@ watch(treeNodes, (newTreeNodes: any) => {
                             severity="danger" text @click="removeService(item, index)" />
                     </div>
 
-                    <div v-if="item.status" class="lg:mx-10 mt-4 p-4 rounded-lg bg-gray-50">
+                    <div v-if="item.status" class="lg:mx-10 mt-4 p-4 rounded-lg bg-gray-50 dark:bg-gray-950">
                         <p>Pilih Kategori</p>
                         <Divider />
                         <div v-for="(category, i) in item.category" :key="i"

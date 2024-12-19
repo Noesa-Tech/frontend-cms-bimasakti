@@ -69,63 +69,63 @@ onMounted(async () => {
     <template #content>
       <h5>Formulir</h5>
       <h5 class="font-medium mb-2">Informasi Pelanggan</h5>
-      <InputGroup class="mb-4">
-        <InputGroupAddon>+62</InputGroupAddon>
-        <FloatLabel variant="on">
+      <div class="flex flex-col gap-2">
+        <label for="on_label">Nomor Hp</label>
+        <InputGroup class="mb-4">
+          <InputGroupAddon>+62</InputGroupAddon>
           <InputNumber v-model="query.phone" :useGrouping="false" :allowEmpty="true" inputId="integeronly" />
-          <label for="on_label">Nomor Hp</label>
-        </FloatLabel>
-      </InputGroup>
-      <FloatLabel variant="on" class="mb-4">
-        <InputText id="nama" v-model="query.name" autocomplete="off" fluid />
+        </InputGroup>
+      </div>
+      <div class="flex flex-col gap-2 mb-4">
         <label for="nama">Nama Lengkap</label>
-      </FloatLabel>
-
-      <FloatLabel variant="on">
-        <InputText id="email" v-model="query.email" autocomplete="off" fluid />
+        <InputText id="nama" v-model="query.name" autocomplete="off" placeholder="Masukkan nama lengkap" fluid />
+      </div>
+      <div class="flex flex-col gap-2">
         <label for="email">Alamat Email</label>
-      </FloatLabel>
+        <InputText id="email" v-model="query.email" autocomplete="off" placeholder="Masukkan alamat email" fluid />
+      </div>
       <Divider class="my-4" />
       <h5 class="font-medium mb-2">Alamat Tujuan</h5>
-
-      <FloatLabel class="mb-4" variant="on">
+      <div class="mb-4 flex flex-col gap-2">
+        <label for="prov">Provinsi</label>
         <Select inputId="prov" v-model="query.selectedProvince" :loading="$location.isLoadingProvince"
           @change="fetchCity($event)" :disabled="provinceList.length < 1" :options="provinceList" filter
-          optionLabel="name" fluid>
+          optionLabel="name" fluid placeholder="Pilih provinsi">
         </Select>
-        <label for="prov">Provinsi</label>
-      </FloatLabel>
-      <FloatLabel class="mb-4" variant="on">
+      </div>
+      <div class="mb-4 flex flex-col gap-2">
+        <label for="city">Kota/Kabupaten</label>
         <Select inputId="city" v-model="query.selectedCity" :loading="$location.isLoadingCities"
           @change="fetchSubDistrict($event)" :disabled="cityList.length < 1" :options="cityList" filter
-          optionLabel="name" fluid>
+          optionLabel="name" fluid placeholder="Pilih kabupaten/kota">
         </Select>
-        <label for="city">Kota/Kabupaten</label>
-      </FloatLabel>
-      <FloatLabel class="mb-4" variant="on">
+      </div>
+      <div class="mb-4 flex flex-col gap-2">
+        <label for="district">Kecamatan</label>
         <Select inputId="district" v-model="query.selectedSubdistrict" :loading="$location.isLoadingDistrict"
           @change="fetchVillage($event)" :disabled="subdistrictList.length < 1" :options="subdistrictList" filter
-          optionLabel="name" fluid>
+          optionLabel="name" fluid placeholder="Pilih kecamatan">
         </Select>
-        <label for="district">Kecamatan</label>
-      </FloatLabel>
-      <FloatLabel class="mb-4" variant="on">
-        <Select inputId="village" v-model="query.selectedVillage" :loading="$location.isLoadingVillage"
-          :disabled="villageList.length < 1" :options="villageList" filter optionLabel="name" fluid>
-        </Select>
+      </div>
+      <div class="mb-4 flex flex-col gap-2">
         <label for="village">Keluarahan</label>
-      </FloatLabel>
-      <FloatLabel variant="on">
-        <Textarea v-model="query.address" id="address" fluid rows="2" cols="30" autoResize />
+        <Select inputId="village" v-model="query.selectedVillage" :loading="$location.isLoadingVillage"
+          :disabled="villageList.length < 1" :options="villageList" filter optionLabel="name" fluid
+          placeholder="Pilih kelurahan">
+        </Select>
+      </div>
+      <div class="flex flex-col gap-2">
         <label for="address">Alamat Lengkap</label>
-      </FloatLabel>
+        <Textarea v-model="query.address" id="address" placeholder="Masukkan alamat lengkap" fluid rows="2" cols="30"
+          autoResize />
+      </div>
 
       <Divider class="my-4" />
       <div class="mb-4">
-        <FloatLabel variant="on">
-          <InputText id="voucher" fluid />
+        <div class="flex flex-col gap-2">
           <label for="voucher">Kode Voucher</label>
-        </FloatLabel>
+          <InputText id="voucher" placeholder="Masukkan kode voucher" fluid />
+        </div>
         <p class="text-sm italic font-thin mt-1">*Masukkan kode voucher untuk mendapatkan potongan.</p>
       </div>
       <Button label="Pesan Layanan" fluid @click="emit('onSave', query)" />

@@ -43,7 +43,7 @@ onMounted(async () => {
       :class="{
         'mt-2': index != 0,
         'border-surface-200': item.id != selectedProperty.id,
-        'border-primary  bg-primary-100': item.id == selectedProperty.id,
+        'border-primary  bg-primary-100 dark:bg-primary-900': item.id == selectedProperty.id,
       }" @click="onPropertyClick(item)">
       <img :src="item.icon_url" :alt="item.name" :srcset="item.icon_url" class="h-[3rem] w-[3rem]" />
       <div class="w-full">
