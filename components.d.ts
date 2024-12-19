@@ -7,6 +7,7 @@ export {}
 /* prettier-ignore */
 declare module 'vue' {
   export interface GlobalComponents {
+    Accordion: typeof import('primevue/accordion')['default']
     ACService: typeof import('./src/components/icons/services/ACService.vue')['default']
     AddBenefits: typeof import('./src/components/base/admin/master/benefits/AddBenefits.vue')['default']
     AddCategory: typeof import('./src/components/base/admin/master/category/AddCategory.vue')['default']
@@ -17,6 +18,7 @@ declare module 'vue' {
     AppSidebar: typeof import('./src/components/base/admin/AppSidebar.vue')['default']
     AppTopbar: typeof import('./src/components/base/admin/AppTopbar.vue')['default']
     Aquarium: typeof import('./src/components/icons/upcoming-features/aquarium.vue')['default']
+    Badge: typeof import('primevue/badge')['default']
     Bathroom: typeof import('./src/components/icons/Bathroom.vue')['default']
     Breadcrumb: typeof import('primevue/breadcrumb')['default']
     Button: typeof import('primevue/button')['default']
@@ -56,6 +58,7 @@ declare module 'vue' {
     PembuatanPerawatanTaman: typeof import('./src/components/icons/upcoming-features/pembuatan-perawatan-taman.vue')['default']
     PerbaikanAlatListrik: typeof import('./src/components/icons/upcoming-features/perbaikan-alat-listrik.vue')['default']
     PerbaikanSaluran: typeof import('./src/components/icons/upcoming-features/perbaikan-saluran.vue')['default']
+    ProgressBar: typeof import('primevue/progressbar')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
     Row: typeof import('primevue/row')['default']

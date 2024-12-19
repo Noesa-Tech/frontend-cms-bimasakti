@@ -58,6 +58,14 @@ const model = ref([
       { label: "Pembayaran", icon: "pi pi-fw pi-credit-card", to: "/pengaturan/pembayaran" },
     ],
   },
+  {
+    separator: true
+  },
+  {
+    // label: "Sistem",
+    items: [{ label: "Keluar", icon: "pi pi-fw pi-sign-out", to: "/", danger: true }],
+  },
+
   // {
   //   label: "UI Components",
   //   items: [
@@ -177,7 +185,7 @@ const model = ref([
   <ul class="layout-menu">
     <template v-for="(item, i) in model" :key="item">
       <app-menu-item v-if="!item.separator" :item="item" :index="i"></app-menu-item>
-      <li v-if="item.separator" class="menu-separator"></li>
+      <Divider v-if="item.separator" class="menu-separator" />
     </template>
   </ul>
 </template>
