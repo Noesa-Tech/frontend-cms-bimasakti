@@ -6,13 +6,26 @@ export const ServiceStore = defineStore('ServiceStore', {
     state: () => ({
         isLoading: false as boolean,
         serviceAll: [] as Array<any>,
+        problem: {} as Record<string, any>,
     }),
     actions: {
         async fetchService() {
             this.isLoading = true
             try {
                 const res = await api.get(`/auth/services`)
-                this.serviceAll= res.data
+                this.serviceAll = res.data
+            } catch (err) {
+            } finally {
+                this.isLoading = false
+            }
+        },
+        async fetchProblem(serviceId: number) {
+            this.isLoading = true
+            try {
+                const res = await api.get(`/services-problem/${serviceId}`)
+                this.problem = res.data
+
+                return res
             } catch (err) {
             } finally {
                 this.isLoading = false
@@ -32,9 +45,9 @@ export const ServiceStore = defineStore('ServiceStore', {
                     headers: {
                         'Content-Type': 'multipart/form-data',
                     },
-                });        
+                });
 
-                 // @ts-ignore
+                // @ts-ignore
                 toast.success('success', res.message)
             } catch (err) {
             } finally {
@@ -55,9 +68,9 @@ export const ServiceStore = defineStore('ServiceStore', {
                     headers: {
                         'Content-Type': 'multipart/form-data',
                     },
-                });        
+                });
 
-                 // @ts-ignore
+                // @ts-ignore
                 toast.success('success', res.message)
             } catch (err) {
             } finally {
@@ -68,9 +81,9 @@ export const ServiceStore = defineStore('ServiceStore', {
             this.isLoading = true
 
             try {
-                const res = await api.delete(`/auth/services/${serviceId}`);        
+                const res = await api.delete(`/auth/services/${serviceId}`);
 
-                 // @ts-ignore
+                // @ts-ignore
                 toast.success('success', res.message)
             } catch (err) {
             } finally {
