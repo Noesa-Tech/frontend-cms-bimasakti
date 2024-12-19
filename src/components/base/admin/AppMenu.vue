@@ -12,7 +12,7 @@ const model = ref([
     label: "Management",
     items: [
       {
-        label: "Data Master", icon: "pi pi-fw pi-server", to: "/master", items: [
+        label: "Data Master", icon: "pi pi-fw pi-server", items: [
           {
             label: "Layanan",
             icon: "pi pi-fw pi-list",

@@ -22,12 +22,12 @@
     background: transparent !important; */
     border: none !important;
   }
-  .accordion-subheader{
-    padding-left: 3rem !important;
+  /* .accordion-subheader{
+    margin-left: 3rem !important;
   }
   .accordion-content{
-    padding-left: 2rem !important;
-  }
+    margin-left: 2rem !important;
+  } */
 }
 
 /* Primary and Surface Palettes */

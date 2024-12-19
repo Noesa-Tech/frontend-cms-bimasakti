@@ -17,7 +17,7 @@ const isLoading = ref<boolean>(false);
 const dt = ref();
 const filters = ref<any>({});
 const reactiveKey = ref<number>(0);
-const ladderStatus = ref<number[]>([1, 0])
+// const ladderStatus = ref<number[]>([1, 0])
 
 
 async function fetchAllService() {
@@ -29,23 +29,14 @@ const serviceItems = computed(() => {
   return $service.serviceAll || [];
 });
 
-function getSeverityLadder(status: number) {
+function ladderStatus(status: number) {
   switch (status) {
     case 0:
-      return "danger";
+      return "Tidak Butuh Tangga";
     case 1:
-      return "success";
-
-  }
-}
-
-function getStatusNameLadder(status: number) {
-  switch (status) {
-    case 0:
-      return "Tidak Butuh";
-    case 1:
-      return "Butuh";
-
+      return "Butuh Tangga";
+    default:
+      return null
   }
 }
 
@@ -72,6 +63,7 @@ function initFilter() {
     'property.name': { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
     paymentMethod: { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
     description: { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
+    location: { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
     date: { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.DATE_IS }] },
     useLadder: { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.EQUALS }] },
   };
@@ -148,7 +140,7 @@ const exportCSV = (event: any) => {
     <div class="font-semibold text-xl mb-4">Laporan Keuangan</div>
     <DataTable ref="dt" :value="paymentReportData" rowGroupMode="rowspan" groupRowsBy="customer.name" :paginator="true"
       :rows="10" dataKey="id" v-model:filters="filters" filterDisplay="menu" :loading="isLoading"
-      :globalFilterFields="['customer.name', 'customer.phone', 'customer.email', 'service.name', 'property.name', 'paymentMethod', 'price', 'useLadder', 'date']"
+      :globalFilterFields="['customer.name', 'customer.phone', 'customer.email', 'service.name', 'property.name', 'paymentMethod', 'location', 'price', 'useLadder', 'date']"
       showGridlines>
       <template #header>
         <div class="flex items-center gap-4 justify-end md:order-2 order-1">
@@ -177,6 +169,14 @@ const exportCSV = (event: any) => {
           <InputText v-model="filterModel.value" type="text" placeholder="Cari Pelanggan" />
         </template>
       </Column>
+      <Column header="Lokasi" filterField="location" dataType="text" class="min-w-[20rem]" sortable>
+        <template #body="{ data }">
+          {{ data.location }}
+        </template>
+        <template #filter="{ filterModel }">
+          <InputText v-model="filterModel.value" type="text" placeholder="Cari Lokasin" />
+        </template>
+      </Column>
       <Column field="service.name" header="Layanan" class="min-w-[32rem]" sortable>
         <template #body="{ data }">
           <Accordion value="0">
@@ -197,7 +197,7 @@ const exportCSV = (event: any) => {
                     <AccordionContent class="accordion-content">
                       <!-- <Divider /> -->
                       <div class="flex flex-col items-start text-start gap-2">
-                        <ol v-for="(item, index) in subtab.sub_problem" :key="index" class=" list-decimal list-inside">
+                        <ol v-for="(item, index) in subtab.sub_problem" :key="index" class=" list-disc list-inside">
                           <li>{{ item.name }} (x{{ item.qty }}) • Rp{{ formatPrice(item.price) }}</li>
                         </ol>
                       </div>
@@ -218,6 +218,7 @@ const exportCSV = (event: any) => {
             <p class="m-0">
               {{ data.property.name }}
             </p>
+            <Badge v-if="data.useLadder" :value="ladderStatus(data.useLadder) ?? ''" size="small" class="mb-2" />
             <p class="m-0 text-sm text-muted-color">Rp{{ formatPrice(data.property.price) }}</p>
           </div>
         </template>
@@ -225,7 +226,7 @@ const exportCSV = (event: any) => {
           <InputText v-model="filterModel.value" type="text" placeholder="Cari Property" />
         </template>
       </Column>
-      <Column header="Butuh Tangga" field="useLadder" :filterMenuStyle="{ width: '14rem' }" class="min-w-[15rem]"
+      <!-- <Column header="Butuh Tangga" field="useLadder" :filterMenuStyle="{ width: '14rem' }" class="min-w-[15rem]"
         sortable>
         <template #body="{ data }">
           <div>
@@ -246,6 +247,15 @@ const exportCSV = (event: any) => {
             </template>
           </Select>
         </template>
+      </Column> -->
+      <Column header="Total Harga" filterField="price" dataType="text" class="min-w-[12rem]" sortable>
+        <template #body="{ data }">
+          Rp{{ formatPrice(data.total) }}
+        </template>
+        <template #filter="{ filterModel }">
+          <InputNumber v-model="filterModel.value" type="text" placeholder="Cari Harga" inputId="currency-indonesia"
+            mode="currency" currency="IDR" locale="id-ID" :minFractionDigits="0" />
+        </template>
       </Column>
       <Column field="vendor.name" header="Vendor" class="min-w-[15rem]" sortable>
         <template #body="{ data }">
@@ -263,15 +273,6 @@ const exportCSV = (event: any) => {
           <Tag value="Selesai" severity="success" class="whitespace-nowrap" />
         </template>
 
-      </Column>
-      <Column header="Total Harga" filterField="price" dataType="text" class="min-w-[12rem]" sortable>
-        <template #body="{ data }">
-          Rp{{ formatPrice(data.total) }}
-        </template>
-        <template #filter="{ filterModel }">
-          <InputNumber v-model="filterModel.value" type="text" placeholder="Cari Harga" inputId="currency-indonesia"
-            mode="currency" currency="IDR" locale="id-ID" :minFractionDigits="0" />
-        </template>
       </Column>
       <Column header="Metode Pembayaran" filterField="paymentMethod" dataType="text" class="min-w-[12rem]" sortable>
         <template #body="{ data }">
