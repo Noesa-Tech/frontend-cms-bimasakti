@@ -71,14 +71,6 @@
     });
   }
 
-function formatDate(value) {
-  return value.toLocaleDateString("en-US", {
-    day: "2-digit",
-    month: "2-digit",
-    year: "numeric",
-  });
-}
-
   const confirm2 = (event:any) => {
     confirm.require({
       target: event.currentTarget,
