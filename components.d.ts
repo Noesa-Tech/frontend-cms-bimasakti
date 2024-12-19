@@ -17,6 +17,7 @@ declare module 'vue' {
     AppSidebar: typeof import('./src/components/base/admin/AppSidebar.vue')['default']
     AppTopbar: typeof import('./src/components/base/admin/AppTopbar.vue')['default']
     Aquarium: typeof import('./src/components/icons/upcoming-features/aquarium.vue')['default']
+    Badge: typeof import('primevue/badge')['default']
     Bathroom: typeof import('./src/components/icons/Bathroom.vue')['default']
     Breadcrumb: typeof import('primevue/breadcrumb')['default']
     Button: typeof import('primevue/button')['default']

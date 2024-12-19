@@ -1,25 +1,35 @@
 <script setup lang="ts">
-import { BenefitService } from "@/service/BenefitService";
 import { FilterMatchMode, FilterOperator } from "@primevue/core/api";
-import { onBeforeMount, reactive, ref } from "vue";
 import DatePicker from "primevue/datepicker";
 import Select from "primevue/select";
 import { useConfirm } from "primevue/useconfirm";
-import { useToast } from 'primevue/usetoast';
 import ConfirmPopup from "primevue/confirmpopup";
 
+
+import { ServiceBenefitStore } from '@/store/serviceBenefit'
+
 const confirm = useConfirm();
-const toast = useToast();
+const $serviceBenefit = ServiceBenefitStore()
+
 const dt = ref();
-const filters = ref<any>({});
-const isLoading = ref<boolean>(false);
-const benefitData = ref(null);
+const filters = ref<any>({
+  global: { value: null, matchMode: FilterMatchMode.CONTAINS },
+    'service.name': { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
+    name: { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
+    updated_at: { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.DATE_IS }] },
+    status: { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.EQUALS }] },
+});
+
+const reactiveKey = ref<number>(0);
+const selectedRow = ref<any>(null)
 const statuses = reactive([1, 0]);
+
+
 const visibleEdit = ref<boolean>(false);
 const visibleAdd = ref<boolean>(false);
 
-function getSeverity(status: number) {
-  switch (status) {
+function getSeverity(e: number) {
+  switch (e) {
     case 0:
       return "danger";
     case 1:
@@ -28,8 +38,8 @@ function getSeverity(status: number) {
   }
 }
 
-function getStatusName(status: number) {
-  switch (status) {
+function getStatusName(e: number) {
+  switch (e) {
     case 0:
       return "Tidak Tersedia";
     case 1:
@@ -38,23 +48,15 @@ function getStatusName(status: number) {
   }
 }
 
-onBeforeMount(() => {
-  BenefitService.getBenefit().then((data: any) => {
-    benefitData.value = data;
-    isLoading.value = false;
-  });
-  initFilter();
+async function fetchAllServiceBenefit() {
+  await $serviceBenefit.fetchServiceBenefit()
+  reactiveKey.value += 1;
+}
+
+const items = computed(() => {
+  return $serviceBenefit.serviceBenefitAll || [];
 });
 
-function initFilter() {
-  filters.value = {
-    global: { value: null, matchMode: FilterMatchMode.CONTAINS },
-    'service.name': { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
-    name: { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
-    updated_at: { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.DATE_IS }] },
-    status: { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.EQUALS }] },
-  };
-}
 
 function formatDate(value: any) {
   const date = new Date(value);
@@ -89,12 +91,16 @@ const confirm2 = (event: any) => {
     },
   });
 };
+
+onMounted(async() => {
+  await $serviceBenefit.fetchServiceBenefit()
+})
 </script>
 <template>
   <TopBreadcrumb :breadcrumbItems="[{ label: 'Master' }, { label: 'Benefit' }]" />
   <div class="card mt-8">
     <div class="font-semibold text-xl mb-4">Data Benefit</div>
-    <DataTable ref="dt" :value="benefitData" rowGroupMode="rowspan" groupRowsBy="service.name" :paginator="true"
+    <DataTable ref="dt" :key="reactiveKey" :value="items" rowGroupMode="rowspan" groupRowsBy="service.name" :paginator="true"
       :rows="10" dataKey="id" :rowHover="true" v-model:filters="filters" filterDisplay="menu" :loading="isLoading"
       :globalFilterFields="['service.name', 'name', 'status', 'updated_at']" showGridlines>
       <template #header>
@@ -137,7 +143,7 @@ const confirm2 = (event: any) => {
       </Column>
       <Column header="Status" field="status" :filterMenuStyle="{ width: '14rem' }">
         <template #body="{ data }">
-          <Tag :value="getStatusName(data.status)" :severity="getSeverity(data.status)" class="whitespace-nowrap" />
+          <Tag :value="getStatusName(data.service.status)" :severity="getSeverity(data.service.status)" class="whitespace-nowrap" />
         </template>
         <template #filter="{ filterModel }">
           <Select v-model="filterModel.value" :options="statuses" placeholder="Pilih" showClear>
