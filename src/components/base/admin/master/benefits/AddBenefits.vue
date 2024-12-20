@@ -7,8 +7,8 @@ import { ServiceStore } from '@/store/service'
 
 const toast = useToast();
 const props = defineProps({
-    benefitsId: {
-        type: [Number, null] as PropType<number | null>,
+    service: {
+        type: [] as Array<any>,
         required: true,
     },
 });
@@ -27,6 +27,7 @@ const query = reactive({
 })
 
 async function onSave() {
+    console.log(query)
     //   const payload = {
     //     ...query,
     //     _method: "PATCH",
@@ -35,16 +36,6 @@ async function onSave() {
 
     //   $vendor.update(props.vendorId as number, payload)
     emit('on-save')
-}
-
-async function fetchDetailVendor() {
-    //   await $vendor.fetchDetail(props.vendorId as number)
-
-    //   query.name = $vendor.detail.name || "";
-    //   query.city_id = $vendor.detail.city_id || null;
-
-    //   // @ts-ignore
-    //   query.service_id =  $vendor.detail.vendor_service.map(item => item.service_id);
 }
 
 function getSeverity(status: number) {
@@ -66,7 +57,7 @@ function getStatusName(status: number) {
 }
 
 const items = computed(() => {
-    return $service.serviceAll || [];
+    return props.service || [];
 });
 
 onMounted(async () => {
@@ -84,7 +75,7 @@ onMounted(async () => {
     </div>
     <div class="flex flex-col gap-2 mb-4">
         <label for="desc">Layanan</label>
-        <Select v-model="query.service" :options="items" placeholder="Pilih Layanan">
+        <Select v-model="query.service" optionValue="id" optionLabel="name" :options="items" placeholder="Pilih Layanan">
             <template #value="slotProps">
                 <div v-if="slotProps.value != null" class="flex gap-4 items-center">
                     <img :src="slotProps.value.image_url" alt="" class="h-4">

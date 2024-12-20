@@ -9,10 +9,10 @@ export const ServiceStore = defineStore('ServiceStore', {
         problem: {} as Record<string, any>,
     }),
     actions: {
-        async fetchService() {
+        async fetchService(status: any = "") {
             this.isLoading = true
             try {
-                const res = await api.get(`/auth/services`)
+                const res = await api.get(`/auth/services?status=${status}`)
                 this.serviceAll = res.data
             } catch (err) {
             } finally {

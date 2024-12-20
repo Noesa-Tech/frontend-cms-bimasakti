@@ -6,9 +6,11 @@ import { useConfirm } from "primevue/useconfirm";
 import ConfirmPopup from "primevue/confirmpopup";
 
 
+import { ServiceStore } from '@/store/service'
 import { ServiceBenefitStore } from '@/store/serviceBenefit'
 
 const confirm = useConfirm();
+const $service = ServiceStore()
 const $serviceBenefit = ServiceBenefitStore()
 
 const dt = ref();
@@ -57,6 +59,10 @@ const items = computed(() => {
   return $serviceBenefit.serviceBenefitAll || [];
 });
 
+const serviceAll = computed(() => {
+  return $service.serviceAll || [];
+});
+
 
 function formatDate(value: any) {
   const date = new Date(value);
@@ -93,6 +99,7 @@ const confirm2 = (event: any) => {
 };
 
 onMounted(async() => {
+  await $service.fetchService(1)
   await $serviceBenefit.fetchServiceBenefit()
 })
 </script>
@@ -125,7 +132,7 @@ onMounted(async() => {
       <Column field="service.name" header="Layanan">
         <template #body="{ data }">
           <div class="flex flex-col items-center gap-2">
-            <img :alt="data.service.name" :src="data.service.image_url" width="32" style="vertical-align: middle" />
+            <img :alt="data.service.name" :src="data.image_url" width="32" style="vertical-align: middle" />
             <span>{{ data.service.name }}</span>
           </div>
         </template>
@@ -178,7 +185,7 @@ onMounted(async() => {
   </div>
   <ConfirmPopup></ConfirmPopup>
   <Dialog v-model:visible="visibleAdd" maximizable modal header="Tambah Benefit" class=" sm:w-1/2 w-full ">
-    <AddBenefits :benefitsId="1" @on-close="visibleAdd = false" @on-save="visibleAdd = false" />
+    <AddBenefits :service="serviceAll" @on-close="visibleAdd = false" @on-save="visibleAdd = false" />
   </Dialog>
   <Dialog v-model:visible="visibleEdit" maximizable modal header="Ubah Benefit" class=" sm:w-1/2 w-full ">
     <EditBenefits :benefitsId="1" @on-close="visibleEdit = false" @on-save="visibleEdit = false" />
