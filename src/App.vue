@@ -72,7 +72,8 @@ watch(() => eventBus.showToast, (newToast) => {
 <template>
    <Toast />
   <div v-if="$route.meta.requiresAuth" class="layout-wrapper" :class="containerClass">
-    <app-topbar></app-topbar>
+    <h1>Freeze Project </h1>
+    <!-- <app-topbar></app-topbar>
     <app-sidebar></app-sidebar>
     <div class="layout-main-container">
       <div class="layout-main">
@@ -82,13 +83,14 @@ watch(() => eventBus.showToast, (newToast) => {
       </div>
       <app-footer></app-footer>
     </div>
-    <div class="layout-mask animate-fadein"></div>
+    <div class="layout-mask animate-fadein"></div> -->
   </div>
 
   <div v-else>
-    <keep-alive>
+    <h1>Freeze Project </h1>
+    <!-- <keep-alive>
       <router-view></router-view>
-    </keep-alive>
+    </keep-alive> -->
   </div>
 </template>
 
