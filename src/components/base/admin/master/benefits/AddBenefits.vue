@@ -1,11 +1,7 @@
 <script setup lang="ts">
 import Select from "primevue/select";
-import { useToast } from 'primevue/usetoast';
-import { VendorStore } from '@/store/vendor'
-import { ServiceStore } from '@/store/service'
+import { ServiceBenefitStore } from '@/store/serviceBenefit'
 
-
-const toast = useToast();
 const props = defineProps({
     service: {
         type: [] as Array<any>,
@@ -15,8 +11,7 @@ const props = defineProps({
 
 const emit = defineEmits(["on-close", "on-save"]);
 
-const $service = ServiceStore()
-const $vendor = VendorStore()
+const $service = ServiceBenefitStore()
 const statuses = reactive([0, 1]);
 
 
@@ -27,14 +22,12 @@ const query = reactive({
 })
 
 async function onSave() {
-    console.log(query)
-    //   const payload = {
-    //     ...query,
-    //     _method: "PATCH",
-    //     service_id: JSON.stringify(query.service_id),
-    //   };
+    const payload = {
+        ...query,
+        service_id: query?.service?.id || null,
+    };
 
-    //   $vendor.update(props.vendorId as number, payload)
+    await $service.addServiceBenefit(payload)
     emit('on-save')
 }
 
@@ -59,13 +52,6 @@ function getStatusName(status: number) {
 const items = computed(() => {
     return props.service || [];
 });
-
-onMounted(async () => {
-    await $service.fetchService()
-})
-
-
-// watch(() => props.vendorId, fetchDetailVendor, { immediate: true });
 </script>
 
 <template>
@@ -75,7 +61,7 @@ onMounted(async () => {
     </div>
     <div class="flex flex-col gap-2 mb-4">
         <label for="desc">Layanan</label>
-        <Select v-model="query.service" optionValue="id" optionLabel="name" :options="items" placeholder="Pilih Layanan">
+        <Select v-model="query.service" optionLabel="name" :options="items" placeholder="Pilih Layanan">
             <template #value="slotProps">
                 <div v-if="slotProps.value != null" class="flex gap-4 items-center">
                     <img :src="slotProps.value.image_url" alt="" class="h-4">

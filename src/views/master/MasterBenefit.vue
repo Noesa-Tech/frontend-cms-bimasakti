@@ -77,10 +77,10 @@ const exportCSV = (event: any) => {
   dt.value.exportCSV();
 };
 
-const confirm2 = (event: any) => {
+const confirmDelete = (e: any) => {
   confirm.require({
-    target: event.currentTarget,
-    message: "Yakin ingin menghapus benefit ini?",
+    target: e.currentTarget,
+    message: "Yakin ingin menghapus service benefit ini?",
     icon: "pi pi-info-circle",
     rejectProps: {
       label: "Batal",
@@ -91,7 +91,9 @@ const confirm2 = (event: any) => {
       label: "Yakin",
       severity: "danger",
     },
-    accept: () => {
+    accept: async() => {
+      await $serviceBenefit.delete(e)
+      await $serviceBenefit.fetchServiceBenefit()
     },
     reject: () => {
     },
@@ -150,7 +152,7 @@ onMounted(async() => {
       </Column>
       <Column header="Status" field="status" :filterMenuStyle="{ width: '14rem' }">
         <template #body="{ data }">
-          <Tag :value="getStatusName(data.service.status)" :severity="getSeverity(data.service.status)" class="whitespace-nowrap" />
+          <Tag :value="getStatusName(data.status)" :severity="getSeverity(data.status)" class="whitespace-nowrap" />
         </template>
         <template #filter="{ filterModel }">
           <Select v-model="filterModel.value" :options="statuses" placeholder="Pilih" showClear>
@@ -175,9 +177,9 @@ onMounted(async() => {
       <Column field="id" header="Action" bodyClass="text-center" class="min-w-[10rem]">
         <template #body="{ data }">
           <div class="flex gap-4 items-center">
-            <Button icon="pi pi-pencil" severity="info" text v-tooltip.bottom="'Ubah'" @click="visibleEdit = true" />
+            <Button icon="pi pi-pencil" severity="info" text v-tooltip.bottom="'Ubah'" @click="selectedRow = data, visibleEdit = true" />
 
-            <Button icon="pi pi-trash" severity="danger" text v-tooltip.bottom="'Hapus'" @click="confirm2($event)" />
+            <Button icon="pi pi-trash" severity="danger" text v-tooltip.bottom="'Hapus'" @click="confirmDelete(data.id)" />
           </div>
         </template>
       </Column>
@@ -185,9 +187,9 @@ onMounted(async() => {
   </div>
   <ConfirmPopup></ConfirmPopup>
   <Dialog v-model:visible="visibleAdd" maximizable modal header="Tambah Benefit" class=" sm:w-1/2 w-full ">
-    <AddBenefits :service="serviceAll" @on-close="visibleAdd = false" @on-save="visibleAdd = false" />
+    <AddBenefits :service="serviceAll || []" @on-close="visibleAdd = false" @on-save="visibleAdd = false, fetchAllServiceBenefit()" />
   </Dialog>
   <Dialog v-model:visible="visibleEdit" maximizable modal header="Ubah Benefit" class=" sm:w-1/2 w-full ">
-    <EditBenefits :benefitsId="1" @on-close="visibleEdit = false" @on-save="visibleEdit = false" />
+    <EditBenefits :service="serviceAll || []" :serviceBenefit="selectedRow" @on-close="visibleEdit = false" @on-save="visibleEdit = false, fetchAllServiceBenefit()" />
   </Dialog>
 </template>

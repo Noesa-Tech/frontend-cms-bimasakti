@@ -18,21 +18,11 @@ export const ServiceBenefitStore = defineStore('ServiceBenefitStore', {
                 this.isLoading = false
             }
         },
-        async addService(payload: any) {
+        async addServiceBenefit(payload: any) {
             this.isLoading = true
 
-            const formData = new FormData();
-
-            for (const key in payload) {
-                formData.append(key, payload[key]);
-            }
-
             try {
-                const res = await api.post(`/auth/services`, formData, {
-                    headers: {
-                        'Content-Type': 'multipart/form-data',
-                    },
-                });        
+                const res = await api.post(`/auth/services-benefit`, payload);        
 
                  // @ts-ignore
                 toast.success('success', res.message)
@@ -41,21 +31,10 @@ export const ServiceBenefitStore = defineStore('ServiceBenefitStore', {
                 this.isLoading = false
             }
         },
-        async updateServcice(serviceId: number, payload: any) {
+        async updateServiceBenefit(serviceBenefitId: number, payload: any) {
             this.isLoading = true
-
-            const formData = new FormData();
-
-            for (const key in payload) {
-                formData.append(key, payload[key]);
-            }
-
             try {
-                const res = await api.post(`/auth/services/${serviceId}`, formData, {
-                    headers: {
-                        'Content-Type': 'multipart/form-data',
-                    },
-                });        
+                const res = await api.post(`/auth/services-benefit/${serviceBenefitId}`, payload);        
 
                  // @ts-ignore
                 toast.success('success', res.message)
@@ -64,11 +43,11 @@ export const ServiceBenefitStore = defineStore('ServiceBenefitStore', {
                 this.isLoading = false
             }
         },
-        async delete(serviceId: Number) {
+        async delete(serviceBenefitId: Number) {
             this.isLoading = true
 
             try {
-                const res = await api.delete(`/auth/services/${serviceId}`);        
+                const res = await api.delete(`/auth/services-benefit/${serviceBenefitId}`);        
 
                  // @ts-ignore
                 toast.success('success', res.message)
