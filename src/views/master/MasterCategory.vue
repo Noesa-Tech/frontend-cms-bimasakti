@@ -1,19 +1,28 @@
 <script setup lang="ts">
 import { CategoryService } from "@/service/CategoryService";
 import { FilterMatchMode, FilterOperator } from "@primevue/core/api";
-import { onBeforeMount, reactive, ref } from "vue";
 import DatePicker from "primevue/datepicker";
 import Select from "primevue/select";
 import { useConfirm } from "primevue/useconfirm";
-import { useToast } from 'primevue/usetoast';
 import ConfirmPopup from "primevue/confirmpopup";
 
+import { ServiceCategoryStore } from '@/store/serviceCategory'
+
 const confirm = useConfirm();
-const toast = useToast();
+const $serviceCategory = ServiceCategoryStore()
+
 const dt = ref();
-const filters = ref<any>({});
-const isLoading = ref<boolean>(false);
-const categoryData = ref(null);
+const selectedRow = ref<any>(null)
+const reactiveKey = ref<number>(0)
+const filters = ref<any>({
+  global: { value: null, matchMode: FilterMatchMode.CONTAINS },
+  'service.name': { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
+  price: { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
+  name: { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
+  updated_at: { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.DATE_IS }] },
+  status: { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.EQUALS }] },
+});
+
 const statuses = reactive([1, 0]);
 const visibleEdit = ref<boolean>(false);
 const visibleAdd = ref<boolean>(false);
@@ -38,25 +47,6 @@ function getStatusName(status: number) {
   }
 }
 
-onBeforeMount(() => {
-  CategoryService.getCategory().then((data: any) => {
-    categoryData.value = data;
-    isLoading.value = false;
-  });
-  initFilter();
-});
-
-function initFilter() {
-  filters.value = {
-    global: { value: null, matchMode: FilterMatchMode.CONTAINS },
-    'service.name': { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
-    price: { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
-    name: { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
-    updated_at: { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.DATE_IS }] },
-    status: { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.EQUALS }] },
-  };
-}
-
 function formatDate(value: any) {
   const date = new Date(value);
   return date.toLocaleDateString("en-US", {
@@ -70,10 +60,10 @@ const exportCSV = (event: any) => {
   dt.value.exportCSV();
 };
 
-const confirm2 = (event: any) => {
+const confirmDelete = (e: any) => {
   confirm.require({
-    target: event.currentTarget,
-    message: "Yakin ingin menghapus kategori ini?",
+    target: e.currentTarget,
+    message: "Yakin ingin menghapus service problem ini?",
     icon: "pi pi-info-circle",
     rejectProps: {
       label: "Batal",
@@ -84,19 +74,35 @@ const confirm2 = (event: any) => {
       label: "Yakin",
       severity: "danger",
     },
-    accept: () => {
+    accept: async() => {
+      await $serviceCategory.delete(e)
+      await $serviceCategory.fetchServiceCategory("",0)
     },
     reject: () => {
     },
   });
 };
+
+async function fetchAllServiceCategory() {
+  await $serviceCategory.fetchServiceCategory("",0)
+  reactiveKey.value += 1;
+}
+
+const items = computed(() => {
+  return $serviceCategory.serviceCategoryAll || [];
+});
+
+onMounted(async() => {
+  await $serviceCategory.fetchServiceCategory("", 0)
+})
+
 </script>
 <template>
   <TopBreadcrumb :breadcrumbItems="[{ label: 'Master' }, { label: 'Kategori' }]" />
   <div class="card mt-8">
     <div class="font-semibold text-xl mb-4">Data Kategori</div>
-    <DataTable ref="dt" :value="categoryData" rowGroupMode="rowspan" groupRowsBy="service.name" :paginator="true"
-      :rows="10" dataKey="id" :rowHover="true" v-model:filters="filters" filterDisplay="menu" :loading="isLoading"
+    <DataTable ref="dt" :key="reactiveKey"  :value="items" rowGroupMode="rowspan" groupRowsBy="service.name" :paginator="true"
+      :rows="10" dataKey="id" :rowHover="true" v-model:filters="filters" filterDisplay="menu" :loading="$serviceCategory.isLoading"
       :globalFilterFields="['service.name', 'name', 'price', 'status', 'updated_at']" showGridlines>
       <template #header>
         <div class="flex flex-col md:flex-row justify-between gap-4">
@@ -120,7 +126,7 @@ const confirm2 = (event: any) => {
       <Column field="service.name" header="Layanan">
         <template #body="{ data }">
           <div class="flex flex-col items-center gap-2">
-            <img :alt="data.service.name" :src="data.service.image_url" width="32" style="vertical-align: middle" />
+            <img :alt="data.service.name" :src="data.image_url" width="32" style="vertical-align: middle" />
             <span>{{ data.service.name }}</span>
           </div>
         </template>
@@ -152,15 +158,6 @@ const confirm2 = (event: any) => {
           </Select>
         </template>
       </Column>
-      <Column header="Harga" filterField="price" dataType="text" class="min-w-[12rem]">
-        <template #body="{ data }">
-          Rp{{ formatPrice(data.price) }}
-        </template>
-        <template #filter="{ filterModel }">
-          <InputNumber v-model="filterModel.value" type="text" placeholder="Cari Harga" inputId="currency-indonesia"
-            mode="currency" currency="IDR" locale="id-ID" :minFractionDigits="0" />
-        </template>
-      </Column>
       <Column header="Terakhir Update" filterField="updated_at" dataType="date" class="min-w-[12rem]">
         <template #body="{ data }">
           {{ formatDate(data.updated_at) }}
@@ -172,9 +169,9 @@ const confirm2 = (event: any) => {
       <Column field="id" header="Action" bodyClass="text-center" class="min-w-[10rem]">
         <template #body="{ data }">
           <div class="flex gap-4 items-center">
-            <Button icon="pi pi-pencil" severity="info" text v-tooltip.bottom="'Ubah'" @click="visibleEdit = true" />
+            <Button icon="pi pi-pencil" severity="info" text v-tooltip.bottom="'Ubah'" @click="selectedRow = data, visibleEdit = true" />
 
-            <Button icon="pi pi-trash" severity="danger" text v-tooltip.bottom="'Hapus'" @click="confirm2($event)" />
+            <Button icon="pi pi-trash" severity="danger" text v-tooltip.bottom="'Hapus'" @click="confirmDelete(data.id)" />
           </div>
         </template>
       </Column>
@@ -182,9 +179,9 @@ const confirm2 = (event: any) => {
   </div>
   <ConfirmPopup></ConfirmPopup>
   <Dialog v-model:visible="visibleAdd" maximizable modal header="Tambah Kategori" class=" sm:w-1/2 w-full ">
-    <AddCategory :categoryId="1" @on-close="visibleAdd = false" @on-save="visibleAdd = false" />
+    <AddCategory @on-close="visibleAdd = false" @on-save="visibleAdd = false, fetchAllServiceCategory()" />
   </Dialog>
   <Dialog v-model:visible="visibleEdit" maximizable modal header="Ubah Kategori" class=" sm:w-1/2 w-full ">
-    <EditCategory :categoryId="1" @on-close="visibleEdit = false" @on-save="visibleEdit = false" />
+    <EditCategory :detail="selectedRow" @on-close="visibleEdit = false" @on-save="visibleEdit = false, fetchAllServiceCategory()" />
   </Dialog>
 </template>

@@ -1,22 +1,12 @@
 <script setup lang="ts">
 import Select from "primevue/select";
-import { useToast } from 'primevue/usetoast';
-import { VendorStore } from '@/store/vendor'
 import { ServiceStore } from '@/store/service'
-
-
-const toast = useToast();
-const props = defineProps({
-    categoryId: {
-        type: [Number, null] as PropType<number | null>,
-        required: true,
-    },
-});
+import { ServiceCategoryStore } from '@/store/serviceCategory'
 
 const emit = defineEmits(["on-close", "on-save"]);
 
 const $service = ServiceStore()
-const $vendor = VendorStore()
+const $serviceCategory = ServiceCategoryStore()
 const statuses = reactive([0, 1]);
 
 
@@ -28,24 +18,14 @@ const query = reactive({
 })
 
 async function onSave() {
-    //   const payload = {
-    //     ...query,
-    //     _method: "PATCH",
-    //     service_id: JSON.stringify(query.service_id),
-    //   };
+      const payload = {
+        name: query.name,
+        status: query.status,
+        service_id: query?.service?.id,
+      };
 
-    //   $vendor.update(props.vendorId as number, payload)
+    await $serviceCategory.addServiceCategory(payload)
     emit('on-save')
-}
-
-async function fetchDetailVendor() {
-    //   await $vendor.fetchDetail(props.vendorId as number)
-
-    //   query.name = $vendor.detail.name || "";
-    //   query.city_id = $vendor.detail.city_id || null;
-
-    //   // @ts-ignore
-    //   query.service_id =  $vendor.detail.vendor_service.map(item => item.service_id);
 }
 
 function getSeverity(status: number) {
@@ -73,9 +53,6 @@ const items = computed(() => {
 onMounted(async () => {
     await $service.fetchService()
 })
-
-
-// watch(() => props.vendorId, fetchDetailVendor, { immediate: true });
 </script>
 
 <template>
@@ -99,11 +76,6 @@ onMounted(async () => {
                 </div>
             </template>
         </Select>
-    </div>
-    <div class="flex flex-col gap-2 mb-4">
-        <label for="name">Harga</label>
-        <InputNumber v-model="query.price" type="text" placeholder="Harga" inputId="currency-indonesia" mode="currency"
-            currency="IDR" locale="id-ID" :minFractionDigits="0" />
     </div>
     <div class="flex flex-col gap-2">
         <label for="desc">Status</label>

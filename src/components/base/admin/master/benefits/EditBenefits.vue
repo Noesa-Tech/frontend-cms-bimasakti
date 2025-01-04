@@ -17,7 +17,7 @@ const emit = defineEmits(["on-close", "on-save"]);
 
 const $service = ServiceBenefitStore()
 const statuses = reactive([0, 1]);
-console.log(props.serviceBenefit)
+
 const query = reactive({
     name: props.serviceBenefit.name,
     service: {

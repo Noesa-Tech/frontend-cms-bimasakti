@@ -110,7 +110,7 @@ onMounted(async() => {
   <div class="card mt-8">
     <div class="font-semibold text-xl mb-4">Data Benefit</div>
     <DataTable ref="dt" :key="reactiveKey" :value="items" rowGroupMode="rowspan" groupRowsBy="service.name" :paginator="true"
-      :rows="10" dataKey="id" :rowHover="true" v-model:filters="filters" filterDisplay="menu" :loading="isLoading"
+      :rows="10" dataKey="id" :rowHover="true" v-model:filters="filters" filterDisplay="menu" :loading="$serviceBenefit.isLoading"
       :globalFilterFields="['service.name', 'name', 'status', 'updated_at']" showGridlines>
       <template #header>
         <div class="flex flex-col md:flex-row justify-between gap-4">
