@@ -25,6 +25,11 @@ const dt = ref();
 const $order = OrderStore()
 const $vendor = VendorStore()
 
+const query = reactive({
+  vendor: null,
+  reason : ""
+})
+
 const reactiveKey = ref<number>(0);
 const filters = ref<any>({
   global: { value: null, matchMode: FilterMatchMode.CONTAINS },
@@ -95,6 +100,7 @@ function ladderStatus(status: number) {
 const vendorItems = computed(() => {
   return $vendor.vendors.map((item: any) => ({
     id: item.id,
+    code: item.id,
     name: item.name,
     location: item.address,
     date: item.created_at,
@@ -113,6 +119,11 @@ async function fetchVendor() {
   reactiveKey.value += 1;
 }
 
+async function fetchOrder() {
+  await $order.fetchOrder()
+  reactiveKey.value += 1;
+}
+
 onMounted(async () => {
   await $order.fetchOrder()
   await $vendor.fetchVendor()
@@ -127,9 +138,9 @@ function formatDate(value: any) {
   });
 }
 
-const confirm2 = (event: any) => {
+const rejectOrder = (e: any) => {
   confirm.require({
-    target: event.currentTarget,
+    target: e.currentTarget,
     message: "Yakin ingin membatalkan pesanan ini?",
     icon: "pi pi-info-circle",
     rejectProps: {
@@ -141,19 +152,26 @@ const confirm2 = (event: any) => {
       label: "Yakin",
       severity: "danger",
     },
-    accept: () => {
-      toast.add({ severity: "info", summary: "Confirmed", detail: "Pesanan dibatalkan", life: 3000 });
+    accept: async() => {
+      // @ts-ignore
+      await $order.rejectOrder(query.vendor.id, e, query.reason)
+      await fetchOrder()
     },
     reject: () => {
-      toast.add({ severity: "error", summary: "Rejected", detail: "You have rejected", life: 3000 });
     },
   });
 };
 
-const confirmNext = (event: any) => {
+const confirmOrder = (e: any) => {
+   // @ts-ignore
+  if(!query.vendor || !query.vendor.name){
+    return toast.add({ severity: "error", summary: "Error", detail: "Vendor belum dipilih"})
+  }
+
   confirm.require({
-    target: event.currentTarget,
-    message: "Yakin ingin meneruskan pesanan ini kepada vendor 'PT Air Conditioner'?",
+    target: e.currentTarget,
+     // @ts-ignore
+    message: `Yakin ingin meneruskan pesanan ini kepada vendor '${query.vendor.name}'?`,
     icon: "pi pi-info-circle",
     rejectProps: {
       label: "Batal",
@@ -164,8 +182,10 @@ const confirmNext = (event: any) => {
       label: "Teruskan",
       severity: "success",
     },
-    accept: () => {
-
+    accept: async() => {
+      // @ts-ignore
+      await $order.acceptOrder(query.vendor.id, e)
+      await fetchOrder()
     },
     reject: () => {
 
@@ -187,7 +207,7 @@ const setPopoverRef = (orderId: number, el: HTMLElement | null) => {
 const togglePhone = (event: any) => {
   opPhone.value.toggle(event);
 };
-const toggleConfirm = (event: any) => {
+const confirmReject = (e: any) => {
   opCancelConfirm.value.toggle(event);
 };
 
@@ -420,7 +440,7 @@ const exportCSV = (event: any) => {
       </Column>
       <Column sortable field="vendor" header="Vendor Pilihan" class="min-w-[15rem]">
         <template #body="{ data }">
-          <Select v-model="data.vendor" :options="vendorItems" filter optionLabel="name" placeholder="Pilih Vendor"
+          <Select v-model="query.vendor" :options="vendorItems" :value="data?.vendor_id?.name" filter optionLabel="name" placeholder="Pilih Vendor"
             class="w-[15rem]" />
         </template>
         <template #filter="{ filterModel }">
@@ -441,19 +461,19 @@ const exportCSV = (event: any) => {
             <Button icon="pi pi-external-link" severity="info" text v-tooltip.bottom="'Detail Pesanan'" as="router-link"
               :to="{ name: 'order-detail', params: { id: data.id } }" />
             <Button icon="pi pi-send" severity="success" text v-tooltip.bottom="'Teruskan Pesanan'"
-              @click="confirmNext($event)" />
+              @click="confirmOrder(data.id)" />
             <Button icon="pi pi-times" severity="danger" text v-tooltip.bottom="'Batalkan'"
-              @click="toggleConfirm($event)" />
+              @click="confirmReject(data.id)" />
             <Popover ref="opCancelConfirm" class="p-0 min-w-[20rem]">
               <h6 class="mb-2">Pembatalan Pesanan</h6>
               <div class="flex flex-col gap-4">
                 <div class="flex flex-col gap-2">
                   <label for="message">Beri alasan</label>
-                  <Textarea id="message" />
+                  <Textarea v-model="query.reason" id="message" />
                 </div>
                 <div class="flex gap-2 justify-end">
-                  <Button label="Batal" severity="secondary" text @click="toggleConfirm($event)" />
-                  <Button label="Submit" @click="confirm2($event)" />
+                  <Button label="Batal" severity="secondary" text @click="confirmReject($event)" />
+                  <Button label="Submit" @click="rejectOrder(data.id)" />
                 </div>
               </div>
             </Popover>
