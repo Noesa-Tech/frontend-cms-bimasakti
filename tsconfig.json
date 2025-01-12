@@ -1,7 +1,10 @@
 {
   "compilerOptions": {
     "target": "ES2015",
-    "lib": ["ES2015", "DOM"],
+    "lib": [
+      "ES2015",
+      "DOM"
+    ],
     "module": "ESNext",
     "moduleResolution": "Node",
     "strict": true,
@@ -11,7 +14,13 @@
     "allowJs": true,
     "checkJs": true,
     "paths": {
-      "@/*": ["src/*"]
+      "@/*": [
+        "src/*"
+      ]
     }
-  }
+  },
+  "include": [
+    "src",
+    "global.d.ts"
+  ]
 }

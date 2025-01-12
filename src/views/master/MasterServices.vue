@@ -4,7 +4,6 @@ import DatePicker from "primevue/datepicker";
 import Select from "primevue/select";
 import { useConfirm } from "primevue/useconfirm";
 import ConfirmPopup from "primevue/confirmpopup";
-
 import { ServiceStore } from '@/store/service'
 
 const confirm = useConfirm();
@@ -73,7 +72,7 @@ const confirmDelete = (e: any) => {
       label: "Yakin",
       severity: "danger",
     },
-    accept: async() => {
+    accept: async () => {
       await $service.delete(e)
       await $service.fetchService()
     },
@@ -109,9 +108,12 @@ const confirmDelete = (e: any) => {
       <template #empty> Tidak ada data layanan. </template>
       <template #loading> Memuat data layanan. Mohon tunggu. </template>
 
-      <Column sortable field="name" header="Layanan" class="min-w-[15rem]">
+      <Column sortable field="name" header="Layanan" class="min-w-[20rem]">
         <template #body="{ data }">
-          {{ data.name }}
+          <div class="flex gap-4">
+            <img :src="data.image_url" :alt="data.name" width="32">
+            <p class="m-0">{{ data.name }}</p>
+          </div>
         </template>
         <template #filter="{ filterModel }">
           <InputText v-model="filterModel.value" type="text" placeholder="Cari Layanan" />
@@ -129,8 +131,7 @@ const confirmDelete = (e: any) => {
       </Column>
       <Column sortable header="Status" field="status" :filterMenuStyle="{ width: '14rem' }">
         <template #body="{ data }">
-          <Tag :value="getStatusName(data.status)" :severity="getSeverity(data.status)"
-            class="whitespace-nowrap" />
+          <Tag :value="getStatusName(data.status)" :severity="getSeverity(data.status)" class="whitespace-nowrap" />
         </template>
         <template #filter="{ filterModel }">
           <Select v-model="filterModel.value" :options="statuses" placeholder="Pilih" showClear>
@@ -155,9 +156,11 @@ const confirmDelete = (e: any) => {
       <Column sortable field="id" header="Action" bodyClass="text-center" class="min-w-[10rem]">
         <template #body="{ data }">
           <div class="flex gap-4 items-center">
-            <Button icon="pi pi-pencil" severity="info" text v-tooltip.bottom="'Ubah'" @click="selectedRow = data ,visibleEdit = true" />
+            <Button icon="pi pi-pencil" severity="info" text v-tooltip.bottom="'Ubah'"
+              @click="selectedRow = data, visibleEdit = true" />
 
-            <Button icon="pi pi-trash" severity="danger" text v-tooltip.bottom="'Hapus'" @click="confirmDelete(data.id)" />
+            <Button icon="pi pi-trash" severity="danger" text v-tooltip.bottom="'Hapus'"
+              @click="confirmDelete(data.id)" />
           </div>
         </template>
       </Column>
@@ -168,6 +171,7 @@ const confirmDelete = (e: any) => {
     <AddService @on-close="visibleAdd = false" @on-save="visibleAdd = false, fetchAllService()" />
   </Dialog>
   <Dialog v-model:visible="visibleEdit" maximizable modal header="Ubah Layanan" class=" sm:w-1/2 w-full ">
-    <EditService :service="selectedRow" @on-close="visibleEdit = false" @on-save="visibleEdit = false, fetchAllService()" />
+    <EditService :service="selectedRow" @on-close="visibleEdit = false"
+      @on-save="visibleEdit = false, fetchAllService()" />
   </Dialog>
 </template>

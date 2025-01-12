@@ -1,51 +1,59 @@
 <script setup lang="ts">
 import { AuthStore } from '@/store/auth'
+import logo from "@/assets/images/logo/logo.png";
 
 const $auth = AuthStore()
 const router = useRouter();
 
 const query = reactive({
   email: "johndoe@gmail.com",
-  password : "password"
+  password: "password"
 })
 const checked = ref<boolean>(false);
 
-async function onSubmit(){
+async function onSubmit() {
   await $auth.login(query);
   router.push("/dashboard");
 }
 </script>
 
 <template>
-  <div class="bg-surface-50 dark:bg-surface-950 flex items-center justify-center min-h-screen min-w-[100vw] overflow-hidden">
+  <div
+    class="bg-surface-50 dark:bg-surface-950 flex items-center justify-center min-h-screen min-w-[100vw] overflow-hidden">
     <div class="flex flex-col items-center justify-center">
-      <div style="border-radius: 56px; padding: 0.3rem; background: linear-gradient(180deg, var(--primary-color) 10%, rgba(33, 150, 243, 0) 30%)">
+      <div
+        style="border-radius: 56px; padding: 0.3rem; background: linear-gradient(180deg, var(--primary-color) 10%, rgba(33, 150, 243, 0) 30%)">
         <div class="w-full bg-surface-0 dark:bg-surface-900 py-20 px-8 sm:px-20" style="border-radius: 53px">
           <div class="text-center mb-8">
             <div class="flex items-center justify-center mb-4">
-              <img src="https://www.bimasakti.homes/_next/image?url=%2Flogo.png&w=1080&q=75" alt="Logo" class="h-[32px]" />
+              <img :src="logo" alt="Logo" class="h-[32px]" />
             </div>
-            <div class="text-surface-900 dark:text-surface-0 text-3xl font-medium mb-4 text-center">Dashboard Admin</div>
+            <div class="text-surface-900 dark:text-surface-0 text-3xl font-medium mb-4 text-center">Dashboard Admin
+            </div>
             <span class="text-muted-color font-medium">Login untuk melanjutkan</span>
           </div>
           <form @submit.prevent="onSubmit">
-          <div>
-            <label for="email1" class="block text-surface-900 dark:text-surface-0 text-xl font-medium mb-2">Email</label>
-            <InputText id="email1" type="text" placeholder="Alamat email" class="w-full md:w-[30rem] mb-8" v-model="query.email" />
+            <div>
+              <label for="email1"
+                class="block text-surface-900 dark:text-surface-0 text-xl font-medium mb-2">Email</label>
+              <InputText id="email1" type="text" placeholder="Alamat email" class="w-full md:w-[30rem] mb-8"
+                v-model="query.email" />
 
-            <label for="password1" class="block text-surface-900 dark:text-surface-0 font-medium text-xl mb-2">Password</label>
-            <Password id="password1" v-model="query.password" placeholder="Password" :toggleMask="true" class="mb-4" fluid :feedback="false"></Password>
+              <label for="password1"
+                class="block text-surface-900 dark:text-surface-0 font-medium text-xl mb-2">Password</label>
+              <Password id="password1" v-model="query.password" placeholder="Password" :toggleMask="true" class="mb-4"
+                fluid :feedback="false"></Password>
 
-            <div class="flex items-center justify-between mt-2 mb-8 gap-8">
-              <div class="flex items-center">
-                <Checkbox v-model="checked" id="rememberme1" binary class="mr-2"></Checkbox>
-                <label for="rememberme1">Ingat Saya</label>
+              <div class="flex items-center justify-between mt-2 mb-8 gap-8">
+                <div class="flex items-center">
+                  <Checkbox v-model="checked" id="rememberme1" binary class="mr-2"></Checkbox>
+                  <label for="rememberme1">Ingat Saya</label>
+                </div>
+                <span class="font-medium no-underline ml-2 text-right cursor-pointer text-primary">Lupa Password?</span>
               </div>
-              <span class="font-medium no-underline ml-2 text-right cursor-pointer text-primary">Lupa Password?</span>
+              <Button type="submit" :loading="$auth.isLoading" label="Login" class="w-full"></Button>
             </div>
-            <Button type="submit" :loading="$auth.isLoading" label="Login" class="w-full"></Button>
-          </div>
-        </form>
+          </form>
         </div>
       </div>
     </div>

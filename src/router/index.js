@@ -68,6 +68,15 @@ const routes = [
     },
   },
   {
+    path: "/master/properti",
+    name: "master-property",
+    component: () => import("@/views/master/MasterProperty.vue"),
+    meta: {
+      requiresAuth: true,
+      title: "Data Properti",
+    },
+  },
+  {
     path: "/vendors",
     name: "vendors",
     component: () => import("@/views/vendors/Vendors.vue"),
@@ -163,6 +172,15 @@ const routes = [
     meta: {
       requiresAuth: true,
       title: "Pengaturan Pembayaran",
+    },
+  },
+  {
+    path: "/pengaturan/media-sosial",
+    name: "settings-social",
+    component: () => import("@/views/settings/social/Social.vue"),
+    meta: {
+      requiresAuth: true,
+      title: "Pengaturan Media Sosial",
     },
   },
   // VENDOR 

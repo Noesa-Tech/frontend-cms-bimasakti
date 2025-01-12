@@ -14,6 +14,7 @@ import ConfirmPopup from "primevue/confirmpopup";
 import Popover from "primevue/popover";
 
 import { OrderStore } from '@/store/order'
+import { VendorStore } from '@/store/vendor'
 
 const popovers = ref<Record<number, HTMLElement | null>>({});
 const opPhone = ref();
@@ -22,6 +23,7 @@ const confirm = useConfirm();
 const toast = useToast();
 const dt = ref();
 const $order = OrderStore()
+const $vendor = VendorStore()
 
 const reactiveKey = ref<number>(0);
 const filters = ref<any>({
@@ -90,12 +92,30 @@ function ladderStatus(status: number) {
   }
 }
 
+const vendorItems = computed(() => {
+  return $vendor.vendors.map((item: any) => ({
+    id: item.id,
+    name: item.name,
+    location: item.address,
+    date: item.created_at,
+    status: item.deleted_at,
+    city: item.city,
+    services: item.vendor_service
+  }));
+});
+
 const items = computed(() => {
   return $order.allOrder || []
 });
 
+async function fetchVendor() {
+  await $vendor.fetchVendor()
+  reactiveKey.value += 1;
+}
+
 onMounted(async () => {
   await $order.fetchOrder()
+  await $vendor.fetchVendor()
 })
 
 function formatDate(value: any) {
@@ -398,27 +418,15 @@ const exportCSV = (event: any) => {
           <Select v-model="filterModel.value" :options="paymentMethods" placeholder="Pilih" showClear />
         </template>
       </Column>
-      <!-- <Column sortable field="vendor" header="Vendor Pilihan" class="min-w-[15rem]">
+      <Column sortable field="vendor" header="Vendor Pilihan" class="min-w-[15rem]">
         <template #body="{ data }">
-          <div v-if="data.vendor">
-            <span class="font-semibold block mb-0">{{ data.vendor.name }}</span>
-            <InputGroup>
-              <InputText :value="data.vendor.code" readonly class="w-[15rem]"></InputText>
-              <InputGroupAddon>
-                <Button icon="pi pi-copy" severity="secondary" text />
-              </InputGroupAddon>
-            </InputGroup>
-          </div>
-          <div v-else class="">
-            <h6 class="m-0">Vendor Belum Dipilih</h6>
-            <Select v-model="data.vendor" :options="vendorsData" filter optionLabel="name" placeholder="Pilih Vendor"
-              class="w-[15rem]" />
-          </div>
+          <Select v-model="data.vendor" :options="vendorItems" filter optionLabel="name" placeholder="Pilih Vendor"
+            class="w-[15rem]" />
         </template>
         <template #filter="{ filterModel }">
           <InputText v-model="filterModel.value" type="text" placeholder="Cari Vendor" />
         </template>
-      </Column> -->
+      </Column>
       <Column sortable header="Tanggal Pesanan" filterField="date" dataType="date" class="min-w-[20rem]">
         <template #body="{ data }">
           {{ formatDate(data.created_at) }}

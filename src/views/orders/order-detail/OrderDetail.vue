@@ -168,8 +168,11 @@ function formatDate(value) {
       </div>
       <Divider />
       <div class="flex gap-2 px-4 items-center">
-        <p class="md:text-sm sm:text-base text-[0.4rem] m-0 w-1/2"><i
-            class="pi pi-shield mr-2 assurance-icon"></i>Asuransi Jasa Bimasakti Homes</p>
+        <div class="w-1/2">
+          <p class="md:text-sm sm:text-base text-[0.4rem] m-0"><i class="pi pi-shield mr-2 assurance-icon"></i>Asuransi
+            Jasa Bimasakti Homes</p>
+          <p class="md:text-xs sm:text-sm text-[0.3rem] m-0 ml-6">Harga sudah termasuk ppn 11%</p>
+        </div>
         <div class="w-1/2">
           <p class="md:text-sm sm:text-base text-[0.4rem] m-0 text-muted-color">Metode Pembayaran:</p>
           <h6 class="md:text-sm sm:text-base text-[0.4rem] m-0">Transfer</h6>

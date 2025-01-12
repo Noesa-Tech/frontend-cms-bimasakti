@@ -1,5 +1,6 @@
-<script setup>
+<script setup lang="ts">
 import { useLayout } from "@/components/base/admin/composables/layout";
+import logo from "@/assets/images/logo/logo.png";
 
 const { onMenuToggle, toggleDarkMode, isDarkTheme } = useLayout();
 </script>
@@ -11,7 +12,7 @@ const { onMenuToggle, toggleDarkMode, isDarkTheme } = useLayout();
         <i class="pi pi-bars"></i>
       </button>
       <div class="layout-topbar-logo">
-        <img src="https://www.bimasakti.homes/_next/image?url=%2Flogo.png&w=1080&q=75" alt="Logo" class="h-[32px]" />
+        <img :src="logo" alt="Logo" class="h-[32px]" />
       </div>
     </div>
 
@@ -22,17 +23,14 @@ const { onMenuToggle, toggleDarkMode, isDarkTheme } = useLayout();
         </button>
       </div>
 
-      <button
-        class="layout-topbar-menu-button layout-topbar-action"
-        v-styleclass="{
-          selector: '@next',
-          enterFromClass: 'hidden',
-          enterActiveClass: 'animate-scalein',
-          leaveToClass: 'hidden',
-          leaveActiveClass: 'animate-fadeout',
-          hideOnOutsideClick: true,
-        }"
-      >
+      <button class="layout-topbar-menu-button layout-topbar-action" v-styleclass="{
+        selector: '@next',
+        enterFromClass: 'hidden',
+        enterActiveClass: 'animate-scalein',
+        leaveToClass: 'hidden',
+        leaveActiveClass: 'animate-fadeout',
+        hideOnOutsideClick: true,
+      }">
         <i class="pi pi-ellipsis-v"></i>
       </button>
 

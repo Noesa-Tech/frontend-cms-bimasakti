@@ -12,7 +12,7 @@ import { VendorStore } from '@/store/vendor'
 import { ServiceStore } from '@/store/service'
 import { LocationStore } from '@/store/location'
 
-const popovers = ref<Record<number, HTMLElement | null>>({}); 
+const popovers = ref<Record<number, HTMLElement | null>>({});
 const $vendor = VendorStore()
 const $service = ServiceStore()
 const $location = LocationStore()
@@ -25,11 +25,11 @@ const visibleEdit = ref<boolean>(false);
 const dt = ref();
 const selectedvendorsData = ref<any>(null);
 const filters1 = ref({
-    global: { value: null, matchMode: FilterMatchMode.CONTAINS },
-    name: { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
-    location: { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
-    date: { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.DATE_IS }] },
-    status: { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.EQUALS }] },
+  global: { value: null, matchMode: FilterMatchMode.CONTAINS },
+  name: { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
+  location: { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
+  date: { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.DATE_IS }] },
+  status: { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.EQUALS }] },
 })
 
 const items = computed(() => {
@@ -39,7 +39,7 @@ const items = computed(() => {
     location: item.address,
     date: item.created_at,
     status: item.deleted_at,
-    city : item.city,
+    city: item.city,
     services: item.vendor_service
   }));
 });
@@ -53,7 +53,7 @@ const allCity = computed(() => {
 
 const statuses = reactive([1, 2]);
 
-function getSeverity(status:any) {
+function getSeverity(status: any) {
   switch (status) {
     case 1:
       return "danger";
@@ -62,15 +62,15 @@ function getSeverity(status:any) {
   }
 }
 
-function getStatusName(status:any) {
-  if(status){
+function getStatusName(status: any) {
+  if (status) {
     return "Unactive";
-  }else{
+  } else {
     return "Active";
   }
 }
 
-async function fetchVendor(){
+async function fetchVendor() {
   await $vendor.fetchVendor()
   reactiveKey.value += 1;
 }
@@ -90,11 +90,11 @@ function formatDate(value: any) {
   });
 }
 
-const exportCSV = (e:any) => {
+const exportCSV = (e: any) => {
   dt.value.exportCSV();
 };
 
-const confirm2 = (vendorId:any) => {
+const confirm2 = (vendorId: any) => {
   confirm.require({
     target: vendorId.currentTarget,
     message: "Yakin ingin menghapus data ini?",
@@ -108,7 +108,7 @@ const confirm2 = (vendorId:any) => {
       label: "Hapus",
       severity: "danger",
     },
-    accept: async() => {
+    accept: async () => {
       await $vendor.delete(vendorId)
       await $vendor.fetchVendor()
     },
@@ -132,27 +132,16 @@ const setPopoverRef = (vendorId: number, el: HTMLElement | null) => {
   <TopBreadcrumb :breadcrumbItems="[{ label: 'Data Vendor' }]" />
   <div class="card mt-8">
     <div class="font-semibold text-xl mb-4">Data Vendor</div>
-    <DataTable
-      v-model:selection="selectedvendorsData"
-      ref="dt"
-      :key="reactiveKey"
-      :loading="$vendor.isLoading"
-      :value="items"
-      :paginator="true"
-      :rows="10"
-      dataKey="id"
-      :rowHover="true"
-      v-model:filters="filters1"
-      filterDisplay="menu"
-      :globalFilterFields="['name', 'location', 'services', 'date', 'status']"
-      showGridlines
-      scrollable
-      >
+    <DataTable v-model:selection="selectedvendorsData" ref="dt" :key="reactiveKey" :loading="$vendor.isLoading"
+      :value="items" :paginator="true" :rows="10" dataKey="id" v-model:filters="filters1" filterDisplay="menu"
+      :globalFilterFields="['name', 'location', 'services', 'date', 'status']" showGridlines scrollable>
       <template #header>
         <div class="flex flex-col md:flex-row justify-between gap-4">
-          <Button type="button" icon="pi pi-plus" label="Tambah Vendor" class="md:order-1 order-2" @click="visibleAdd = true" />
+          <Button type="button" icon="pi pi-plus" label="Tambah Vendor" class="md:order-1 order-2"
+            @click="visibleAdd = true" />
           <div class="flex items-center gap-4 md:order-2 order-1">
-            <div class="hidden md:flex"><Button type="button" icon="pi pi-download" outlined label="Unduh" @click="exportCSV($event)" /></div>
+            <div class="hidden md:flex"><Button type="button" icon="pi pi-download" outlined label="Unduh"
+                @click="exportCSV($event)" /></div>
             <div class="flex md:hidden"><Button type="button" icon="pi pi-download" outlined /></div>
             <IconField class="w-full md:w-auto">
               <InputIcon>
@@ -177,8 +166,8 @@ const setPopoverRef = (vendorId: number, el: HTMLElement | null) => {
       <Column sortable header="Lokasi" filterField="location">
         <template #body="{ data }">
           <div>
-          {{ data.city?.nama }}
-        </div>
+            {{ data.city?.nama }}
+          </div>
         </template>
         <template #filter="{ filterModel }">
           <InputText v-model="filterModel.value" type="text" placeholder="Cari Kota" />
@@ -192,7 +181,8 @@ const setPopoverRef = (vendorId: number, el: HTMLElement | null) => {
       </Column>
       <Column sortable header="Layanan" filterField="services" dataType="string" style="min-width: 10rem">
         <template #body="{ data }">
-          <Button @click="toggle($event, data.id)" :label="data.services.length + ' Layanan'" severity="info" outlined icon="pi pi-angle-down" iconPos="right" />
+          <Button @click="toggle($event, data.id)" :label="data.services.length + ' Layanan'" severity="info" outlined
+            icon="pi pi-angle-down" iconPos="right" />
           <Popover :ref="el => setPopoverRef(data.id, el as any)">
             <ul class="list-disc list-inside flex flex-col gap-4">
               <li v-for="(item, index) in data.services" :key="index">
@@ -213,7 +203,8 @@ const setPopoverRef = (vendorId: number, el: HTMLElement | null) => {
         <template #filter="{ filterModel }">
           <Select v-model="filterModel.value" :options="statuses" placeholder="Select One" showClear>
             <template #value="slotProps">
-              <Tag v-if="slotProps.value" :value="getStatusName(slotProps.value)" :severity="getSeverity(slotProps.value)" />
+              <Tag v-if="slotProps.value" :value="getStatusName(slotProps.value)"
+                :severity="getSeverity(slotProps.value)" />
             </template>
             <template #option="slotProps">
               <Tag :value="getStatusName(slotProps.option)" :severity="getSeverity(slotProps.option)" />
@@ -232,7 +223,8 @@ const setPopoverRef = (vendorId: number, el: HTMLElement | null) => {
       <Column sortable field="id" header="Action" bodyClass="text-center" style="min-width: 12rem">
         <template #body="{ data }">
           <div class="flex gap-4 items-center">
-            <Button icon="pi pi-pencil" severity="info" text v-tooltip="'Ubah'" @click="selectedId = data.id,  visibleEdit = true" />
+            <Button icon="pi pi-pencil" severity="info" text v-tooltip="'Ubah'"
+              @click="selectedId = data.id, visibleEdit = true" />
             <Button icon="pi pi-trash" severity="danger" text v-tooltip="'Hapus'" @click="confirm2(data.id)" />
           </div>
         </template>
@@ -240,11 +232,13 @@ const setPopoverRef = (vendorId: number, el: HTMLElement | null) => {
     </DataTable>
   </div>
   <ConfirmPopup></ConfirmPopup>
-  <Dialog v-model:visible="visibleAdd" maximizable modal header="Tambah Vendor"  class=" w-[25rem]" >
-    <AddVendor :city="allCity" :service="$service.serviceAll" @on-close="visibleAdd = false" @on-save="visibleAdd = false, fetchVendor()"/>
+  <Dialog v-model:visible="visibleAdd" maximizable modal header="Tambah Vendor" class=" md:w-1/2 w-[25rem]">
+    <AddVendor :city="allCity" :service="$service.serviceAll" @on-close="visibleAdd = false"
+      @on-save="visibleAdd = false, fetchVendor()" />
   </Dialog>
-  <Dialog v-model:visible="visibleEdit" maximizable modal header="Ubah Vendor"  class=" w-[25rem]" >
-    <EditVendor :city="allCity" :service="$service.serviceAll" :vendorId="selectedId" @on-close="visibleEdit = false" @on-save="visibleEdit = false,fetchVendor()" />
+  <Dialog v-model:visible="visibleEdit" maximizable modal header="Ubah Vendor" class="md:w-1/2 w-[25rem]">
+    <EditVendor :city="allCity" :service="$service.serviceAll" :vendorId="selectedId" @on-close="visibleEdit = false"
+      @on-save="visibleEdit = false, fetchVendor()" />
   </Dialog>
 </template>
 
@@ -253,6 +247,6 @@ const setPopoverRef = (vendorId: number, el: HTMLElement | null) => {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  max-width: 350px; 
+  max-width: 350px;
 }
 </style>
