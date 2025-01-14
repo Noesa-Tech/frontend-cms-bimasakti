@@ -1,44 +1,39 @@
 <script setup lang="ts">
+import { PropertyStore } from '@/store/property'
 
-const src = ref<string>("");
 const props = defineProps({
-    id: {
-        type: Number,
-        required: true,
-    },
-    image: {
-        type: String,
-        required: true,
-    },
-    name: {
-        type: String,
+    property: {
+        type: Object as PropType<Record<string, any>>,
         required: true,
     },
 });
 
 const emit = defineEmits(["on-close", "on-save"]);
+const $property = PropertyStore()
 
-
+const icon = ref<any>(null)
+const src = ref<string>(props.property.icon_url);
 const query = reactive({
-    id: props.id,
-    image: props.image,
-    name: props.name,
-
+    propertyId : props.property.id,
+    name: props.property.name,
+    fee : props.property.fee,
 })
 
 async function onSave() {
+
     const payload = {
         ...query,
         _method: "PATCH",
-        property_id: query?.id,
+        ...(icon.value !== null && { icon: icon.value }),
     };
 
+    await $property.updateProperty(payload)
     emit('on-save')
 }
 
 function onFileSelect(event: any) {
     const file = event.files[0];
-    query.image = file
+    icon.value = file
     const reader = new FileReader();
     reader.onload = async (e) => {
         if (typeof e.target?.result === "string") {
@@ -52,7 +47,7 @@ function onFileSelect(event: any) {
 
 <template>
     <div class="flex flex-col items-start gap-2 mb-4">
-        <label for="name">Ubah Gambar</label>
+        <label for="name">Tambah Gambar</label>
         <div class="flex flex-col gap-2 items-start">
             <div v-if="src" class="relative">
                 <img :src="src" alt="Image" class="shadow-md rounded-xl w-full sm:w-64" />
@@ -66,11 +61,15 @@ function onFileSelect(event: any) {
     </div>
     <div class="flex flex-col gap-2 mb-4">
         <label for="name">Nama Properti</label>
-        <InputText v-model="query.name" id="name" aria-describedby="name-help" placeholder="Nama Properti" />
+        <InputText v-model="query.name" id="name-add-properties" aria-describedby="name-help" placeholder="Nama Properti" />
+    </div>
+    <div class="flex flex-col gap-2 mb-4">
+        <label for="name">Fee</label>
+        <InputText v-model="query.fee" id="fee-add-properties" aria-describedby="name-help" placeholder="Fee Properti" />
     </div>
 
     <div class="flex justify-end gap-2 mt-8">
         <Button type="button" label="Batal" text severity="secondary" @click="emit('on-close')"></Button>
-        <Button type="button" label="Simpan" @click="onSave()"></Button>
+        <Button type="button" :loading="$property.isLoading" :disabled="$isQueryInvalid(query)" label="Simpan" @click="onSave()"></Button>
     </div>
 </template>

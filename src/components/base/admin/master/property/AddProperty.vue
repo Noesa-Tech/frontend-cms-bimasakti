@@ -1,27 +1,25 @@
 <script setup lang="ts">
-
-const src = ref<string>("");
+import { PropertyStore } from '@/store/property'
 
 const emit = defineEmits(["on-close", "on-save"]);
 
+const $property = PropertyStore()
+
+const src = ref<string>("");
 const query = reactive({
-    image: '',
+    icon: '',
     name: '',
+    fee : ''
 })
 
 async function onSave() {
-    const payload = {
-        ...query,
-        _method: "PATCH",
-        property_id: query?.id,
-    };
-
+    await $property.addProperty(query)
     emit('on-save')
 }
 
 function onFileSelect(event: any) {
     const file = event.files[0];
-    query.image = file
+    query.icon = file
     const reader = new FileReader();
     reader.onload = async (e) => {
         if (typeof e.target?.result === "string") {
@@ -49,11 +47,15 @@ function onFileSelect(event: any) {
     </div>
     <div class="flex flex-col gap-2 mb-4">
         <label for="name">Nama Properti</label>
-        <InputText v-model="query.name" id="name" aria-describedby="name-help" placeholder="Nama Properti" />
+        <InputText v-model="query.name" id="name-add-properties" aria-describedby="name-help" placeholder="Nama Properti" />
+    </div>
+    <div class="flex flex-col gap-2 mb-4">
+        <label for="name">Fee</label>
+        <InputText v-model="query.fee" id="fee-add-properties" aria-describedby="name-help" placeholder="Fee Properti" />
     </div>
 
     <div class="flex justify-end gap-2 mt-8">
         <Button type="button" label="Batal" text severity="secondary" @click="emit('on-close')"></Button>
-        <Button type="button" label="Simpan" @click="onSave()"></Button>
+        <Button type="button" :loading="$property.isLoading" :disabled="$isQueryInvalid(query)" label="Simpan" @click="onSave()"></Button>
     </div>
 </template>

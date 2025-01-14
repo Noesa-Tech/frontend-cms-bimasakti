@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { CategoryService } from "@/service/CategoryService";
 import { FilterMatchMode, FilterOperator } from "@primevue/core/api";
 import DatePicker from "primevue/datepicker";
 import Select from "primevue/select";

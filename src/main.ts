@@ -17,6 +17,7 @@ import Tooltip from "primevue/tooltip";
 import "core-js/stable";
 import Ripple from "primevue/ripple";
 import Toast from 'primevue/toast';
+import { isQueryInvalid } from './utils/helpers';
 
 
 const MyPreset = definePreset(Aura, {
@@ -38,6 +39,7 @@ const MyPreset = definePreset(Aura, {
 });
 
 export const app = createApp(App);
+app.config.globalProperties.$isQueryInvalid = isQueryInvalid;
 
 const pinia = createPinia()
 pinia.use(piniaPersistedstate)

@@ -1,21 +1,32 @@
 <script setup lang="ts">
-import { ProperyService } from '@/service/PropertyService';
-import logo from '@/assets/images/logo/logo.png'
 import { useConfirm } from "primevue/useconfirm";
 import { useToast } from "primevue/usetoast";
 import ConfirmPopup from "primevue/confirmpopup";
+import { PropertyStore } from '@/store/property'
+import { SettingStore } from '@/store/setting';
 
-const properties = ref<any>(null);
+interface Property {
+    id: number;
+    name: string;
+    icon_url?: string;
+}
+
 const confirm = useConfirm();
 const toast = useToast();
+const $property = PropertyStore()
+const $setting = SettingStore()
+
 const visibleEdit = ref<boolean>(false);
 const visibleAdd = ref<boolean>(false);
-const searchText = ref('');
-const priceLadder = ref<any>(50000);
 
-const confirmDelete = (event: any) => {
+const searchText = ref<string>('');
+const filteredProperties = ref<Property[]>([]);
+const selectedRow = ref<any>(null);
+const priceLadder = ref<any>(0);
+
+const confirmDelete = (e: any) => {
     confirm.require({
-        target: event.currentTarget,
+        target: e.currentTarget,
         message: "Yakin ingin menghapus properti ini?",
         icon: "pi pi-info-circle",
         rejectProps: {
@@ -27,15 +38,43 @@ const confirmDelete = (event: any) => {
             label: "Yakin",
             severity: "danger",
         },
-        accept: () => {
-            toast.add({ severity: "info", summary: "Confirmed", detail: "Properti Dihapus", life: 3000 });
+        accept: async () => {
+            await $property.delete(e)
+            await fetchProperty()
         },
     });
 };
 
-onMounted(() => {
-    ProperyService.getProperties().then((data) => (properties.value = data));
+async function fetchProperty() {
+    await $property.fetchProperties()
+    filteredProperties.value = $property.properties
+}
+
+async function fetchSettingLadder() {
+    const res = await $setting.fetchDetail(1)
+    priceLadder.value = parseInt(res.data.value)
+}
+
+async function updateSetting(closeCallback:any){
+    const payload = {
+        _method: "PATCH",
+        value: priceLadder.value
+    };
+
+    await $setting.update(payload, 1)
+    closeCallback();
+    await fetchSettingLadder()
+}
+
+onMounted(async () => {
+    await fetchSettingLadder()
+    await fetchProperty()
 });
+
+watch(() => searchText.value, (newValue) => {
+    filteredProperties.value = $property.properties.filter(item => item.name.toLowerCase().includes(newValue.toLowerCase()));
+}, { immediate: true });
+
 </script>
 <template>
     <TopBreadcrumb :breadcrumbItems="[{ label: 'Properti' }]" />
@@ -52,7 +91,7 @@ onMounted(() => {
                         <InputNumber v-model="priceLadder" type="text" placeholder="Cari Harga"
                             inputId="currency-indonesia" mode="currency" currency="IDR" locale="id-ID"
                             :minFractionDigits="0" />
-                        <Button icon="pi pi-check" label="Simpan" severity="success" @click="closeCallback" />
+                        <Button :loading="$setting.isLoading" icon="pi pi-check" label="Simpan" severity="success" @click="updateSetting(closeCallback)" />
                     </span>
                 </template>
             </Inplace>
@@ -73,18 +112,18 @@ onMounted(() => {
             </div>
         </div>
         <div class="grid grid-cols-12 gap-4">
-            <div v-for="(item, index) in properties" :key="index"
+            <div v-for="(item, index) in filteredProperties" :key="index"
                 class=" md:col-span-3 sm:col-span-4 col-span-6 border border-surface-200 dark:border-surface-700 rounded p-4">
                 <div class="mb-4">
-                    <img :src="logo" :alt="item.name" class=" mx-auto" />
+                    <img :src="item?.icon_url" :alt="item?.name" class=" mx-auto" />
                 </div>
-                <div class="mt-0 font-semibold text-xl">{{ item.name }}</div>
+                <div class="mt-0 font-semibold text-xl">{{ item?.name }}</div>
                 <div class="flex items-center justify-end">
                     <span>
                         <Button icon="pi pi-pencil" severity="info" outlined v-tooltip.bottom="'Ubah'"
-                            @click="visibleEdit = true" />
-                        <Button icon="pi pi-trash" severity="danger" class="ml-2" v-tooltip.bottom="'Hapus'"
-                            @click="confirmDelete($event)" />
+                            @click="selectedRow = item, visibleEdit = true" />
+                        <Button icon="pi pi-trash" :loading="$property.isLoading" severity="danger" class="ml-2"
+                            v-tooltip.bottom="'Hapus'" @click="confirmDelete(item.id)" />
                     </span>
                 </div>
             </div>
@@ -92,9 +131,11 @@ onMounted(() => {
     </div>
     <ConfirmPopup></ConfirmPopup>
     <Dialog v-model:visible="visibleAdd" maximizable modal header="Tambah Properti" class=" sm:w-1/2 w-full ">
-        <AddProperty @on-close="visibleAdd = false" @on-save="visibleAdd = false" />
+        <AddProperty @on-close="visibleAdd = false" @on-save="visibleAdd = false, fetchProperty()" />
     </Dialog>
+
     <Dialog v-model:visible="visibleEdit" maximizable modal header="Ubah Property" class=" sm:w-1/2 w-full">
-        <EditProperty id:1, @on-close="visibleEdit = false" @on-save="visibleEdit = false" />
+        <EditProperty :property="selectedRow" @on-close="visibleEdit = false"
+            @on-save="visibleEdit = false, fetchProperty()" />
     </Dialog>
 </template>
