@@ -13,7 +13,6 @@ interface Property {
 }
 
 const confirm = useConfirm();
-const toast = useToast();
 const $property = PropertyStore()
 const $setting = SettingStore()
 
@@ -53,7 +52,7 @@ async function fetchProperty() {
 
 async function fetchSettingLadder() {
     const res = await $setting.fetchDetail(1)
-    priceLadder.value = parseInt(res.data.value)
+    priceLadder.value = parseInt(res?.data.value)
 }
 
 async function updateSetting(closeCallback: any) {

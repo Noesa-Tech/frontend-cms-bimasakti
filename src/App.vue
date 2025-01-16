@@ -7,6 +7,7 @@ const { layoutConfig, layoutState, isSidebarActive, resetMenu } = useLayout();
 
 const outsideClickListener = ref<((event: MouseEvent) => void) | null>(null);
 
+const router = useRouter();
 watch(isSidebarActive, (newVal) => {
   if (newVal) {
     bindOutsideClickListener();
@@ -65,6 +66,13 @@ watch(() => eventBus.showToast, (newToast) => {
     if (newToast.type === "error") {
       toast.error('error', newToast.message)
     }
+  }
+});
+
+watchEffect(() => {
+  if (eventBus.redirectTo) {
+    router.push(eventBus.redirectTo);
+    eventBus.redirectTo = null;  
   }
 });
 </script>

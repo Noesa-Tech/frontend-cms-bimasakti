@@ -9,10 +9,10 @@ export const OrderStore = defineStore('OrderStore', {
         detail:  null as any | null,
     }),
     actions: {
-        async fetchOrder() {
+        async fetchOrder(status : string) {
             this.isLoading = true
             try {
-                const res = await api.get('/auth/orders')
+                const res = await api.get(`/auth/orders?status=${status}`)
                 this.allOrder = res.data
             } catch (err) {
             } finally {
@@ -45,6 +45,16 @@ export const OrderStore = defineStore('OrderStore', {
 
                  // @ts-ignore
                 toast.success('success', res.message)
+            } catch (err) {
+            } finally {
+                this.isLoading = false
+            }
+        },
+        async createOrder(data:any) {
+            this.isLoading = true
+            try {
+                const res = await api.post('/order', data)
+                return res
             } catch (err) {
             } finally {
                 this.isLoading = false

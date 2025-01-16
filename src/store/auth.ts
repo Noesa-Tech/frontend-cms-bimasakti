@@ -28,6 +28,15 @@ export const AuthStore = defineStore('AuthStore', {
                 this.isLoading = false
             }
         },
+        async logout() {
+            this.isLoading = true
+            try {
+                this.isAuthenticated = false
+            } catch (err) {
+            } finally {
+                this.isLoading = false
+            }
+        },
     },
     persist: {
         paths: ['users', 'isAuthenticated','token'],

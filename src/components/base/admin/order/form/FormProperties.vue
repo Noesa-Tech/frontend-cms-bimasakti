@@ -9,15 +9,16 @@ const props = defineProps({
   },
 });
 
+const emit = defineEmits(["on-click", 'ladder']);
+
 const route = useRoute();
 const $property = PropertyStore();
-const emit = defineEmits(["on-click", 'ladder']);
 
 const { formatPrice } = mixins.methods;
 
-
 const selectedProperty = ref<any>({});
 const useLadder = ref<boolean>(false);
+
 const onPropertyClick = (item: any) => {
   selectedProperty.value = item;
 
@@ -29,7 +30,7 @@ const items = computed(() => {
 });
 
 onMounted(async () => {
-  await $property.fetchProperties(props.serviceId)
+  await $property.fetchProperties(props?.serviceId)
 });
 
 </script>

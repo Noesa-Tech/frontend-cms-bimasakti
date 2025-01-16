@@ -1,4 +1,5 @@
 import axios from 'axios'
+// import { useRouter } from 'vue-router';
 import eventBus from '@/composables/eventBus';
 
 const Api = axios.create({
@@ -51,7 +52,8 @@ Api.interceptors.response.use(
     if (error.response) {
       if (error.response.status > 400) {
         eventBus.showToast = { type: 'error', message: error.response.data.message };
-        return Promise.reject(error.response.data.message)
+        eventBus.triggerRedirect('/');
+        // return Promise.reject(error.response.data.message)
       }
 
       if (error.response.status === 400) {

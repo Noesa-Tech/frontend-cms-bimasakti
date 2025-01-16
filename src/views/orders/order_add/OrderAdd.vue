@@ -2,14 +2,17 @@
 import DatePicker from "primevue/datepicker";
 import Fieldset from "primevue/fieldset";
 import Tree from "primevue/tree";
+import { format } from 'date-fns';
 import { ServiceStore } from '@/store/service'
+import { OrderStore } from '@/store/order'
 
+const router = useRouter();
+const $order = OrderStore()
 const $service = ServiceStore()
-// const route = useRoute();
-// const date = ref<any>(null);
-// const visible = ref<boolean>(false);
+
 const expandedKeys = ref<any>({});
 
+const loadingForm = ref<boolean>(false)
 const query = reactive<any>({
     selectedService: null,
     date: null,
@@ -153,11 +156,47 @@ const toggleInplace = (index: number, e: boolean) => {
 };
 
 async function setForm(e: any) {
+    loadingForm.value = true
+    
     query.name = e.name;
     query.phone = e.phone;
     (query.email = e.email), (query.address = e.address);
     (query.province = e.selectedProvince), (query.city = e.selectedCity), (query.subdistrict = e.selectedSubdistrict);
     query.village = e.selectedVillage;
+    
+    await onSubmit()
+    loadingForm.value = false
+}
+
+async function onSubmit() {
+    const rawService = treeNodes.value.flatMap(item => item.children);
+    let fixService = [] as any;
+    rawService.forEach(el => {
+        let dataService = {
+            service_problem: el.id_parent,
+            service_sub_problem_id: el.key,
+            qty: el.qty,
+            name: el.name,
+            isCustom: el.key === 'undefined' ? true : false
+        }
+        fixService.push(dataService)
+    });
+
+    const payload = {
+        name: query.name,
+        email: query.email,
+        phone: "+62" + query.phone,
+        date_appointment: format(query?.date, 'yyyy-MM-dd HH:mm:ss'),
+        properties_id: query?.selectedProperties?.id,
+        village_id: query?.village?.id,
+        isLadderRequired: query?.useLadder,
+        service_id : query.selectedService.id,
+        location: `${query.address}, ${provinceName.value}, ${cityName.value}, ${subdistrictName.value}, ${villageName.value}`,
+        order_service: JSON.stringify(fixService)
+    }
+    
+    await $order.createOrder(payload)
+    router.push(`/pesanan`);
 }
 
 const provinceName = computed(() => {
@@ -175,12 +214,6 @@ const subdistrictName = computed(() => {
 const villageName = computed(() => {
     return query.village?.name ?? "Village is not selected";
 });
-
-const isAddressSelected = computed(() => {
-    return query.province?.name != null && query.city?.name != null && query.subdistrict?.name != null && query.village?.name != null;
-});
-
-
 
 watch(treeNodes, (newTreeNodes: any) => {
     expandedKeys.value = {};
@@ -296,6 +329,6 @@ watch(treeNodes, (newTreeNodes: any) => {
             :serviceId="query.selectedService.id" />
     </div>
     <div v-if="itemIssue.length > 0" class="card mt-8">
-        <FormOrder @onSave=" setForm($event)" />
+        <FormOrder :isLoading="loadingForm" @onSave="setForm($event)" />
     </div>
 </template>

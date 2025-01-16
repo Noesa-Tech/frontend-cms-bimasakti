@@ -1,7 +1,13 @@
 <script setup lang="ts">
 import Select from "primevue/select";
 import { LocationStore } from '@/store/location'
-import InputMask from "primevue/inputmask";
+
+const props = defineProps({
+  isLoading: {
+    type: Boolean,
+    required: false,
+  },
+});
 
 const emit = defineEmits(["onSave"]);
 
@@ -128,7 +134,7 @@ onMounted(async () => {
         </div>
         <p class="text-sm italic font-thin mt-1">*Masukkan kode voucher untuk mendapatkan potongan.</p>
       </div>
-      <Button label="Pesan Layanan" fluid @click="emit('onSave', query)" />
+      <Button :loading="props.isLoading" label="Pesan Layanan" fluid @click="emit('onSave', query)" />
     </template>
   </Card>
 </template>

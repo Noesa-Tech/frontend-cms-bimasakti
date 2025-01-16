@@ -1,5 +1,6 @@
 import { defineConfig } from 'vite';
 import vue from '@vitejs/plugin-vue';
+// import Inspect from 'vite-plugin-inspect';
 import AutoImport from 'unplugin-auto-import/vite';
 import Components from 'unplugin-vue-components/vite';
 import { PrimeVueResolver } from 'unplugin-vue-components/resolvers';
@@ -11,10 +12,13 @@ export default defineConfig({
     }
   },
   build: {
-    target: 'es2015',
+    minify: 'esbuild', 
+    cssCodeSplit: true, 
+    chunkSizeWarningLimit: 1000,
   },
   plugins: [
     vue(),
+    // Inspect(),
     Components({
       resolvers: [
         PrimeVueResolver()
@@ -37,5 +41,9 @@ export default defineConfig({
       dts: 'src/auto-imports.d.ts',
     }),
   ],
-  
+  server: {
+    hmr: {
+      protocol: 'ws',
+    },
+  },
 });

@@ -9,6 +9,17 @@ export const SettingStore = defineStore('SettingStore', {
         detail: {} as Record<any, any>,
     }),
     actions: {
+        async fetchAll() {
+            this.isLoading = true
+            try {
+                const res = await api.get(`/auth/setting`)
+                this.setting = res.data
+                return res
+            } catch (err) {
+            } finally {
+                this.isLoading = false
+            }
+        },
         async fetchDetail(settingId: number) {
             this.isLoading = true
             try {

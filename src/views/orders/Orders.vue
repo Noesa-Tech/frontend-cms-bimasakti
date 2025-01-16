@@ -125,7 +125,7 @@ async function fetchOrder() {
 }
 
 onMounted(async () => {
-  await $order.fetchOrder()
+  await $order.fetchOrder('order_confirmed')
   await $vendor.fetchVendor()
 })
 

@@ -395,7 +395,6 @@ router.afterEach(() => {
 
 router.beforeEach((to, from, next) => {
   const $auth = AuthStore()
-  console.log($auth.isAuthenticated)
   if (to.meta.requiresAuth && !$auth.isAuthenticated) {
     next({ name: 'login' })
   } else {
