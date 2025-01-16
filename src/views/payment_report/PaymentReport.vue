@@ -18,7 +18,7 @@ const dt = ref();
 const filters = ref<any>({});
 const reactiveKey = ref<number>(0);
 // const ladderStatus = ref<number[]>([1, 0])
-
+const dates = ref();
 
 async function fetchAllService() {
   await $service.fetchService()
@@ -143,16 +143,24 @@ const exportCSV = (event: any) => {
       :globalFilterFields="['customer.name', 'customer.phone', 'customer.email', 'service.name', 'property.name', 'paymentMethod', 'location', 'price', 'useLadder', 'date']"
       showGridlines>
       <template #header>
-        <div class="flex items-center gap-4 justify-end md:order-2 order-1">
-          <div class="hidden md:flex"><Button type="button" icon="pi pi-download" outlined label="Unduh"
-              @click="exportCSV($event)" /></div>
-          <div class="flex md:hidden"><Button type="button" icon="pi pi-download" outlined /></div>
-          <IconField class="w-full md:w-auto">
-            <InputIcon>
-              <i class="pi pi-search" />
-            </InputIcon>
-            <InputText v-model="filters['global'].value" placeholder="Pencarian" fluid />
-          </IconField>
+        <div class="flex flex-col md:flex-row justify-end gap-4">
+          <DatePicker v-model="dates" selectionMode="range" :manualInput="false" showIcon iconDisplay="input"
+            placeholder="Pilih tanggal">
+            <template #inputicon="slotProps">
+              <i class="pi pi-calendar" @click="slotProps.clickCallback" />
+            </template>
+          </DatePicker>
+          <div class="flex items-center gap-4 md:order-2 order-1">
+            <div class="hidden md:flex"><Button type="button" icon="pi pi-download" outlined label="Unduh"
+                @click="exportCSV($event)" /></div>
+            <div class="flex md:hidden"><Button type="button" icon="pi pi-download" outlined /></div>
+            <IconField class="w-full md:w-auto">
+              <InputIcon>
+                <i class="pi pi-search" />
+              </InputIcon>
+              <InputText v-model="filters['global'].value" placeholder="Pencarian" fluid />
+            </IconField>
+          </div>
         </div>
       </template>
       <template #empty> Tidak ada data Kategori. </template>

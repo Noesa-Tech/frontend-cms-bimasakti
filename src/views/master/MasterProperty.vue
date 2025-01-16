@@ -8,6 +8,7 @@ import { SettingStore } from '@/store/setting';
 interface Property {
     id: number;
     name: string;
+    fee: string;
     icon_url?: string;
 }
 
@@ -55,7 +56,7 @@ async function fetchSettingLadder() {
     priceLadder.value = parseInt(res.data.value)
 }
 
-async function updateSetting(closeCallback:any){
+async function updateSetting(closeCallback: any) {
     const payload = {
         _method: "PATCH",
         value: priceLadder.value
@@ -91,7 +92,8 @@ watch(() => searchText.value, (newValue) => {
                         <InputNumber v-model="priceLadder" type="text" placeholder="Cari Harga"
                             inputId="currency-indonesia" mode="currency" currency="IDR" locale="id-ID"
                             :minFractionDigits="0" />
-                        <Button :loading="$setting.isLoading" icon="pi pi-check" label="Simpan" severity="success" @click="updateSetting(closeCallback)" />
+                        <Button :loading="$setting.isLoading" icon="pi pi-check" label="Simpan" severity="success"
+                            @click="updateSetting(closeCallback)" />
                     </span>
                 </template>
             </Inplace>
@@ -115,9 +117,10 @@ watch(() => searchText.value, (newValue) => {
             <div v-for="(item, index) in filteredProperties" :key="index"
                 class=" md:col-span-3 sm:col-span-4 col-span-6 border border-surface-200 dark:border-surface-700 rounded p-4">
                 <div class="mb-4">
-                    <img :src="item?.icon_url" :alt="item?.name" class=" mx-auto" />
+                    <img :src="item?.icon_url" :alt="item?.name" class="h-32 w-auto mx-auto" />
                 </div>
                 <div class="mt-0 font-semibold text-xl">{{ item?.name }}</div>
+                <div class="mt-0">Rp{{ formatPrice(item?.fee) }}</div>
                 <div class="flex items-center justify-end">
                     <span>
                         <Button icon="pi pi-pencil" severity="info" outlined v-tooltip.bottom="'Ubah'"

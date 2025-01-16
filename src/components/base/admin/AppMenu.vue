@@ -15,12 +15,12 @@ const model = ref([
         label: "Data Master", icon: "pi pi-fw pi-server", items: [
           {
             label: "Layanan",
-            icon: "pi pi-fw pi-list",
+            icon: "pi pi-fw pi-wrench",
             to: "/master/layanan",
           },
           {
             label: "Benefit",
-            icon: "pi pi-fw pi-list",
+            icon: "pi pi-fw pi-check-circle",
             to: "/master/benefit",
           },
           {
@@ -30,12 +30,12 @@ const model = ref([
           },
           {
             label: "Sub Kategori",
-            icon: "pi pi-fw pi-list",
+            icon: "pi pi-fw pi-box",
             to: "/master/sub-kategori",
           },
           {
             label: "Properti",
-            icon: "pi pi-fw pi-home",
+            icon: "pi pi-fw pi-building",
             to: "/master/properti",
           },
         ],
@@ -46,8 +46,10 @@ const model = ref([
   },
   {
     label: "Pemesanan",
-    items: [{ label: "Pesanan", icon: "pi pi-fw pi-book", to: "/pesanan" },
-    { label: "Tambah Pesanan", icon: "pi pi-fw pi-file-plus", to: "/pesanan/tambah" }
+    items: [
+      { label: "Pesanan", icon: "pi pi-fw pi-book", to: "/pesanan" },
+      { label: "Tambah Pesanan", icon: "pi pi-fw pi-file-plus", to: "/pesanan/tambah" },
+      { label: "Pesanan Diproses", icon: "pi pi-spin pi-spinner", to: "/pesanan-diproses" },
     ],
   },
   {
@@ -188,6 +190,10 @@ const model = ref([
 </script>
 
 <template>
+  <h5 class="m-0">John Doe</h5>
+  <p class="text-sm m-0">johndoe@gmail.com</p>
+  <p class="text-sm m-0 text-primary font-semibold mt-1">Admin Bandung</p>
+  <Divider />
   <ul class="layout-menu">
     <template v-for="(item, i) in model" :key="item">
       <app-menu-item v-if="!item.separator" :item="item" :index="i"></app-menu-item>
