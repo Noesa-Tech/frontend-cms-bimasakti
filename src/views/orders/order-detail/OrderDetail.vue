@@ -1,10 +1,20 @@
-<script setup>
+<script setup lang="ts">
+import { OrderStore } from '@/store/order'
+import { PropertyStore } from '@/store/property'
+
+const route = useRoute();
+const $order = OrderStore();
+const $property = PropertyStore()
+
 const item = ref({
-  id: 1001,
-  noInvoice: "INV-0938483-20241505",
-  name: "Hari Nurah Nahrani",
-  email: "hari@gmail.com",
-  phone: "6282117688166",
+  noInvoice: "",
+  name: "",
+  email: "",
+  phone: "",
+  property_name:"",
+  property_fee : 0,
+  subtotal_fee : 0,
+  total_fee : 0,
   vendor: {
     id: 1000,
     name: "PT. Air Conditioner",
@@ -57,13 +67,54 @@ const item = ref({
   status: 2,
 });
 
-function formatDate(value) {
+function formatDate(value : any) {
   return value.toLocaleDateString("en-US", {
     day: "2-digit",
     month: "2-digit",
     year: "numeric",
   });
 }
+
+onMounted(async () => {
+  await $order.detailOrder(route.params.id)
+  console.log($order.detail)
+  item.value.noInvoice = $order.detail.invoice
+  item.value.name = $order.detail.user.name
+  item.value.email = $order.detail.user.email
+  item.value.phone = $order.detail.user.phone
+
+  item.value.vendor.name = $order.detail?.vendor_id?.name
+  item.value.vendor.services = $order.detail.service.name
+  item.value.vendor.location = $order.detail.service.name
+
+  item.value.location.address = $order.detail.location
+
+  item.value.date = $order.detail.date_appointment
+  item.value.date = $order.detail.date_appointment
+  item.value.property_fee = $order.detail.fee_properties
+  item.value.property_name = $order.detail.properties.name
+
+  let orders = []
+  $order.detail.order_service.forEach((el:any, index:number) => {
+    let serviceOrder = {
+      label :  el.service_sub_problem.service_problem.name,
+      category :  []
+    }
+
+    let ctg = {
+      label : el.service_sub_problem.name,
+      qty : el.qty,
+      price: el.fee ? el.fee : "harga belum ditentukan" 
+    }
+
+    serviceOrder.category.push(ctg)
+    orders.push(serviceOrder)
+  });
+
+  item.value.items = orders
+
+  // await $order.detailProperty(route.params.id)
+});
 </script>
 <template>
   <TopBreadcrumb :breadcrumbItems="[{ label: 'Pesanan', route: '/pesanan' }, { label: item.noInvoice }]" />
@@ -103,9 +154,7 @@ function formatDate(value) {
             <div class="w-6/12">
               <p class="md:text-sm sm:text-base text-[0.4rem] m-0 font-semibold">{{ item.name }} (+{{ item.phone }})</p>
               <p class="md:text-sm sm:text-base text-[0.4rem] m-0">
-                {{ item.location.address }}, {{ item.location.village }}, {{ item.location.distric }}, {{
-                  item.location.city }},
-                {{ item.location.country }}
+                {{ item.location.address }}
               </p>
             </div>
           </div>
@@ -130,10 +179,13 @@ function formatDate(value) {
               </h6>
             </div>
             <h6 class="md:text-sm sm:text-base text-[0.4rem] m-0 font-normal w-2/12 text-start">{{ category.qty }}</h6>
-            <h6 class="md:text-sm sm:text-base text-[0.4rem] m-0 font-normal w-2/12 text-end">Rp{{
-              formatPrice(category.price) }}</h6>
-            <h6 class="md:text-sm sm:text-base text-[0.4rem] m-0 font-normal w-2/12 text-end">Rp{{
-              formatPrice(category.price * category.qty) }}</h6>
+              <h6 v-if="typeof category.price === 'string'" class="md:text-sm sm:text-base text-[0.4rem] m-0 font-normal w-2/12 text-end">harga belum ditentukan</h6>
+              <h6 v-if="typeof category.price === 'string'" class="md:text-sm sm:text-base text-[0.4rem] m-0 font-normal w-2/12 text-end">harga belum ditentukan</h6>
+
+              <h6 v-if="typeof category.price === 'number'" class="md:text-sm sm:text-base text-[0.4rem] m-0 font-normal w-2/12 text-end">Rp{{
+                formatPrice(category.price) }}</h6>
+              <h6 v-if="typeof category.price === 'number'" class="md:text-sm sm:text-base text-[0.4rem] m-0 font-normal w-2/12 text-end">Rp{{
+                formatPrice(category.price * category.qty) }}</h6>
           </div>
         </div>
       </div>
@@ -143,26 +195,26 @@ function formatDate(value) {
         <div class="w-1/2 flex flex-col md:gap-2 gap-1">
           <div class="flex justify-between gap-2">
             <p class="md:text-sm sm:text-base text-[0.4rem] m-0">Subtotal Harga Barang</p>
-            <p class="md:text-sm sm:text-base text-[0.4rem] m-0 text-end">Rp{{ formatPrice(200000) }}</p>
+            <p class="md:text-sm sm:text-base text-[0.4rem] m-0 text-end">Rp{{ formatPrice(0) }}</p>
           </div>
           <div class="flex justify-between gap-2">
             <p class="md:text-sm sm:text-base text-[0.4rem] m-0">Diskon</p>
-            <p class="md:text-sm sm:text-base text-[0.4rem] m-0 text-end">Rp{{ formatPrice(0) }}</p>
+            <p class="md:text-sm sm:text-base text-[0.4rem] m-0 text-end">{{ item.subtotal_fee < 1 ? 'harga belum ditentukan' : 'Rp'+formatPrice(item.subtotal_fee) }}</p>
           </div>
           <div class="flex justify-between items-center gap-2">
             <p class="md:text-sm sm:text-base text-[0.4rem] m-0">Jenis Property<br /><span
-                class="font-semibold">(Rumah)</span></p>
-            <p class="md:text-sm sm:text-base text-[0.4rem] m-0 text-end">Rp{{ formatPrice(0) }}</p>
+                class="font-semibold">({{item.property_name}})</span></p>
+            <p class="md:text-sm sm:text-base text-[0.4rem] m-0 text-end">Rp{{ formatPrice(item.property_fee) }}</p>
           </div>
           <div class="flex justify-between items-center gap-2">
             <p class="md:text-sm sm:text-base text-[0.4rem] m-0">Butuh Tangga<br /><span
                 class="font-semibold">(Butuh)</span></p>
-            <p class="md:text-sm sm:text-base text-[0.4rem] m-0 text-end">Rp{{ formatPrice(50000) }}</p>
+            <p class="md:text-sm sm:text-base text-[0.4rem] m-0 text-end">Rp{{ formatPrice(0) }}</p>
           </div>
           <Divider />
           <div class="flex justify-between gap-2">
             <h5 class="md:text-sm sm:text-base text-[0.5rem] m-0">Total Biaya</h5>
-            <h5 class="md:text-sm sm:text-base text-[0.5rem] m-0 text-end">Rp{{ formatPrice(200000) }}</h5>
+            <h5 class="md:text-sm sm:text-base text-[0.5rem] m-0 text-end">{{ item.total_fee < 1 ? 'harga belum ditentukan' : 'Rp'+formatPrice(item.total_fee) }}</h5>
           </div>
         </div>
       </div>
@@ -171,11 +223,11 @@ function formatDate(value) {
         <div class="w-1/2">
           <p class="md:text-sm sm:text-base text-[0.4rem] m-0"><i class="pi pi-shield mr-2 assurance-icon"></i>Asuransi
             Jasa Bimasakti Homes</p>
-          <p class="md:text-xs sm:text-sm text-[0.3rem] m-0 ml-6">Harga sudah termasuk ppn 11%</p>
+          <p class="md:text-xs sm:text-sm text-[0.3rem] m-0 ml-6">Harga sudah termasuk ppn 12%</p>
         </div>
         <div class="w-1/2">
           <p class="md:text-sm sm:text-base text-[0.4rem] m-0 text-muted-color">Metode Pembayaran:</p>
-          <h6 class="md:text-sm sm:text-base text-[0.4rem] m-0">Transfer</h6>
+          <h6 class="md:text-sm sm:text-base text-[0.4rem] m-0">Bank Transfer</h6>
         </div>
       </div>
       <Divider />

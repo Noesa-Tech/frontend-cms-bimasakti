@@ -19,6 +19,16 @@ export const OrderStore = defineStore('OrderStore', {
                 this.isLoading = false
             }
         },
+        async detailOrder(orderId : string) {
+            this.isLoading = true
+            try {
+                const res = await api.get(`/auth/orders/${orderId}`)
+                this.detail = res.data
+            } catch (err) {
+            } finally {
+                this.isLoading = false
+            }
+        },
         async acceptOrder(vendorId : Number, OrderId: Number) {
             this.isLoading = true
             try {
