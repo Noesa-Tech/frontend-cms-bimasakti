@@ -28,7 +28,6 @@ declare module 'vue' {
     Checkbox: typeof import('primevue/checkbox')['default']
     CleaningService: typeof import('./src/components/icons/services/CleaningService.vue')['default']
     Column: typeof import('primevue/column')['default']
-    Confirm: typeof import('./src/components/general/Confirm.vue')['default']
     DataTable: typeof import('primevue/datatable')['default']
     Dialog: typeof import('primevue/dialog')['default']
     Divider: typeof import('primevue/divider')['default']
