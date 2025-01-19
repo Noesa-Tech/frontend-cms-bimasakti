@@ -2,27 +2,27 @@ import api from '@/api/api'
 import { defineStore } from 'pinia'
 import * as toast from '@/composables/toast'
 
-export const ServiceCategoryStore = defineStore('ServiceCategoryStore', {
+export const ServiceSubCategorytStore = defineStore('ServiceSubCategory', {
     state: () => ({
         isLoading: false as boolean,
-        serviceCategoryAll: [] as Array<any>,
+        serviceSubCategory: [] as Array<any>,
     }),
     actions: {
-        async fetchServiceCategory(status: any, isCustom: number) {
+        async getServiceSubCategory() {
             this.isLoading = true
             try {
-                const res = await api.get(`/auth/services-problem?status=${status}&isCustom=${isCustom}`)
-                this.serviceCategoryAll= res.data
+                const res = await api.get(`/auth/services-sub-problem`)
+                this.serviceSubCategory= res.data
             } catch (err) {
             } finally {
                 this.isLoading = false
             }
         },
-        async addServiceCategory(payload: any) {
+        async createServiceSubCategory(payload: any) {
             this.isLoading = true
 
             try {
-                const res = await api.post(`/auth/services-problem`, payload);        
+                const res = await api.post(`/auth/services-sub-problem`, payload);        
 
                  // @ts-ignore
                 toast.success('success', res.message)
@@ -31,10 +31,10 @@ export const ServiceCategoryStore = defineStore('ServiceCategoryStore', {
                 this.isLoading = false
             }
         },
-        async updateServiceCategory(serviceCategoryId:number, payload: any) {
+        async updateServiceSubCategory(serviceSubCategoryId:number, payload: any) {
             this.isLoading = true
             try {
-                const res = await api.post(`/auth/services-problem/${serviceCategoryId}`, payload);        
+                const res = await api.post(`/auth/services-sub-problem/${serviceSubCategoryId}`, payload);        
 
                  // @ts-ignore
                 toast.success('success', res.message)
@@ -43,11 +43,11 @@ export const ServiceCategoryStore = defineStore('ServiceCategoryStore', {
                 this.isLoading = false
             }
         },
-        async delete(serviceCategoryId: Number) {
+        async delete(serviceSubCategoryId: Number) {
             this.isLoading = true
 
             try {
-                const res = await api.delete(`/auth/services-problem/${serviceCategoryId}`);        
+                const res = await api.delete(`/auth/services-sub-problem/${serviceSubCategoryId}`);        
 
                  // @ts-ignore
                 toast.success('success', res.message)

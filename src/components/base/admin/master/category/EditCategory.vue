@@ -63,8 +63,6 @@ const items = computed(() => {
 onMounted(async () => {
     await $service.fetchService()
 })
-
-console.log(query.service)
 </script>
 
 <template>

@@ -77,7 +77,7 @@ function formatDate(value : any) {
 
 onMounted(async () => {
   await $order.detailOrder(route.params.id)
-  console.log($order.detail)
+  
   item.value.noInvoice = $order.detail.invoice
   item.value.name = $order.detail.user.name
   item.value.email = $order.detail.user.email

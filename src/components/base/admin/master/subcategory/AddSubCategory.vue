@@ -1,49 +1,33 @@
 <script setup lang="ts">
 import Select from "primevue/select";
-import { useToast } from 'primevue/usetoast';
-import { VendorStore } from '@/store/vendor'
-import { ServiceStore } from '@/store/service'
-import { CategoryService } from "@/service/CategoryService";
-
-const toast = useToast();
-const props = defineProps({
-    categoryId: {
-        type: [Number, null] as PropType<number | null>,
-        required: true,
-    },
-});
-
+import { ServiceCategoryStore } from '@/store/serviceCategory'
+import { ServiceSubCategorytStore } from '@/store/serviceSubCategory'
+    
 const emit = defineEmits(["on-close", "on-save"]);
+    
+const $serviceCategory = ServiceCategoryStore()
+const $serviceSubCategory = ServiceSubCategorytStore()
 
 const statuses = reactive([0, 1]);
-const categoryData = ref([]);
 
 const query = reactive({
+    problem_id:null,
     name: "",
-    price: 0,
-    category: null,
-    status: null,
+    description: "",
+    status: 1,
 })
 
 async function onSave() {
-    //   const payload = {
-    //     ...query,
-    //     _method: "PATCH",
-    //     service_id: JSON.stringify(query.service_id),
-    //   };
+      const payload = {
+        // @ts-ignore
+        problem_id: query?.problem_id?.id,
+        name : query.name,
+        description: query.description,
+        status: query.status
+      };
 
-    //   $vendor.update(props.vendorId as number, payload)
+      $serviceSubCategory.createServiceSubCategory(payload)
     emit('on-save')
-}
-
-async function fetchDetailVendor() {
-    //   await $vendor.fetchDetail(props.vendorId as number)
-
-    //   query.name = $vendor.detail.name || "";
-    //   query.city_id = $vendor.detail.city_id || null;
-
-    //   // @ts-ignore
-    //   query.service_id =  $vendor.detail.vendor_service.map(item => item.service_id);
 }
 
 function getSeverity(status: number) {
@@ -65,13 +49,8 @@ function getStatusName(status: number) {
 }
 
 onMounted(async () => {
-    CategoryService.getCategory().then((data: any) => {
-        categoryData.value = data;
-    });
+    await $serviceCategory.fetchServiceCategory("", 0)
 })
-
-
-// watch(() => props.vendorId, fetchDetailVendor, { immediate: true });
 </script>
 
 <template>
@@ -81,36 +60,35 @@ onMounted(async () => {
     </div>
     <div class="flex flex-col gap-2 mb-4">
         <label for="desc">Kategori</label>
-        <Select v-model="query.category" :options="categoryData" placeholder="Pilih Layanan">
+        <Select v-model="query.problem_id" :options="$serviceCategory.serviceCategoryAll" placeholder="Pilih Layanan">
             <template #value="slotProps">
                 <div v-if="slotProps.value != null" class="flex gap-4 items-center ">
-                    <img :alt="slotProps.value.service.name" :src="slotProps.value.service.image_url"
+                    <img :alt="slotProps?.value?.service?.name" :src="slotProps.value.image_url"
                         class=" align-middle w-10" />
                     <div>
-                        <h6 class="m-0">{{ slotProps.value.name }}</h6>
-                        <p class="m-0 text-muted-color text-sm">{{ slotProps.value.service.name }}</p>
+                        <h6 class="m-0">{{ slotProps?.value?.name }}</h6>
+                        <p class="m-0 text-muted-color text-sm">{{ slotProps?.value?.service?.name }}</p>
                     </div>
                 </div>
-
             </template>
             <template #option="slotProps">
                 <div class="flex gap-4 items-center ">
-                    <img :alt="slotProps.option.service.name" :src="slotProps.option.service.image_url"
+                    <img :alt="slotProps?.option?.service?.name" :src="slotProps?.option?.image_url"
                         class=" align-middle w-10" />
                     <div>
                         <h6 class="m-0">{{ slotProps.option.name }}</h6>
-                        <p class="m-0 text-muted-color text-sm">{{ slotProps.option.service.name }}</p>
+                        <p class="m-0 text-muted-color text-sm">{{ slotProps?.option?.service?.name }}</p>
                     </div>
                 </div>
             </template>
         </Select>
     </div>
-    <div class="flex flex-col gap-2 mb-4">
+    <!-- <div class="flex flex-col gap-2 mb-4">
         <label for="name">Harga</label>
         <InputNumber v-model="query.price" type="text" placeholder="Harga" inputId="currency-indonesia" mode="currency"
             currency="IDR" locale="id-ID" :minFractionDigits="0" />
-    </div>
-    <div class="flex flex-col gap-2">
+    </div> -->
+    <div class="flex flex-col gap-2 mb-4">
         <label for="desc">Status</label>
         <Select v-model="query.status" :options="statuses" placeholder="Pilih Status">
             <template #value="slotProps">
@@ -123,8 +101,13 @@ onMounted(async () => {
         </Select>
     </div>
 
+    <div class="flex flex-col gap-2">
+        <label for="desc">Description</label>
+        <Textarea v-model="query.description" rows="5" cols="30" />
+    </div>
+
     <div class="flex justify-end gap-2 mt-8">
         <Button type="button" label="Batal" text severity="secondary" @click="emit('on-close')"></Button>
-        <Button type="button" label="Simpan" @click="onSave()"></Button>
+        <Button type="button" label="Simpan" :disabled="$isQueryInvalid(query)" @click="onSave()"></Button>
     </div>
 </template>
