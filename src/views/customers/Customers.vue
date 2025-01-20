@@ -15,10 +15,12 @@ const filters = ref<any>({
   phone: { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
 });
 
-const reactiveKey = ref<number>(0)
-const isLoading = ref<boolean>(false);
 const visibleEdit = ref<boolean>(false);
 const visibleAdd = ref<boolean>(false);
+const reactiveKey = ref<number>(0)
+const isLoading = ref<boolean>(false);
+
+const selectedRow = ref<any>(null)
 
 async function fetchUsers() {
   await $user.getAll(1)
@@ -42,25 +44,25 @@ const exportCSV = (event: any) => {
   dt.value.exportCSV();
 };
 
-const confirm2 = (event: any) => {
-  confirm.require({
-    target: event.currentTarget,
-    message: "Yakin ingin menghapus pelanggan ini?",
-    icon: "pi pi-info-circle",
-    rejectProps: {
-      label: "Batal",
-      severity: "secondary",
-      outlined: true,
-    },
-    acceptProps: {
-      label: "Yakin",
-      severity: "danger",
-    },
-    accept: () => {
-    },
-    reject: () => {
-    },
-  });
+const confirmDelete = (e: any) => {
+    confirm.require({
+        target: e.currentTarget,
+        message: "Yakin ingin menghapus data pelanggan ini?",
+        icon: "pi pi-info-circle",
+        rejectProps: {
+            label: "Batal",
+            severity: "secondary",
+            outlined: true,
+        },
+        acceptProps: {
+            label: "Yakin",
+            severity: "danger",
+        },
+        accept: async () => {
+            await $user.delete(e)
+            await fetchUsers()
+        },
+    });
 };
 </script>
 <template>
@@ -119,9 +121,9 @@ const confirm2 = (event: any) => {
       <Column sortable field="id" header="Action" bodyClass="text-center" class="min-w-[10rem]">
         <template #body="{ data }">
           <div class="flex gap-4 items-center">
-            <Button icon="pi pi-pencil" severity="info" text v-tooltip.bottom="'Ubah'" @click="visibleEdit = true" />
+            <Button icon="pi pi-pencil" severity="info" text v-tooltip.bottom="'Ubah'" @click="selectedRow = data, visibleEdit = true" />
 
-            <Button icon="pi pi-trash" severity="danger" text v-tooltip.bottom="'Hapus'" @click="confirm2($event)" />
+            <Button icon="pi pi-trash" severity="danger" text v-tooltip.bottom="'Hapus'" @click="confirmDelete(data.id)" />
           </div>
         </template>
       </Column>
@@ -129,9 +131,9 @@ const confirm2 = (event: any) => {
   </div>
   <ConfirmPopup></ConfirmPopup>
   <Dialog v-model:visible="visibleAdd" maximizable modal header="Tambah Pelanggan" class=" sm:w-1/2 w-full ">
-    <AddCustomer @on-close="visibleAdd = false" @on-save="visibleAdd = false" />
+    <AddCustomer @on-close="visibleAdd = false" @on-save="visibleAdd = false, fetchUsers()" />
   </Dialog>
   <Dialog v-model:visible="visibleEdit" maximizable modal header="Ubah Pelanggan" class=" sm:w-1/2 w-full ">
-    <EditCustomer :customer="{}" @on-close="visibleEdit = false" @on-save="visibleEdit = false" />
+    <EditCustomer :customer="selectedRow" @on-close="visibleEdit = false" @on-save="visibleEdit = false, fetchUsers()" />
   </Dialog>
 </template>

@@ -11,6 +11,8 @@ const query = reactive<any>({
 })
 
 async function onSave() {
+    query.phone = `+62${query.phone?.toString() || ''}`;
+    await $user.create(query)
     emit('on-save')
 }
 
@@ -24,7 +26,7 @@ async function onSave() {
             placeholder="Masukkan nama lengkap pelanggan" />
     </div>
     <div class="flex flex-col gap-2 mb-4">
-        <label for="email">Nomor Hp Pelanggan</label>
+        <label for="email">Email</label>
         <InputText v-model="query.email" id="email" aria-describedby="phone-help"
             placeholder="Masukkan email pelanggan" />
     </div>

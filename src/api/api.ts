@@ -50,10 +50,13 @@ Api.interceptors.response.use(
     // Handle error responses
     // For example, you can check for specific error codes or network errors
     if (error.response) {
-      if (error.response.status > 400) {
+      if (error.response.status === 401) {
         eventBus.showToast = { type: 'error', message: error.response.data.message };
         eventBus.triggerRedirect('/');
-        // return Promise.reject(error.response.data.message)
+      }
+
+      if (error.response.status > 401) {
+        return Promise.reject(error.response.data.message)
       }
 
       if (error.response.status === 400) {

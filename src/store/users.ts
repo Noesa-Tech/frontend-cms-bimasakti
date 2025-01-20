@@ -20,13 +20,38 @@ export const UserStore = defineStore('UserStore', {
                 this.isLoading = false
             }
         },
-        async update(payload: any, paymentId:any) {
+        async create(data: any) {
             this.isLoading = true
             try {
-                const res = await api.post(`/auth/social-media/${paymentId}`, payload);
+                const res = await api.post(`/auth/users`, data);
 
                 // @ts-ignore
                 return toast.success('success', res.message)
+            } catch (err) {
+            } finally {
+                this.isLoading = false
+            }
+        },
+        async update(payload: any, userId:any) {
+            this.isLoading = true
+            try {
+                const res = await api.post(`/auth/users/${userId}`, payload);
+
+                // @ts-ignore
+                return toast.success('success', res.message)
+            } catch (err) {
+            } finally {
+                this.isLoading = false
+            }
+        },
+        async delete(userId: Number) {
+            this.isLoading = true
+
+            try {
+                const res = await api.delete(`/auth/users/${userId}`);
+
+                // @ts-ignore
+                toast.success('success', res.message)
             } catch (err) {
             } finally {
                 this.isLoading = false

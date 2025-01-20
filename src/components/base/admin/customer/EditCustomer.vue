@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ServiceStore } from '@/store/service'
+import { UserStore } from '@/store/users'
 
 const props = defineProps({
     customer: {
@@ -10,27 +10,25 @@ const props = defineProps({
 
 const emit = defineEmits(["on-close", "on-save"]);
 
-const $service = ServiceStore()
-const src = ref<any>(null);
+const $user = UserStore()
 
 const query = reactive<Record<string, any>>({
     name: props.customer.name,
-    description: props.customer.email,
-    status: props.customer.phone,
+    email: props.customer.email,
+    phone: props.customer.phone ? props.customer.phone.slice(3) : '',
 })
 
 async function onSave() {
+    const payload = {
+        _method: "PATCH",
+        name : query.name,
+        email : query.email,
+        phone : `+62${query.phone?.toString() || ''}`
+    };
+
+    await $user.update(payload, props.customer.id)
     emit('on-save')
 }
-
-
-watch(
-    () => props.customer,
-    (newValue) => {
-
-    },
-    { immediate: true }
-)
 </script>
 
 <template>
@@ -56,6 +54,6 @@ watch(
     </div>
     <div class="flex justify-end gap-2 mt-8">
         <Button type="button" label="Batal" text severity="secondary" @click="emit('on-close')"></Button>
-        <Button type="button" label="Simpan" @click="onSave()"></Button>
+        <Button type="button" label="Simpan" :disabled="$isQueryInvalid(query)" :loading="$user.isLoading" @click="onSave()"></Button>
     </div>
 </template>
