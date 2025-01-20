@@ -1,10 +1,39 @@
-<script setup>
+<script setup lang="ts">
+import { PaymentStore } from '@/store/payment';
+
+const $payment = PaymentStore()
 
 const query = reactive({
-  name: 'Bimasakti Home',
-  bankName: 'Bank BCA',
-  accountNumber: '1039438492',
+  id: null,
+  name: '',
+  bankName: '',
+  accountNumber: '',
 })
+
+onMounted(async() => {
+  await $payment.getAll()
+
+  if ($payment?.allPayment?.length) {
+    query.id = $payment.allPayment[0].id
+    query.name = $payment.allPayment[0].bank_account
+    query.bankName = $payment.allPayment[0].bank_name
+    query.accountNumber = $payment.allPayment[0].no_rekening
+  }
+})
+
+async function onUpdate(closeCallback: () => void){
+
+  const payload = {
+        _method: "PATCH",
+        bank_name: query.bankName,
+        bank_account: query.name,
+        no_rekening: query.accountNumber,
+    };
+
+    await $payment.update(payload, query.id)
+    closeCallback();
+    await $payment.getAll()
+}
 </script>
 <template>
   <TopBreadcrumb :breadcrumbItems="[{ label: 'Pengaturan Pembayaran' }]" />
@@ -37,7 +66,7 @@ const query = reactive({
           <InputText v-model="query.accountNumber" id="bank-name" placeholder="Nama Bank" class=" w-auto" />
         </div>
         <div class="flex justify-end">
-          <Button icon="pi pi-check" label="Simpan" severity="primary" @click="closeCallback" />
+          <Button icon="pi pi-check" :loading="$payment.isLoading" :disabled="$payment.isLoading" label="Simpan" severity="primary" @click="onUpdate(closeCallback)" />
         </div>
       </template>
     </Inplace>

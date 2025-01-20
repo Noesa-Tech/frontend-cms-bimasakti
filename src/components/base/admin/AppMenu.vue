@@ -102,10 +102,10 @@ onMounted(async () => {
 
 <template>
   <div class="flex items-center justify-start gap-2">
-    <Avatar :label="initials('John Doe')" size="xlarge" shape="circle" />
+    <Avatar :label="initials(query.name)" size="xlarge" />
     <div>
-      <h5 class="m-0">John Doe</h5>
-      <p class="text-sm m-0">johndoe@gmail.com</p>
+      <h6 class="m-0">{{ query.name }}</h6>
+      <p class="text-sm m-0">{{ query.email }}</p>
       <p class="text-sm m-0 text-primary font-semibold mt-1">Admin Bandung</p>
     </div>
   </div>
