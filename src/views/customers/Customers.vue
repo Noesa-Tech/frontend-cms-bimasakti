@@ -1,38 +1,33 @@
 <script setup lang="ts">
-import { CustomerService } from "@/service/CustomerService";
-import { FilterMatchMode, FilterOperator } from "@primevue/core/api";
-import { onBeforeMount, reactive, ref } from "vue";
-import DatePicker from "primevue/datepicker";
-import Select from "primevue/select";
+import { UserStore } from '@/store/users'
 import { useConfirm } from "primevue/useconfirm";
-import { useToast } from 'primevue/usetoast';
 import ConfirmPopup from "primevue/confirmpopup";
+import { FilterMatchMode, FilterOperator } from "@primevue/core/api";
 
+const $user = UserStore();
 const confirm = useConfirm();
-const toast = useToast();
 const dt = ref();
-const filters = ref<any>({});
+
+const filters = ref<any>({
+  global: { value: null, matchMode: FilterMatchMode.CONTAINS },
+  name: { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
+  email: { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
+  phone: { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
+});
+
+const reactiveKey = ref<number>(0)
 const isLoading = ref<boolean>(false);
-const customerData = ref(null);
 const visibleEdit = ref<boolean>(false);
 const visibleAdd = ref<boolean>(false);
 
-onBeforeMount(() => {
-  CustomerService.getCustomer().then((data: any) => {
-    customerData.value = data;
-    isLoading.value = false;
-  });
-  initFilter();
-});
-
-function initFilter() {
-  filters.value = {
-    global: { value: null, matchMode: FilterMatchMode.CONTAINS },
-    name: { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
-    email: { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
-    phone: { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
-  };
+async function fetchUsers() {
+  await $user.getAll(1)
+  reactiveKey.value += 1;
 }
+
+onMounted(async() => {
+  await fetchUsers()
+});
 
 function formatDate(value: any) {
   const date = new Date(value);
@@ -72,7 +67,7 @@ const confirm2 = (event: any) => {
   <TopBreadcrumb :breadcrumbItems="[{ label: 'Pelanggan' }]" />
   <div class="card mt-8">
     <div class="font-semibold text-xl mb-4">Data Pelanggan</div>
-    <DataTable ref="dt" :value="customerData" :paginator="true" :rows="10" dataKey="id" :rowHover="true"
+    <DataTable ref="dt" :key="reactiveKey" :value="$user.users" :paginator="true" :rows="10" dataKey="id" :rowHover="true"
       v-model:filters="filters" filterDisplay="menu" :loading="isLoading"
       :globalFilterFields="['name', 'email', 'phone']" showGridlines>
       <template #header>

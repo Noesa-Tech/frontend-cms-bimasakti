@@ -1,7 +1,9 @@
 <script setup lang="ts">
+import { UserStore } from '@/store/users'
 
 const emit = defineEmits(["on-close", "on-save"]);
 
+const $user = UserStore()
 const query = reactive<any>({
     name: "",
     email: "",
@@ -38,6 +40,6 @@ async function onSave() {
     </div>
     <div class="flex justify-end gap-2 mt-8">
         <Button type="button" label="Batal" text severity="secondary" @click="emit('on-close')"></Button>
-        <Button type="button" label="Simpan" @click="onSave()"></Button>
+        <Button type="button" label="Simpan" :disabled="$isQueryInvalid(query)" :loading="$user.isLoading" @click="onSave()"></Button>
     </div>
 </template>
