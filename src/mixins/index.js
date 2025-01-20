@@ -1,5 +1,43 @@
 const mixins = {
   methods: {
+
+    /**
+     * Mask the password by replacing characters with asterisks.
+     * @param {*} password
+     */
+    maskPassword(password) {
+      // Check if password is not empty
+      if (password && password.length > 0) {
+        // Return a string of asterisks of the same length as the password
+        return '•'.repeat(password.length);
+      } else {
+        // Return an empty string if the password is empty
+        return '';
+      }
+    },
+
+    /**
+     *
+     * @param {*} fullName
+     */
+    initials(fullName) {
+      // Create a array from fullName
+      if (fullName.indexOf(" ") < 1) {
+        return fullName.charAt(0).toUpperCase();
+      } else {
+        var arrName = fullName.split(" ");
+
+        // Select the first letter of the name
+        var iniName = fullName.charAt(0);
+
+        // Select the first letter of the lastname
+        var iniLname = arrName[1].charAt(0);
+
+        // Return the initials
+        return (iniName + iniLname).toUpperCase();
+      }
+    },
+
     /**
      * Copies the given value to the clipboard
      * @param {string} value - The value to copy to the clipboard
@@ -115,7 +153,7 @@ const mixins = {
 
       let result = Math.floor(
         (Date.UTC(dt2.getFullYear(), dt2.getMonth(), dt2.getDate()) - Date.UTC(dt1.getFullYear(), dt1.getMonth(), dt1.getDate())) /
-          (1000 * 60 * 60 * 24)
+        (1000 * 60 * 60 * 24)
       );
 
       if (result < 0) {

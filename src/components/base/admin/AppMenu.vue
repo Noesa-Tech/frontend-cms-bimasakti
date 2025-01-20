@@ -42,6 +42,7 @@ const model = ref([
           },
         ],
       },
+      { label: "Admin", icon: "pi pi-fw pi-id-card", to: "/admin" },
       { label: "Vendor", icon: "pi pi-fw pi-user", to: "/vendors" },
       { label: "Pelanggan", icon: "pi pi-fw pi-users", to: "/pelanggan" },
     ],
@@ -78,19 +79,19 @@ const model = ref([
 
 const query = reactive({
   name: "",
-  email : ""
+  email: ""
 })
 
 onMounted(async () => {
   const users = localStorage.getItem('AuthStore');
-  
+
   if (users) {
     const parsedData = JSON.parse(users);
 
     query.name = parsedData.users.name;
     query.email = parsedData.users.email;
   } else {
-    
+
     await $auth.logout()
     localStorage.removeItem('AuthStore');
 
@@ -100,9 +101,15 @@ onMounted(async () => {
 </script>
 
 <template>
-  <h5 class="m-0">John Doe</h5>
-  <p class="text-sm m-0">johndoe@gmail.com</p>
-  <p class="text-sm m-0 text-primary font-semibold mt-1">Admin Bandung</p>
+  <div class="flex items-center justify-start gap-2">
+    <Avatar :label="initials('John Doe')" size="xlarge" shape="circle" />
+    <div>
+      <h5 class="m-0">John Doe</h5>
+      <p class="text-sm m-0">johndoe@gmail.com</p>
+      <p class="text-sm m-0 text-primary font-semibold mt-1">Admin Bandung</p>
+    </div>
+  </div>
+
   <Divider />
   <ul class="layout-menu">
     <template v-for="(item, i) in model" :key="item">

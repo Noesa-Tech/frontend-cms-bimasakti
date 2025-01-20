@@ -71,7 +71,7 @@ const confirm2 = (event: any) => {
 <template>
   <TopBreadcrumb :breadcrumbItems="[{ label: 'Pelanggan' }]" />
   <div class="card mt-8">
-    <div class="font-semibold text-xl mb-4">Data Benefit</div>
+    <div class="font-semibold text-xl mb-4">Data Pelanggan</div>
     <DataTable ref="dt" :value="customerData" :paginator="true" :rows="10" dataKey="id" :rowHover="true"
       v-model:filters="filters" filterDisplay="menu" :loading="isLoading"
       :globalFilterFields="['name', 'email', 'phone']" showGridlines>
@@ -92,24 +92,24 @@ const confirm2 = (event: any) => {
           </div>
         </div>
       </template>
-      <template #empty> Tidak ada data Benefit. </template>
-      <template #loading> Memuat data Benefit. Mohon tunggu. </template>
+      <template #empty> Tidak ada data Pelanggan. </template>
+      <template #loading> Memuat data Pelanggan. Mohon tunggu. </template>
       <Column sortable field="name" header="Nama" class="min-w-[15rem]">
         <template #body="{ data }">
           {{ data.name }}
         </template>
         <template #filter="{ filterModel }">
-          <InputText v-model="filterModel.value" type="text" placeholder="Cari Benefit" />
+          <InputText v-model="filterModel.value" type="text" placeholder="Cari Pelanggan" />
         </template>
       </Column>
       <Column sortable field="email" header="Alamat Email" class="min-w-[15rem]">
         <template #body="{ data }">
           <a :href="'mailto:' + data.email" class=" text-blue-400 hover:text-blue-500 transition-all" target="_blank">{{
             data.email
-            }}</a>
+          }}</a>
         </template>
         <template #filter="{ filterModel }">
-          <InputText v-model="filterModel.value" type="text" placeholder="Cari Benefit" />
+          <InputText v-model="filterModel.value" type="text" placeholder="Cari Pelanggan" />
         </template>
       </Column>
       <Column sortable field="phone" header="Nomor Hp" class="min-w-[15rem]">
@@ -117,7 +117,7 @@ const confirm2 = (event: any) => {
           {{ data.phone }}
         </template>
         <template #filter="{ filterModel }">
-          <InputText v-model="filterModel.value" type="text" placeholder="Cari Benefit" />
+          <InputText v-model="filterModel.value" type="text" placeholder="Cari Pelanggan" />
         </template>
       </Column>
 

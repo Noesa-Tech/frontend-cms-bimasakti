@@ -77,6 +77,15 @@ const routes = [
     },
   },
   {
+    path: "/admin",
+    name: "admins",
+    component: () => import("@/views/admins/Admins.vue"),
+    meta: {
+      requiresAuth: true,
+      title: "Data Admin",
+    },
+  },
+  {
     path: "/vendors",
     name: "vendors",
     component: () => import("@/views/vendors/Vendors.vue"),
