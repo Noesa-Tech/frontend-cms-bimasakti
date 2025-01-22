@@ -63,7 +63,6 @@ function getStatusName(status: number) {
 onMounted(async () => {
     await $serviceCategory.fetchServiceCategory("", 0)
 })
-console.log(props)
 </script>
 
 <template>

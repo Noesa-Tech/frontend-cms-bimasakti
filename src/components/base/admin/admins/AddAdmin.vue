@@ -1,7 +1,13 @@
 <script setup lang="ts">
+import { Password } from "primevue";
 import Select from "primevue/select";
+import { UserStore } from '@/store/users'
 import { LocationStore } from '@/store/location'
+
+
+const $user = UserStore()
 const $location = LocationStore()
+
 const emit = defineEmits(["on-close", "on-save"]);
 const query = reactive<any>({
     name: "",
@@ -35,6 +41,16 @@ onMounted(async () => {
 });
 
 async function onSave() {
+    let payload = {
+        name : query.name,
+        email : query.email,
+        phone: `+62${query.phone?.toString() || ''}`,
+        city_id: query.selectedCity.id,
+        password: query.password,
+        role_id: 2,
+    }
+
+    await $user.create(payload)
     emit('on-save')
 }
 </script>
@@ -46,7 +62,7 @@ async function onSave() {
             placeholder="Masukkan nama lengkap admin" />
     </div>
     <div class="flex flex-col gap-2 mb-4">
-        <label for="email">Nomor Hp Admin</label>
+        <label for="email">Email</label>
         <InputText v-model="query.email" id="email" aria-describedby="phone-help" placeholder="Masukkan email admin" />
     </div>
     <div class="flex flex-col gap-2 mb-4">
@@ -68,8 +84,7 @@ async function onSave() {
     </div>
     <div class="mb-4 flex flex-col gap-2">
         <label for="city">Kota/Kabupaten</label>
-        <Select inputId="city" v-model="query.selectedCity" :loading="$location.isLoadingCities"
-            @change="fetchSubDistrict($event)" :disabled="cityList.length < 1" :options="cityList" filter
+        <Select inputId="city" v-model="query.selectedCity" :loading="$location.isLoadingCities" :disabled="cityList.length < 1" :options="cityList" filter
             optionLabel="name" fluid placeholder="Pilih kabupaten/kota">
         </Select>
     </div>
@@ -80,6 +95,6 @@ async function onSave() {
     </div>
     <div class="flex justify-end gap-2 mt-8">
         <Button type="button" label="Batal" text severity="secondary" @click="emit('on-close')"></Button>
-        <Button type="button" label="Simpan" @click="onSave()"></Button>
+        <Button type="button" label="Simpan" :disabled="$isQueryInvalid(query)" :loading="$user.isLoading" @click="onSave()"></Button>
     </div>
 </template>

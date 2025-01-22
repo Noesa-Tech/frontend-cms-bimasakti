@@ -31,15 +31,6 @@ onMounted(async() => {
   await fetchUsers()
 });
 
-function formatDate(value: any) {
-  const date = new Date(value);
-  return date.toLocaleDateString("en-US", {
-    day: "2-digit",
-    month: "2-digit",
-    year: "numeric",
-  });
-}
-
 const exportCSV = (event: any) => {
   dt.value.exportCSV();
 };

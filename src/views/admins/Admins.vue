@@ -1,64 +1,57 @@
 <script setup lang="ts">
-import { AdminService } from "@/service/AdminService";
+import { UserStore } from '@/store/users'
 import { FilterMatchMode, FilterOperator } from "@primevue/core/api";
-import { onBeforeMount, reactive, ref } from "vue";
-import Select from "primevue/select";
 import { useConfirm } from "primevue/useconfirm";
-import { useToast } from 'primevue/usetoast';
 import ConfirmPopup from "primevue/confirmpopup";
-import EditAdmin from "@/components/base/admin/admins/EditAdmin.vue";
 
+const $user = UserStore();
 const confirm = useConfirm();
-const toast = useToast();
 const dt = ref();
-const filters = ref<any>({});
+
+const filters = ref<any>({
+    global: { value: null, matchMode: FilterMatchMode.CONTAINS },
+        name: { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
+        email: { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
+        phone: { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
+        'location.name': { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
+});
 const isLoading = ref<boolean>(false);
 const adminData = ref(null);
 const visibleEdit = ref<boolean>(false);
 const visibleAdd = ref<boolean>(false);
 const selectedAdmin = ref<any>(null);
+const reactiveKey = ref<number>(0);
 
-onBeforeMount(() => {
-    AdminService.getAdmin().then((data: any) => {
-        adminData.value = data;
-        isLoading.value = false;
-    });
-    initFilter();
-});
-
-function initFilter() {
-    filters.value = {
-        global: { value: null, matchMode: FilterMatchMode.CONTAINS },
-        name: { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
-        email: { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
-        phone: { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
-        'location.name': { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
-    };
+async function fetchAdmin() {
+  await $user.getAll(2)
+  reactiveKey.value += 1;
 }
 
 const exportCSV = (event: any) => {
     dt.value.exportCSV();
 };
 
-const confirm2 = (event: any) => {
-    confirm.require({
-        target: event.currentTarget,
-        message: "Yakin ingin menghapus admin ini?",
-        icon: "pi pi-info-circle",
-        rejectProps: {
-            label: "Batal",
-            severity: "secondary",
-            outlined: true,
-        },
-        acceptProps: {
-            label: "Yakin",
-            severity: "danger",
-        },
-        accept: () => {
-        },
-        reject: () => {
-        },
-    });
+const confirmDelete = (e: any) => {
+  confirm.require({
+    target: e.currentTarget,
+    message: "Yakin ingin menghapus users admin ini?",
+    icon: "pi pi-info-circle",
+    rejectProps: {
+      label: "Batal",
+      severity: "secondary",
+      outlined: true,
+    },
+    acceptProps: {
+      label: "Yakin",
+      severity: "danger",
+    },
+    accept: async() => {
+      await $user.delete(e)
+      await fetchAdmin()
+    },
+    reject: () => {
+    },
+  });
 };
 
 function openEditDialog(admin: any) {
@@ -66,13 +59,16 @@ function openEditDialog(admin: any) {
     visibleEdit.value = true;
 }
 
+onMounted(async() => {
+    await fetchAdmin()
+})
 
 </script>
 <template>
     <TopBreadcrumb :breadcrumbItems="[{ label: 'Admin' }]" />
     <div class="card mt-8">
         <div class="font-semibold text-xl mb-4">Data Admin</div>
-        <DataTable ref="dt" :value="adminData" :paginator="true" :rows="10" dataKey="id" v-model:filters="filters"
+        <DataTable ref="dt" :value="$user.users" :paginator="true" :rows="10" dataKey="id" v-model:filters="filters"
             filterDisplay="menu" :loading="isLoading" :globalFilterFields="['name', 'email', 'phone', 'location.name']"
             showGridlines>
             <template #header>
@@ -115,7 +111,7 @@ function openEditDialog(admin: any) {
             </Column>
             <Column sortable field="phone" header="Nomor Hp" class="min-w-[15rem]">
                 <template #body="{ data }">
-                    {{ data.phone }}
+                    {{ data.phone ?? '-' }}
                 </template>
                 <template #filter="{ filterModel }">
                     <InputText v-model="filterModel.value" type="text" placeholder="Cari Admin" />
@@ -123,24 +119,24 @@ function openEditDialog(admin: any) {
             </Column>
             <Column sortable field="location.name" header="Lokasi" class="min-w-[15rem]">
                 <template #body="{ data }">
-                    {{ data.location.name }}
+                    {{ data.city.nama }}
                 </template>
                 <template #filter="{ filterModel }">
                     <InputText v-model="filterModel.value" type="text" placeholder="Cari Lokasi" />
                 </template>
             </Column>
-            <Column header="Password" class="min-w-[15rem]">
+            <!-- <Column header="Password" class="min-w-[15rem]">
                 <template #body="{ data }">
                     <toggle-text :password="data.password" />
                 </template>
-            </Column>
+            </Column> -->
             <Column sortable field="id" header="Action" bodyClass="text-center" class="min-w-[10rem]">
                 <template #body="{ data }">
                     <div class="flex gap-4 items-center">
                         <Button icon="pi pi-pencil" severity="info" text v-tooltip.bottom="'Ubah'"
                             @click="openEditDialog(data)" />
                         <Button icon="pi pi-trash" severity="danger" text v-tooltip.bottom="'Hapus'"
-                            @click="confirm2($event)" />
+                            @click="confirmDelete(data.id)" />
                     </div>
                 </template>
             </Column>
@@ -148,9 +144,9 @@ function openEditDialog(admin: any) {
     </div>
     <ConfirmPopup></ConfirmPopup>
     <Dialog v-model:visible="visibleAdd" maximizable modal header="Tambah Admin" class=" sm:w-1/2 w-full ">
-        <AddAdmin @on-close="visibleAdd = false" @on-save="visibleAdd = false" />
+        <AddAdmin @on-close="visibleAdd = false" @on-save="visibleAdd = false, fetchAdmin()" />
     </Dialog>
     <Dialog v-model:visible="visibleEdit" maximizable modal header="Ubah Admin" class=" sm:w-1/2 w-full ">
-        <EditAdmin :data="selectedAdmin" @on-close="visibleEdit = false" @on-save="visibleEdit = false" />
+        <EditAdmin :data="selectedAdmin" @on-close="visibleEdit = false" @on-save="visibleEdit = false, fetchAdmin()" />
     </Dialog>
 </template>

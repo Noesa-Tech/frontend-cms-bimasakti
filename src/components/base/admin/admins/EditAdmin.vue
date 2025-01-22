@@ -1,11 +1,12 @@
 <script setup lang="ts">
 import Select from "primevue/select";
+import { UserStore } from '@/store/users'
 import { LocationStore } from '@/store/location'
 
+const $user = UserStore()
 const $location = LocationStore()
 const emit = defineEmits(["on-close", "on-save"]);
 
-// Define props for the form data
 const props = defineProps({
     data: {
         type: Object,
@@ -13,13 +14,18 @@ const props = defineProps({
     }
 });
 
-// Initialize query with the data passed as a prop
 const query = reactive<any>({
     name: props.data.name || "",
     email: props.data.email || "",
-    phone: props.data.phone || null,
-    selectedProvince: props.data.province || {},
-    selectedCity: props.data.location || {},
+    phone: props.data.phone ? props.data.phone.slice(3) : null,
+    selectedProvince: {
+        id: null,
+        name:null
+    },
+    selectedCity: {
+        id: null,
+        name:null
+    },
     password: props.data.password || "",
 })
 
@@ -37,17 +43,44 @@ const cityList = computed(() =>
     }))
 );
 
-async function fetchCity(e: any) {
-    await $location.fetchCities(e.value.id)
+async function fetchCity() {
+    await $location.fetchCities(0) 
+    const city = $location.cities.find(city => city.id === props.data.city_id);
+
+    query.selectedCity.id = city.id
+    query.selectedCity.name = city.nama
+
+    let provinceId = city.province.id
+    let provinceName = city.province.nama
+    
+    await $location.fetchProvinces();
+
+    query.selectedProvince.id = provinceId
+    query.selectedProvince.name = provinceName
 }
 
 onMounted(async () => {
-    await $location.fetchProvinces();
+    await fetchCity();
 });
 
 async function onSave() {
-    // Emit the updated query object to the parent
-    emit('on-save', query);
+
+    const payload = {
+        // @ts-ignore
+        _method: "PATCH",
+        name : query.name,
+        email : query.email,
+        phone: `+62${query.phone?.toString() || ''}`,
+        city_id: query.selectedCity.id,
+      };
+
+      if(query.password){
+        // @ts-ignore
+        payload.password = query.password 
+      }
+      
+    await $user.update(payload, props.data.id)
+    emit('on-save');
 }
 </script>
 
@@ -81,8 +114,8 @@ async function onSave() {
     <div class="mb-4 flex flex-col gap-2">
         <label for="city">Kota/Kabupaten</label>
         <Select inputId="city" v-model="query.selectedCity" :loading="$location.isLoadingCities"
-            @change="fetchSubDistrict($event)" :disabled="cityList.length < 1" :options="cityList" filter
-            optionLabel="name" fluid placeholder="Pilih kabupaten/kota">
+            :options="cityList" filter optionLabel="name"
+            fluid placeholder="Pilih kabupaten/kota">
         </Select>
     </div>
     <div class="mb-4 flex flex-col gap-2">
@@ -92,6 +125,6 @@ async function onSave() {
     </div>
     <div class="flex justify-end gap-2 mt-8">
         <Button type="button" label="Batal" text severity="secondary" @click="emit('on-close')"></Button>
-        <Button type="button" label="Simpan" @click="onSave()"></Button>
+        <Button type="button" label="Simpan" :loading="$user.isLoading" @click="onSave()"></Button>
     </div>
 </template>
