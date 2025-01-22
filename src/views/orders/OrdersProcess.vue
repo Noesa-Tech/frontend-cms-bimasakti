@@ -313,58 +313,52 @@ const exportCSV = (event: any) => {
                       {{ subtab.name }}
                     </AccordionHeader>
                     <AccordionContent class="accordion-content">
-                      <div class="flex flex-col items-start text-start gap-4">
-                        <ol v-for="(item, index) in subtab.sub_problem" :key="index" class=" list-disc list-inside">
-                          <li>
-                            <div class="inline-flex">
-                              <div class="flex flex-col gap-1">
-                                <p class="m-0 font-medium">Kategori: {{ item.name }}</p>
-                                <div class="flex items-center gap-2">
-                                  <p class="m-0">QTY:</p>
-                                  <Inplace class="inplace-custom-display">
-                                    <template #display>
-                                      <p class="m-0">{{ item.qty }}<i class="pi pi-pencil ml-2"></i> </p>
-                                    </template>
-                                    <template #content="{ closeCallback }">
-                                      <div class="flex items-center gap-2">
-                                        <InputNumber v-model="item.qty" inputId="horizontal-buttons" showButtons
-                                          buttonLayout="horizontal" :min="0" :max="99"
-                                          inputClass=" text-center border-l border-l-red-500 border-r border-r-green-500 bg-transparent max-w-[4rem]"
-                                          incrementButtonClass="border-green-500" decrementButtonClass="border-red-500"
-                                          small>
-                                          <template #incrementbuttonicon>
-                                            <span class="pi pi-plus" />
-                                          </template>
-                                          <template #decrementbuttonicon>
-                                            <span class="pi pi-minus" />
-                                          </template>
-                                        </InputNumber>
-                                        <Button icon="pi pi-check" outlined severity="success" @click="closeCallback" />
-                                      </div>
-                                    </template>
-                                  </Inplace>
-                                </div>
-                                <div class="flex items-center gap-2">
-                                  <p class="m-0">Harga:</p>
-                                  <Inplace class="inplace-custom-display">
-                                    <template #display>
-                                      <p class="m-0">Rp{{ formatPrice(item.price) }}<i class="pi pi-pencil ml-2"></i>
-                                      </p>
-                                    </template>
-                                    <template #content="{ closeCallback }">
-                                      <div class="flex items-center gap-2">
-                                        <InputNumber v-model="item.price" type="text" placeholder="Cari Harga"
-                                          inputId="currency-indonesia" mode="currency" currency="IDR" locale="id-ID"
-                                          :minFractionDigits="0" />
-                                        <Button icon="pi pi-check" outlined severity="success" @click="closeCallback" />
-                                      </div>
-                                    </template>
-                                  </Inplace>
-                                </div>
-                              </div>
+                      <div class="flex flex-col items-start text-start gap-4 w-full">
+                        <div v-for="(item, index) in subtab.sub_problem" :key="index" class="w-full">
+                          <div class="flex flex-col gap-1 w-full">
+                            <p class="m-0 font-semibold">• Kategori: {{ item.name }}</p>
+                            <div class="border rounded-md">
+                              <Inplace class="inplace-display-full">
+                                <template #display>
+                                  <div class="flex items-start justify-between gap-4">
+                                    <div>
+                                      <p class="m-0">QTY: {{ item.qty }}</p>
+                                      <p class="m-0">Harga: Rp{{ formatPrice(item.price) }}</p>
+                                    </div>
+                                    <i class="pi pi-pencil ml-2"></i>
+                                  </div>
+                                </template>
+                                <template #content="{ closeCallback }">
+                                  <div class="flex flex-col gap-2 p-2">
+                                    <div class="flex items-center justify-start gap-2">
+                                      <p class="m-0">QTY: </p>
+                                      <InputNumber v-model="item.qty" inputId="horizontal-buttons" showButtons
+                                        buttonLayout="horizontal" :min="0" :max="99"
+                                        inputClass=" text-center border-l border-l-red-500 border-r border-r-green-500 bg-transparent max-w-[4rem]"
+                                        incrementButtonClass="border-green-500" decrementButtonClass="border-red-500"
+                                        small>
+                                        <template #incrementbuttonicon>
+                                          <span class="pi pi-plus" />
+                                        </template>
+                                        <template #decrementbuttonicon>
+                                          <span class="pi pi-minus" />
+                                        </template>
+                                      </InputNumber>
+                                    </div>
+                                    <div class="flex items-center justify-start gap-2">
+                                      <p class="m-0">Harga: </p>
+                                      <InputNumber v-model="item.price" type="text" placeholder="Masukkan Harga"
+                                        inputId="currency-indonesia" mode="currency" currency="IDR" locale="id-ID"
+                                        :minFractionDigits="0" />
+                                    </div>
+                                    <Button label="Simpan" icon="pi pi-check" outlined severity="success"
+                                      class=" max-w-fit" @click="closeCallback" />
+                                  </div>
+                                </template>
+                              </Inplace>
                             </div>
-                          </li>
-                        </ol>
+                          </div>
+                        </div>
                       </div>
                     </AccordionContent>
                   </AccordionPanel>
