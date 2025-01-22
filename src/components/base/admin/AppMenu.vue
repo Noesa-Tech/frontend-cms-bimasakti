@@ -66,7 +66,7 @@ const model = ref([
       { label: "Kontak", icon: "pi pi-fw pi-phone", to: "/pengaturan/kontak" },
       { label: "Review", icon: "pi pi-fw pi-star", to: "/pengaturan/ulasan" },
       { label: "Pembayaran", icon: "pi pi-fw pi-credit-card", to: "/pengaturan/pembayaran" },
-      { label: "Media Sosial", icon: "pi pi-fw pi-credit-card", to: "/pengaturan/media-sosial" },
+      { label: "Media Sosial", icon: "pi pi-fw pi-at", to: "/pengaturan/media-sosial" },
     ],
   },
   {
