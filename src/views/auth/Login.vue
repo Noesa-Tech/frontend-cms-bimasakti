@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { AuthStore } from '@/store/auth'
 import logo from "@/assets/images/logo/logo.png";
+import { version } from '../../../package.json';
 
 const $auth = AuthStore()
 const router = useRouter();
@@ -52,7 +53,7 @@ async function onSubmit() {
                 <span class="font-medium no-underline ml-2 text-right cursor-pointer text-primary">Lupa Password?</span>
               </div>
               <Button type="submit" :loading="$auth.isLoading" label="Login" class="w-full"></Button>
-              <p class="m-0 text-muted-color mt-8 text-center">Version 1.0.0</p>
+              <p class="m-0 text-muted-color mt-8 text-center">Version {{ version }}</p>
             </div>
           </form>
         </div>

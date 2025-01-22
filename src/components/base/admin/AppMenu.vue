@@ -79,7 +79,8 @@ const model = ref([
 
 const query = reactive({
   name: "",
-  email: ""
+  email: "",
+  location:""
 })
 
 onMounted(async () => {
@@ -90,6 +91,7 @@ onMounted(async () => {
 
     query.name = parsedData.users.name;
     query.email = parsedData.users.email;
+    query.location = parsedData.users.city.nama;
   } else {
 
     await $auth.logout()
@@ -106,7 +108,7 @@ onMounted(async () => {
     <div>
       <h6 class="m-0">{{ query.name }}</h6>
       <p class="text-sm m-0">{{ query.email }}</p>
-      <p class="text-sm m-0 text-primary font-semibold mt-1">Admin Bandung</p>
+      <p class="text-sm m-0 text-primary font-semibold mt-1">Admin {{ query.location }}</p>
     </div>
   </div>
 
