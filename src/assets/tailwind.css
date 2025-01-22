@@ -21,6 +21,9 @@
     padding: 0 !important;
     width: 100% !important;
   }
+  .inplace-display-full .p-inplace-display, .btn{
+    width: 100% !important;
+  }
 
   .accordion-table{
     /* box-shadow: none !important;
