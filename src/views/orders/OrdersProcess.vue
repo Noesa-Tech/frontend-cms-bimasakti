@@ -25,6 +25,8 @@ const dt = ref();
 const $order = OrderStore()
 const $vendor = VendorStore()
 
+const userLoginCity = ref<any>("")
+
 const query = reactive({
   vendor: null,
   reason: ""
@@ -120,12 +122,20 @@ async function fetchVendor() {
 }
 
 async function fetchOrder() {
-  await $order.fetchOrder()
+  await $order.fetchOrder("monitoring", userLoginCity.value)
   reactiveKey.value += 1;
 }
 
 onMounted(async () => {
-  await $order.fetchOrder("monitoring")
+
+  const users = localStorage.getItem('AuthStore');
+
+  if (users) {
+    const parsedData = JSON.parse(users);
+    userLoginCity.value = parsedData?.users?.city_id
+  }
+
+  await $order.fetchOrder("monitoring", userLoginCity.value)
   await $vendor.fetchVendor()
 })
 
@@ -214,6 +224,32 @@ const confirmReject = (e: any) => {
 const exportCSV = (event: any) => {
   dt.value.exportCSV();
 };
+
+async function updatePrice(closeCallback: () => void, order: any, orderId:number, orderServiceId:number) {
+  let payload = {
+    _method: "PATCH",
+    qty: order.qty,
+    price: order.price,
+    order_service_id : orderServiceId
+  }
+
+  await $order.updateOrder(payload, orderId)
+  closeCallback();
+  
+  await $order.fetchOrder("monitoring", userLoginCity.value)
+}
+
+async function updateFeeProperties(closeCallback: () => void,fee_properties: any, orderId:number) {
+  let payload = {
+    _method: "PATCH",
+    fee_properties: fee_properties
+  }
+  
+  await $order.updateOrder(payload, orderId)
+  closeCallback();
+  
+  await $order.fetchOrder("monitoring", userLoginCity.value)
+}
 
 </script>
 <template>
@@ -352,7 +388,7 @@ const exportCSV = (event: any) => {
                                         :minFractionDigits="0" />
                                     </div>
                                     <Button label="Simpan" icon="pi pi-check" outlined severity="success"
-                                      class=" max-w-fit" @click="closeCallback" />
+                                      class=" max-w-fit" @click="updatePrice(closeCallback, item, data.id, item.id)" />
                                   </div>
                                 </template>
                               </Inplace>
@@ -378,14 +414,14 @@ const exportCSV = (event: any) => {
               class="mb-2" />
             <Inplace class="inplace-custom-display">
               <template #display>
-                <p class="m-0">Rp{{ formatPrice(data.properties.fee) }}<i class="pi pi-pencil ml-2"></i>
+                <p class="m-0">Rp{{ formatPrice(data.fee_properties) }}<i class="pi pi-pencil ml-2"></i>
                 </p>
               </template>
               <template #content="{ closeCallback }">
                 <div class="flex items-center gap-2">
-                  <InputNumber v-model="data.properties.fee" type="text" placeholder="Cari Harga"
+                  <InputNumber v-model="data.fee_properties" type="text" placeholder="Cari Harga"
                     inputId="currency-indonesia" mode="currency" currency="IDR" locale="id-ID" :minFractionDigits="0" />
-                  <Button icon="pi pi-check" outlined severity="success" @click="closeCallback" />
+                  <Button icon="pi pi-check" outlined severity="success" @click="updateFeeProperties(closeCallback,data.fee_properties, data.id)" />
                 </div>
               </template>
             </Inplace>

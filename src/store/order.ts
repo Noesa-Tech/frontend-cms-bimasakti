@@ -7,13 +7,24 @@ export const OrderStore = defineStore('OrderStore', {
         isLoading: false as boolean,
         allOrder: [] as Array<any>,
         detail:  null as any | null,
+        summary:  null as any | null,
     }),
     actions: {
-        async fetchOrder(status : string) {
+        async fetchOrder(status : string, cityId: number) {
             this.isLoading = true
             try {
-                const res = await api.get(`/auth/orders?status=${status}`)
+                const res = await api.get(`/auth/orders?status=${status}&city_id=${cityId}`)
                 this.allOrder = res.data
+            } catch (err) {
+            } finally {
+                this.isLoading = false
+            }
+        },
+        async fetchSummaryOrder(cityId: number) {
+            this.isLoading = true
+            try {
+                const res = await api.get(`/auth/order/summary?city_id=${cityId}`)
+                this.summary = res.data
             } catch (err) {
             } finally {
                 this.isLoading = false

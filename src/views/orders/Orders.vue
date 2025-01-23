@@ -24,6 +24,7 @@ const toast = useToast();
 const dt = ref();
 const $order = OrderStore()
 const $vendor = VendorStore()
+const userLoginCity = ref<any>("")
 
 const query = reactive({
   vendor: null,
@@ -120,12 +121,20 @@ async function fetchVendor() {
 }
 
 async function fetchOrder() {
-  await $order.fetchOrder()
+  await $order.fetchOrder('order_confirmed', userLoginCity.value)
   reactiveKey.value += 1;
 }
 
 onMounted(async () => {
-  await $order.fetchOrder('order_confirmed')
+
+  const users = localStorage.getItem('AuthStore');
+
+  if (users) {
+    const parsedData = JSON.parse(users);
+    userLoginCity.value = parsedData?.users?.city_id
+  }
+
+  await $order.fetchOrder('order_confirmed', userLoginCity.value)
   await $vendor.fetchVendor()
 })
 
@@ -155,7 +164,7 @@ const rejectOrder = (e: any) => {
     accept: async () => {
       // @ts-ignore
       await $order.rejectOrder(query.vendor.id, e, query.reason)
-      await $order.fetchOrder('order_confirmed')
+      await $order.fetchOrder('order_confirmed', userLoginCity.value)
     },
     reject: () => {
     },
@@ -185,7 +194,7 @@ const confirmOrder = (e: any) => {
     accept: async () => {
       // @ts-ignore
       await $order.acceptOrder(query.vendor.id, e)
-      await $order.fetchOrder('order_confirmed')
+      await $order.fetchOrder('order_confirmed', userLoginCity.value)
     },
     reject: () => {
 
@@ -226,7 +235,7 @@ async function updatePrice(closeCallback: () => void, order: any, orderId:number
   await $order.updateOrder(payload, orderId)
   closeCallback();
   
-  await $order.fetchOrder('order_confirmed')
+  await $order.fetchOrder('order_confirmed', userLoginCity.value)
 }
 
 async function updateFeeProperties(closeCallback: () => void,fee_properties: any, orderId:number) {
@@ -238,7 +247,7 @@ async function updateFeeProperties(closeCallback: () => void,fee_properties: any
   await $order.updateOrder(payload, orderId)
   closeCallback();
   
-  await $order.fetchOrder('order_confirmed')
+  await $order.fetchOrder('order_confirmed', userLoginCity.value)
 }
 
 </script>

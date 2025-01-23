@@ -5,20 +5,32 @@ import AccordionPanel from 'primevue/accordionpanel';
 import AccordionHeader from 'primevue/accordionheader';
 import AccordionContent from 'primevue/accordioncontent';
 
-import { PaymentReportService } from "@/service/PaymentReportService";
 import { FilterMatchMode, FilterOperator } from "@primevue/core/api";
 import DatePicker from "primevue/datepicker";
-import Select from "primevue/select";
 import { ServiceStore } from '@/store/service'
+import { OrderStore } from '@/store/order'
 
+const $order = OrderStore()
 const $service = ServiceStore()
-const paymentReportData = ref(null);
 const isLoading = ref<boolean>(false);
 const dt = ref();
-const filters = ref<any>({});
+const filters = ref<any>({
+  global: { value: null, matchMode: FilterMatchMode.CONTAINS },
+    'customer.name': { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
+    'customer.phone': { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
+    'customer.email': { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
+    'vendor.name': { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
+    'service.name': { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
+    'property.name': { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
+    paymentMethod: { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
+    description: { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
+    location: { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
+    date: { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.DATE_IS }] },
+    useLadder: { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.EQUALS }] },
+});
 const reactiveKey = ref<number>(0);
-// const ladderStatus = ref<number[]>([1, 0])
 const dates = ref();
+const userLoginCity = ref<any>("")
 
 async function fetchAllService() {
   await $service.fetchService()
@@ -27,6 +39,10 @@ async function fetchAllService() {
 
 const serviceItems = computed(() => {
   return $service.serviceAll || [];
+});
+
+const items = computed(() => {
+  return $order.allOrder || []
 });
 
 function ladderStatus(status: number) {
@@ -41,33 +57,18 @@ function ladderStatus(status: number) {
 }
 
 onMounted(async () => {
+
+  const users = localStorage.getItem('AuthStore');
+
+  if (users) {
+    const parsedData = JSON.parse(users);
+    userLoginCity.value = parsedData?.users?.city_id
+  }
+
+  await $order.fetchOrder('completed', userLoginCity.value)
+  await $order.fetchSummaryOrder(userLoginCity.value)
   await $service.fetchService()
 })
-
-onBeforeMount(() => {
-  PaymentReportService.getPaymentReportService().then((data: any) => {
-    paymentReportData.value = data;
-    isLoading.value = false;
-  });
-  initFilter();
-});
-
-function initFilter() {
-  filters.value = {
-    global: { value: null, matchMode: FilterMatchMode.CONTAINS },
-    'customer.name': { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
-    'customer.phone': { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
-    'customer.email': { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
-    'vendor.name': { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
-    'service.name': { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
-    'property.name': { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
-    paymentMethod: { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
-    description: { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
-    location: { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
-    date: { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.DATE_IS }] },
-    useLadder: { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.EQUALS }] },
-  };
-}
 
 function formatDate(value: any) {
   const date = new Date(value);
@@ -91,7 +92,7 @@ const exportCSV = (event: any) => {
         <div class="flex justify-between mb-4">
           <div>
             <span class="block text-muted-color font-medium mb-4">Transaksi Berhasil</span>
-            <div class="text-surface-900 dark:text-surface-0 font-medium text-xl">960</div>
+            <div class="text-surface-900 dark:text-surface-0 font-medium text-xl">{{ $order?.summary?.order_complete }}</div>
           </div>
           <div class="flex items-center justify-center bg-blue-100 dark:bg-blue-400/10 rounded-border"
             style="width: 2.5rem; height: 2.5rem">
@@ -107,7 +108,7 @@ const exportCSV = (event: any) => {
         <div class="flex justify-between mb-4">
           <div>
             <span class="block text-muted-color font-medium mb-4">Pendapatan</span>
-            <div class="text-surface-900 dark:text-surface-0 font-medium text-xl">Rp{{ formatPrice(53450000) }}</div>
+            <div class="text-surface-900 dark:text-surface-0 font-medium text-xl">Rp{{ formatPrice($order?.summary?.total_fee ? $order?.summary?.total_fee : 0) }}</div>
           </div>
           <div class="flex items-center justify-center bg-orange-100 dark:bg-orange-400/10 rounded-border"
             style="width: 2.5rem; height: 2.5rem">
@@ -123,7 +124,7 @@ const exportCSV = (event: any) => {
         <div class="flex justify-between mb-4">
           <div>
             <span class="block text-muted-color font-medium mb-4">Pelanggan</span>
-            <div class="text-surface-900 dark:text-surface-0 font-medium text-xl">890</div>
+            <div class="text-surface-900 dark:text-surface-0 font-medium text-xl">{{ $order?.summary?.total_users }}</div>
           </div>
           <div class="flex items-center justify-center bg-cyan-100 dark:bg-cyan-400/10 rounded-border"
             style="width: 2.5rem; height: 2.5rem">
@@ -138,7 +139,7 @@ const exportCSV = (event: any) => {
   </div>
   <div class="card mt-8">
     <div class="font-semibold text-xl mb-4">Laporan Keuangan</div>
-    <DataTable ref="dt" :value="paymentReportData" rowGroupMode="rowspan" groupRowsBy="customer.name" :paginator="true"
+    <DataTable ref="dt" :key="reactiveKey" :value="items" rowGroupMode="rowspan" groupRowsBy="customer.name" :paginator="true"
       :rows="10" dataKey="id" v-model:filters="filters" filterDisplay="menu" :loading="isLoading"
       :globalFilterFields="['customer.name', 'customer.phone', 'customer.email', 'service.name', 'property.name', 'paymentMethod', 'location', 'price', 'useLadder', 'date']"
       showGridlines>
@@ -168,9 +169,9 @@ const exportCSV = (event: any) => {
       <Column field="customer.name" header="Pelanggan" sortable>
         <template #body="{ data }">
           <div class="flex flex-col text-start w-full">
-            <h6 class="m-0">{{ data.customer.name }}</h6>
-            <p class="m-0 text-sm text-muted-color">+62-{{ data.customer.phone }}</p>
-            <p class="m-0 text-sm text-muted-color">{{ data.customer.email }}</p>
+            <h6 class="m-0">{{ data.user.name }}</h6>
+            <p class="m-0 text-sm text-muted-color">{{ data.user.phone }}</p>
+            <p class="m-0 text-sm text-muted-color">{{ data.user.email }}</p>
           </div>
         </template>
         <template #filter="{ filterModel }">
@@ -185,29 +186,71 @@ const exportCSV = (event: any) => {
           <InputText v-model="filterModel.value" type="text" placeholder="Cari Lokasin" />
         </template>
       </Column>
-      <Column field="service.name" header="Layanan" class="min-w-[32rem]" sortable>
+      <Column sortable header="Layanan" filterField="service.name" class="min-w-[40rem]">
         <template #body="{ data }">
           <Accordion value="0">
             <AccordionPanel value="1" class="accordion-table">
               <AccordionHeader>
                 <div class="flex items-center justify-start gap-4">
-                  <img :src="data.service.image_url" :alt="data.service.name" class="h-6">
+                  <img v-if="data.service.full_image_url" :src="data.service.full_image_url" :alt="data.service.name"
+                    class="h-6 text-sm font-normal">
                   <span>{{ data.service.name }}</span>
                 </div>
               </AccordionHeader>
               <AccordionContent>
                 <Divider />
                 <Accordion value="0">
-                  <AccordionPanel v-for="subtab in data.service.problem" :key="subtab.name" :value="subtab.name">
-                    <AccordionHeader class="accordion-subheader">
+                  <AccordionPanel v-for="(subtab, index) in data.problems" :key="subtab.name" :value="index">
+                    <AccordionHeader :class="{ 'accordion-subheader': data.service.image_url }">
                       {{ subtab.name }}
                     </AccordionHeader>
                     <AccordionContent class="accordion-content">
-                      <!-- <Divider /> -->
-                      <div class="flex flex-col items-start text-start gap-2">
-                        <ol v-for="(item, index) in subtab.sub_problem" :key="index" class=" list-disc list-inside">
-                          <li>{{ item.name }} (x{{ item.qty }}) • Rp{{ formatPrice(item.price) }}</li>
-                        </ol>
+                      <div class="flex flex-col items-start text-start gap-4 w-full">
+                        <div v-for="(item, index) in subtab.sub_problem" :key="index" class="w-full">
+                          <div class="flex flex-col gap-1 w-full">
+                            <p class="m-0 font-semibold">• Kategori: {{ item.name }}</p>
+                            <div class="border rounded-md">
+                              <Inplace class="inplace-display-full">
+                                <template #display>
+                                  <div class="flex items-start justify-between gap-4">
+                                    <div>
+                                      <p class="m-0">QTY: {{ item.qty }}</p>
+                                      <p class="m-0">Harga: Rp{{ formatPrice(item.price) }}</p>
+                                    </div>
+                                    <i class="pi pi-pencil ml-2"></i>
+                                  </div>
+                                </template>
+                                <template #content="{ closeCallback }">
+                                  <div class="flex flex-col gap-2 p-2">
+                                    <div class="flex items-center justify-start gap-2">
+                                      <p class="m-0">QTY: </p>
+                                      <InputNumber v-model="item.qty" inputId="horizontal-buttons" showButtons
+                                        buttonLayout="horizontal" :min="0" :max="99"
+                                        inputClass=" text-center border-l border-l-red-500 border-r border-r-green-500 bg-transparent max-w-[4rem]"
+                                        incrementButtonClass="border-green-500" decrementButtonClass="border-red-500"
+                                        small>
+                                        <template #incrementbuttonicon>
+                                          <span class="pi pi-plus" />
+                                        </template>
+                                        <template #decrementbuttonicon>
+                                          <span class="pi pi-minus" />
+                                        </template>
+                                      </InputNumber>
+                                    </div>
+                                    <div class="flex items-center justify-start gap-2">
+                                      <p class="m-0">Harga: </p>
+                                      <InputNumber v-model="item.price" type="text" placeholder="Masukkan Harga"
+                                        inputId="currency-indonesia" mode="currency" currency="IDR" locale="id-ID"
+                                        :minFractionDigits="0" />
+                                    </div>
+                                    <Button label="Simpan" icon="pi pi-check" outlined severity="success"
+                                      class=" max-w-fit" @click="updatePrice(closeCallback, item, data.id, item.id)" />
+                                  </div>
+                                </template>
+                              </Inplace>
+                            </div>
+                          </div>
+                        </div>
                       </div>
                     </AccordionContent>
                   </AccordionPanel>
@@ -216,18 +259,15 @@ const exportCSV = (event: any) => {
             </AccordionPanel>
           </Accordion>
         </template>
-        <template #filter="{ filterModel }">
-          <InputText v-model="filterModel.value" type="text" placeholder="Cari Layanan" />
-        </template>
       </Column>
       <Column field="property.name" header="Jenis Property" class="min-w-[15rem]" sortable>
         <template #body="{ data }">
           <div>
             <p class="m-0">
-              {{ data.property.name }}
+              {{ data.properties.name }}
             </p>
-            <Badge v-if="data.useLadder" :value="ladderStatus(data.useLadder) ?? ''" size="small" class="mb-2" />
-            <p class="m-0 text-sm text-muted-color">Rp{{ formatPrice(data.property.price) }}</p>
+            <Badge v-if="data.isLadderRequired" :value="ladderStatus(data.isLadderRequired) ?? ''" size="small" class="mb-2" />
+            <p class="m-0 text-sm text-muted-color">Rp{{ formatPrice(data.properties.fee) }}</p>
           </div>
         </template>
         <template #filter="{ filterModel }">
@@ -258,7 +298,7 @@ const exportCSV = (event: any) => {
       </Column> -->
       <Column header="Total Harga" filterField="price" dataType="text" class="min-w-[12rem]" sortable>
         <template #body="{ data }">
-          Rp{{ formatPrice(data.total) }}
+          Rp{{ formatPrice(data.total_fee) }}
         </template>
         <template #filter="{ filterModel }">
           <InputNumber v-model="filterModel.value" type="text" placeholder="Cari Harga" inputId="currency-indonesia"
@@ -268,8 +308,8 @@ const exportCSV = (event: any) => {
       <Column field="vendor.name" header="Vendor" class="min-w-[15rem]" sortable>
         <template #body="{ data }">
           <div class="flex flex-col text-start w-full">
-            <p class="m-0">{{ data.vendor.name }}</p>
-            <p class="m-0 text-sm text-muted-color">{{ data.vendor.code }}</p>
+            <p class="m-0">{{ data.vendor_id.name }}</p>
+            <p class="m-0 text-sm text-muted-color">{{ data.vendor_id.code }}</p>
           </div>
         </template>
         <template #filter="{ filterModel }">
@@ -284,7 +324,7 @@ const exportCSV = (event: any) => {
       </Column>
       <Column header="Metode Pembayaran" filterField="paymentMethod" dataType="text" class="min-w-[12rem]" sortable>
         <template #body="{ data }">
-          {{ data.paymentMethod }}
+          Bank Transfer
         </template>
         <template #filter="{ filterModel }">
           <InputText v-model="filterModel.value" type="text" placeholder="Cari Metode Pembayaran" />
@@ -293,7 +333,7 @@ const exportCSV = (event: any) => {
       </Column>
       <Column header="Tanggal Transaksi" filterField="date" dataType="date" class="min-w-[12rem]" sortable>
         <template #body="{ data }">
-          {{ formatDate(data.date) }}
+          {{ formatDate(data.created_at) }}
         </template>
         <template #filter="{ filterModel }">
           <DatePicker v-model="filterModel.value" dateFormat="mm/dd/yy" placeholder="mm/dd/yyyy" />

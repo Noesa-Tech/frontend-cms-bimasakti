@@ -16,6 +16,7 @@ const item = ref({
   subtotal_fee: 0,
   ladder_fee: 0,
   total_fee: 0,
+  vendorName: "",
   vendor: {
     id: 1000,
     name: "PT. Air Conditioner",
@@ -109,6 +110,7 @@ onMounted(async () => {
   item.value.subtotal_fee = $order.detail.subtotal_fee
   item.value.total_fee = $order.detail.total_fee
   item.value.ladder_fee = $order.detail.ladder_fee
+  item.value.vendorName = $order.detail.vendor_id?.name ?? 'vendor belum ditentukan'
 
   let orders = []
   $order.detail.order_service.forEach((el: any, index: number) => {
@@ -151,7 +153,7 @@ onMounted(async () => {
           </div>
           <div class="flex">
             <p class="md:text-sm sm:text-base text-[0.4rem] m-0 text-muted-color w-2/12">Vendor</p>
-            <p class="md:text-sm sm:text-base text-[0.4rem] m-0 font-semibold">: PT. BIMASAKTI</p>
+            <p class="md:text-sm sm:text-base text-[0.4rem] m-0 font-semibold">: {{ item.vendorName }}</p>
           </div>
         </div>
       </div>
