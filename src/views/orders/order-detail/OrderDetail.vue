@@ -11,10 +11,10 @@ const item = ref({
   name: "",
   email: "",
   phone: "",
-  property_name:"",
-  property_fee : 0,
-  subtotal_fee : 0,
-  total_fee : 0,
+  property_name: "",
+  property_fee: 0,
+  subtotal_fee: 0,
+  total_fee: 0,
   vendor: {
     id: 1000,
     name: "PT. Air Conditioner",
@@ -67,7 +67,7 @@ const item = ref({
   status: 2,
 });
 
-function formatDate(value : any) {
+function formatDate(value: any) {
   return value.toLocaleDateString("en-US", {
     day: "2-digit",
     month: "2-digit",
@@ -77,7 +77,7 @@ function formatDate(value : any) {
 
 onMounted(async () => {
   await $order.detailOrder(route.params.id)
-  
+
   item.value.noInvoice = $order.detail.invoice
   item.value.name = $order.detail.user.name
   item.value.email = $order.detail.user.email
@@ -97,16 +97,16 @@ onMounted(async () => {
   item.value.total_fee = $order.detail.total_fee
 
   let orders = []
-  $order.detail.order_service.forEach((el:any, index:number) => {
+  $order.detail.order_service.forEach((el: any, index: number) => {
     let serviceOrder = {
-      label :  el.service_sub_problem.service_problem.name,
-      category :  []
+      label: el.service_sub_problem.service_problem.name,
+      category: []
     }
 
     let ctg = {
-      label : el.service_sub_problem.name,
-      qty : el.qty,
-      price: el.fee ? el.fee : "harga belum ditentukan" 
+      label: el.service_sub_problem.name,
+      qty: el.qty,
+      price: el.fee ? el.fee : "harga belum ditentukan"
     }
 
     serviceOrder.category.push(ctg)
@@ -134,9 +134,15 @@ onMounted(async () => {
     <div class="flex items-start gap-2">
       <div class="w-1/2">
         <h6 class="md:text-sm sm:text-base text-[0.4rem] md:mb-2 mb-1">DITERBITKAN ATAS NAMA</h6>
-        <div class="flex">
-          <p class="md:text-sm sm:text-base text-[0.4rem] m-0 text-muted-color w-2/12">Jasa</p>
-          <p class="md:text-sm sm:text-base text-[0.4rem] m-0 font-semibold">: BIMASAKTI HOMES</p>
+        <div class="flex flex-col md:gap-2 gap-1">
+          <div class="flex">
+            <p class="md:text-sm sm:text-base text-[0.4rem] m-0 text-muted-color w-2/12">Jasa</p>
+            <p class="md:text-sm sm:text-base text-[0.4rem] m-0 font-semibold">: BIMASAKTI HOMES</p>
+          </div>
+          <div class="flex">
+            <p class="md:text-sm sm:text-base text-[0.4rem] m-0 text-muted-color w-2/12">Vendor</p>
+            <p class="md:text-sm sm:text-base text-[0.4rem] m-0 font-semibold">: PT. BIMASAKTI</p>
+          </div>
         </div>
       </div>
       <div class="w-1/2">
@@ -183,13 +189,15 @@ onMounted(async () => {
               </h6>
             </div>
             <h6 class="md:text-sm sm:text-base text-[0.4rem] m-0 font-normal w-2/12 text-start">{{ category.qty }}</h6>
-              <h6 v-if="!category.price" class="md:text-sm sm:text-base text-[0.4rem] m-0 font-normal w-2/12 text-end">harga belum ditentukan</h6>
-              <h6 v-if="!category.price" class="md:text-sm sm:text-base text-[0.4rem] m-0 font-normal w-2/12 text-end">harga belum ditentukan</h6>
+            <h6 v-if="!category.price" class="md:text-sm sm:text-base text-[0.4rem] m-0 font-normal w-2/12 text-end">
+              harga belum ditentukan</h6>
+            <h6 v-if="!category.price" class="md:text-sm sm:text-base text-[0.4rem] m-0 font-normal w-2/12 text-end">
+              harga belum ditentukan</h6>
 
-              <h6 v-if="category.price" class="md:text-sm sm:text-base text-[0.4rem] m-0 font-normal w-2/12 text-end">Rp{{
-                formatPrice(category.price) }}</h6>
-              <h6 v-if="category.price" class="md:text-sm sm:text-base text-[0.4rem] m-0 font-normal w-2/12 text-end">Rp{{
-                formatPrice(category.price * category.qty) }}</h6>
+            <h6 v-if="category.price" class="md:text-sm sm:text-base text-[0.4rem] m-0 font-normal w-2/12 text-end">Rp{{
+              formatPrice(category.price) }}</h6>
+            <h6 v-if="category.price" class="md:text-sm sm:text-base text-[0.4rem] m-0 font-normal w-2/12 text-end">Rp{{
+              formatPrice(category.price * category.qty) }}</h6>
           </div>
         </div>
       </div>
@@ -203,11 +211,12 @@ onMounted(async () => {
           </div>
           <div class="flex justify-between gap-2">
             <p class="md:text-sm sm:text-base text-[0.4rem] m-0">Diskon</p>
-            <p class="md:text-sm sm:text-base text-[0.4rem] m-0 text-end">{{ item.subtotal_fee < 1 ? 'harga belum ditentukan' : 'Rp'+formatPrice(0) }}</p>
+            <p class="md:text-sm sm:text-base text-[0.4rem] m-0 text-end">{{ item.subtotal_fee < 1
+              ? 'harga belum ditentukan' : 'Rp' + formatPrice(0) }}</p>
           </div>
           <div class="flex justify-between items-center gap-2">
-            <p class="md:text-sm sm:text-base text-[0.4rem] m-0">Jenis Property<br /><span
-                class="font-semibold">({{item.property_name}})</span></p>
+            <p class="md:text-sm sm:text-base text-[0.4rem] m-0">Jenis Property<br /><span class="font-semibold">({{
+              item.property_name }})</span></p>
             <p class="md:text-sm sm:text-base text-[0.4rem] m-0 text-end">Rp{{ formatPrice(item.property_fee) }}</p>
           </div>
           <div class="flex justify-between items-center gap-2">
@@ -218,7 +227,8 @@ onMounted(async () => {
           <Divider />
           <div class="flex justify-between gap-2">
             <h5 class="md:text-sm sm:text-base text-[0.5rem] m-0">Total Biaya</h5>
-            <h5 class="md:text-sm sm:text-base text-[0.5rem] m-0 text-end">{{ item.total_fee < 1 ? 'harga belum ditentukan' : 'Rp'+formatPrice(item.total_fee) }}</h5>
+            <h5 class="md:text-sm sm:text-base text-[0.5rem] m-0 text-end">{{ item.total_fee < 1
+              ? 'harga belum ditentukan' : 'Rp' + formatPrice(item.total_fee) }}</h5>
           </div>
         </div>
       </div>
