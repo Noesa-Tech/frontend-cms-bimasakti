@@ -11,10 +11,11 @@ const item = ref({
   name: "",
   email: "",
   phone: "",
-  property_name:"",
-  property_fee : 0,
-  subtotal_fee : 0,
-  total_fee : 0,
+  property_name: "",
+  property_fee: 0,
+  subtotal_fee: 0,
+  ladder_fee: 0,
+  total_fee: 0,
   vendor: {
     id: 1000,
     name: "PT. Air Conditioner",
@@ -63,21 +64,33 @@ const item = ref({
       category: [{ label: "AC 0.5 pk", qty: 2, isDefault: true, price: 50000 }],
     },
   ],
-  date: "2015-09-14",
+  date: "",
+  updated_at: "",
   status: 2,
 });
 
-function formatDate(value : any) {
-  return value.toLocaleDateString("en-US", {
+function formatDate(value: any) {
+  const date = new Date(value);
+
+  const options = {
     day: "2-digit",
-    month: "2-digit",
+    month: "long", 
     year: "numeric",
-  });
+    hour: "2-digit",
+    minute: "2-digit",
+    timeZone: "Asia/Jakarta", 
+    timeZoneName: "short",
+  };
+
+  const formatter = new Intl.DateTimeFormat("id-ID", options);
+  const formattedDate = formatter.format(date);
+
+  return formattedDate;
 }
 
 onMounted(async () => {
   await $order.detailOrder(route.params.id)
-  
+
   item.value.noInvoice = $order.detail.invoice
   item.value.name = $order.detail.user.name
   item.value.email = $order.detail.user.email
@@ -90,23 +103,24 @@ onMounted(async () => {
   item.value.location.address = $order.detail.location
 
   item.value.date = $order.detail.date_appointment
-  item.value.date = $order.detail.date_appointment
+  item.value.updated_at = formatDate($order.detail.updated_at)
   item.value.property_fee = $order.detail.fee_properties
   item.value.property_name = $order.detail.properties.name
   item.value.subtotal_fee = $order.detail.subtotal_fee
   item.value.total_fee = $order.detail.total_fee
+  item.value.ladder_fee = $order.detail.ladder_fee
 
   let orders = []
-  $order.detail.order_service.forEach((el:any, index:number) => {
+  $order.detail.order_service.forEach((el: any, index: number) => {
     let serviceOrder = {
-      label :  el.service_sub_problem.service_problem.name,
-      category :  []
+      label: el.service_sub_problem.service_problem.name,
+      category: []
     }
 
     let ctg = {
-      label : el.service_sub_problem.name,
-      qty : el.qty,
-      price: el.fee ? el.fee : "harga belum ditentukan" 
+      label: el.service_sub_problem.name,
+      qty: el.qty,
+      price: el.fee ? parseInt(el.fee) : "harga belum ditentukan"
     }
 
     serviceOrder.category.push(ctg)
@@ -114,10 +128,6 @@ onMounted(async () => {
   });
 
   item.value.items = orders
-
-  console.log($order.detail)
-
-  // await $order.detailProperty(route.params.id)
 });
 </script>
 <template>
@@ -182,13 +192,18 @@ onMounted(async () => {
               <h6 class="md:text-sm sm:text-base text-[0.4rem] m-0 font-normal text-muted-color">• {{ category.label }}
               </h6>
             </div>
-            <h6 class="md:text-sm sm:text-base text-[0.4rem] m-0 font-normal w-2/12 text-start">{{ category.qty }}</h6>
-              <h6 v-if="!category.price" class="md:text-sm sm:text-base text-[0.4rem] m-0 font-normal w-2/12 text-end">harga belum ditentukan</h6>
-              <h6 v-if="!category.price" class="md:text-sm sm:text-base text-[0.4rem] m-0 font-normal w-2/12 text-end">harga belum ditentukan</h6>
 
-              <h6 v-if="category.price" class="md:text-sm sm:text-base text-[0.4rem] m-0 font-normal w-2/12 text-end">Rp{{
+            <h6 class="md:text-sm sm:text-base text-[0.4rem] m-0 font-normal w-2/12 text-start">{{ category.qty }}</h6>
+            <h6 v-if="typeof category.price === 'string'"
+              class="md:text-sm sm:text-base text-[0.4rem] m-0 font-normal w-2/12 text-end">harga belum ditentukan</h6>
+            <h6 v-if="typeof category.price === 'string'"
+              class="md:text-sm sm:text-base text-[0.4rem] m-0 font-normal w-2/12 text-end">harga belum ditentukan</h6>
+
+            <h6 v-if="typeof category.price === 'number'"
+              class="md:text-sm sm:text-base text-[0.4rem] m-0 font-normal w-2/12 text-end">Rp{{
                 formatPrice(category.price) }}</h6>
-              <h6 v-if="category.price" class="md:text-sm sm:text-base text-[0.4rem] m-0 font-normal w-2/12 text-end">Rp{{
+            <h6 v-if="typeof category.price === 'number'"
+              class="md:text-sm sm:text-base text-[0.4rem] m-0 font-normal w-2/12 text-end">Rp{{
                 formatPrice(category.price * category.qty) }}</h6>
           </div>
         </div>
@@ -203,22 +218,24 @@ onMounted(async () => {
           </div>
           <div class="flex justify-between gap-2">
             <p class="md:text-sm sm:text-base text-[0.4rem] m-0">Diskon</p>
-            <p class="md:text-sm sm:text-base text-[0.4rem] m-0 text-end">{{ item.subtotal_fee < 1 ? 'harga belum ditentukan' : 'Rp'+formatPrice(0) }}</p>
+            <p class="md:text-sm sm:text-base text-[0.4rem] m-0 text-end">{{ item.subtotal_fee < 1
+              ? 'harga belum ditentukan' : 'Rp' +formatPrice(0) }}</p>
           </div>
           <div class="flex justify-between items-center gap-2">
             <p class="md:text-sm sm:text-base text-[0.4rem] m-0">Jenis Property<br /><span
-                class="font-semibold">({{item.property_name}})</span></p>
+                class="font-semibold">({{ item.property_name }})</span></p>
             <p class="md:text-sm sm:text-base text-[0.4rem] m-0 text-end">Rp{{ formatPrice(item.property_fee) }}</p>
           </div>
           <div class="flex justify-between items-center gap-2">
             <p class="md:text-sm sm:text-base text-[0.4rem] m-0">Butuh Tangga<br /><span
                 class="font-semibold">(Butuh)</span></p>
-            <p class="md:text-sm sm:text-base text-[0.4rem] m-0 text-end">Rp{{ formatPrice(0) }}</p>
+            <p class="md:text-sm sm:text-base text-[0.4rem] m-0 text-end">Rp{{ formatPrice(item.ladder_fee) }}</p>
           </div>
           <Divider />
           <div class="flex justify-between gap-2">
             <h5 class="md:text-sm sm:text-base text-[0.5rem] m-0">Total Biaya</h5>
-            <h5 class="md:text-sm sm:text-base text-[0.5rem] m-0 text-end">{{ item.total_fee < 1 ? 'harga belum ditentukan' : 'Rp'+formatPrice(item.total_fee) }}</h5>
+            <h5 class="md:text-sm sm:text-base text-[0.5rem] m-0 text-end">{{ item.total_fee < 1
+              ? 'harga belum ditentukan' : 'Rp' + formatPrice(item.total_fee) }}</h5>
           </div>
         </div>
       </div>
@@ -239,8 +256,7 @@ onMounted(async () => {
         <p class="md:text-sm sm:text-base text-[0.4rem] m-0 w-1/2">
           Invoice ini sah dan diproses oleh komputer Silakan hubungi Bimasakti Homes apabila kamu membutuhkan bantuan.
         </p>
-        <p class="md:text-sm sm:text-base text-[0.4rem] m-0 w-1/2 italic text-end">Terakhir diupdate: 03 Desember 2024
-          06:26 WIB</p>
+        <p class="md:text-sm sm:text-base text-[0.4rem] m-0 w-1/2 italic text-end">Terakhir diupdate: {{ item.updated_at }}</p>
       </div>
     </div>
   </div>
