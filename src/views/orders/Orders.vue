@@ -155,7 +155,7 @@ const rejectOrder = (e: any) => {
     accept: async () => {
       // @ts-ignore
       await $order.rejectOrder(query.vendor.id, e, query.reason)
-      await fetchOrder()
+      await $order.fetchOrder('order_confirmed')
     },
     reject: () => {
     },
@@ -185,7 +185,7 @@ const confirmOrder = (e: any) => {
     accept: async () => {
       // @ts-ignore
       await $order.acceptOrder(query.vendor.id, e)
-      await fetchOrder()
+      await $order.fetchOrder('order_confirmed')
     },
     reject: () => {
 
@@ -214,6 +214,21 @@ const confirmReject = (e: any) => {
 const exportCSV = (event: any) => {
   dt.value.exportCSV();
 };
+
+async function updatePrice(closeCallback: () => void, order: any, orderId:number) {
+  console.log(orderId)
+
+  let payload = {
+    _method: "PATCH",
+    qty: order.qty,
+    price: order.price
+  }
+
+  await $order.updateOrder(payload, orderId)
+  closeCallback();
+  
+  await $order.fetchOrder('order_confirmed')
+}
 
 </script>
 <template>
@@ -355,7 +370,7 @@ const exportCSV = (event: any) => {
                                         :minFractionDigits="0" />
                                     </div>
                                     <Button label="Simpan" icon="pi pi-check" outlined severity="success"
-                                      class=" max-w-fit" @click="closeCallback" />
+                                      class=" max-w-fit" @click="updatePrice(closeCallback, item, data.id)" />
                                   </div>
                                 </template>
                               </Inplace>

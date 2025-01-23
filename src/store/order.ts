@@ -70,5 +70,15 @@ export const OrderStore = defineStore('OrderStore', {
                 this.isLoading = false
             }
         },
+        async updateOrder(data:any, orderId:number) {
+            this.isLoading = true
+            try {
+                const res = await api.post(`/auth/orders/${orderId}`, data)
+                return res
+            } catch (err) {
+            } finally {
+                this.isLoading = false
+            }
+        },
     },
 })
