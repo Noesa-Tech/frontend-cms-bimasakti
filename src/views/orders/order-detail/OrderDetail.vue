@@ -144,9 +144,15 @@ onMounted(async () => {
     <div class="flex items-start gap-2">
       <div class="w-1/2">
         <h6 class="md:text-sm sm:text-base text-[0.4rem] md:mb-2 mb-1">DITERBITKAN ATAS NAMA</h6>
-        <div class="flex">
-          <p class="md:text-sm sm:text-base text-[0.4rem] m-0 text-muted-color w-2/12">Jasa</p>
-          <p class="md:text-sm sm:text-base text-[0.4rem] m-0 font-semibold">: BIMASAKTI HOMES</p>
+        <div class="flex flex-col md:gap-2 gap-1">
+          <div class="flex">
+            <p class="md:text-sm sm:text-base text-[0.4rem] m-0 text-muted-color w-2/12">Jasa</p>
+            <p class="md:text-sm sm:text-base text-[0.4rem] m-0 font-semibold">: BIMASAKTI HOMES</p>
+          </div>
+          <div class="flex">
+            <p class="md:text-sm sm:text-base text-[0.4rem] m-0 text-muted-color w-2/12">Vendor</p>
+            <p class="md:text-sm sm:text-base text-[0.4rem] m-0 font-semibold">: PT. BIMASAKTI</p>
+          </div>
         </div>
       </div>
       <div class="w-1/2">
