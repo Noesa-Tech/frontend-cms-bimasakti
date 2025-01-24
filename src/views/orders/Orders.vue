@@ -26,8 +26,9 @@ const $order = OrderStore()
 const $vendor = VendorStore()
 const userLoginCity = ref<any>("")
 
+const selectedIndex = ref<any>(null)
 const query = reactive({
-  vendor: null,
+  vendor: [],
   reason: ""
 })
 
@@ -163,7 +164,7 @@ const rejectOrder = (e: any) => {
     },
     accept: async () => {
       // @ts-ignore
-      await $order.rejectOrder(query.vendor.id, e, query.reason)
+      await $order.rejectOrder(query.vendor[selectedIndex.value].id, e, query.reason)
       await $order.fetchOrder('order_confirmed', userLoginCity.value)
     },
     reject: () => {
@@ -482,8 +483,8 @@ const selectStatus = (status: string, itemStatus: string) => {
         </template>
       </Column>
       <Column sortable field="vendor" header="Vendor Pilihan" class="min-w-[15rem]">
-        <template #body="{ data }">
-          <Select v-model="query.vendor" :options="vendorItems" :value="data?.vendor_id?.name" filter optionLabel="name"
+        <template #body="{ data, index }">
+          <Select v-model="query.vendor[index]" :options="vendorItems" :value="data?.vendor_id?.name" filter optionLabel="name"
             placeholder="Pilih Vendor" class="w-[15rem]" />
         </template>
         <template #filter="{ filterModel }">
@@ -499,14 +500,14 @@ const selectStatus = (status: string, itemStatus: string) => {
         </template>
       </Column>
       <Column sortable field="id" header="Action" bodyClass="text-center" class="min-w-[10rem]">
-        <template #body="{ data }">
+        <template #body="{ data, index }">
           <div class="flex gap-4 items-center">
             <Button icon="pi pi-external-link" severity="info" text v-tooltip.bottom="'Detail Pesanan'" as="router-link"
               :to="{ name: 'order-detail', params: { id: data.id } }" />
             <Button icon="pi pi-send" severity="success" text v-tooltip.bottom="'Teruskan Pesanan'"
               @click="confirmOrder(data.id)" />
             <Button icon="pi pi-times" severity="danger" text v-tooltip.bottom="'Batalkan'"
-              @click="confirmReject(data.id)" />
+              @click="confirmReject(data.id), selectedIndex = index" />
             <Popover ref="opCancelConfirm" class="p-0 min-w-[20rem]">
               <h6 class="mb-2">Pembatalan Pesanan</h6>
               <div class="flex flex-col gap-4">
