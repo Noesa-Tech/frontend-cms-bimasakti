@@ -172,16 +172,16 @@ const rejectOrder = (e: any) => {
   });
 };
 
-const confirmOrder = (e: any) => {
+const confirmOrder = (e: any, index:number) => {
   // @ts-ignore
-  if (!query.vendor || !query.vendor.name) {
+  if (!query.vendor) {
     return toast.add({ severity: "error", summary: "Error", detail: "Vendor belum dipilih" })
   }
 
   confirm.require({
     target: e.currentTarget,
     // @ts-ignore
-    message: `Yakin ingin meneruskan pesanan ini kepada vendor '${query.vendor.name}'?`,
+    message: `Yakin ingin meneruskan pesanan ini kepada vendor '${query.vendor[index].name}'?`,
     icon: "pi pi-info-circle",
     rejectProps: {
       label: "Batal",
@@ -194,7 +194,7 @@ const confirmOrder = (e: any) => {
     },
     accept: async () => {
       // @ts-ignore
-      await $order.acceptOrder(query.vendor.id, e)
+      await $order.acceptOrder(query.vendor[index].id, e)
       await $order.fetchOrder('order_confirmed', userLoginCity.value)
     },
     reject: () => {
@@ -505,7 +505,7 @@ const selectStatus = (status: string, itemStatus: string) => {
             <Button icon="pi pi-external-link" severity="info" text v-tooltip.bottom="'Detail Pesanan'" as="router-link"
               :to="{ name: 'order-detail', params: { id: data.id } }" />
             <Button icon="pi pi-send" severity="success" text v-tooltip.bottom="'Teruskan Pesanan'"
-              @click="confirmOrder(data.id)" />
+              @click="confirmOrder(data.id, index)" />
             <Button icon="pi pi-times" severity="danger" text v-tooltip.bottom="'Batalkan'"
               @click="confirmReject(data.id), selectedIndex = index" />
             <Popover ref="opCancelConfirm" class="p-0 min-w-[20rem]">
