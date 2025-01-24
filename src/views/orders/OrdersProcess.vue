@@ -16,7 +16,7 @@ import Popover from "primevue/popover";
 import { OrderStore } from '@/store/order'
 import { VendorStore } from '@/store/vendor'
 
-const popovers = ref<Record<number, HTMLElement | null>>({});
+const opStatus = ref();
 const opPhone = ref();
 const opCancelConfirm = ref();
 const confirm = useConfirm();
@@ -203,16 +203,7 @@ const confirmOrder = (e: any) => {
   });
 };
 
-const toggle = (event: any, orderId: number) => {
-  const popoverRef = popovers.value[orderId];
-  if (popoverRef) {
-    (popoverRef as any).toggle(event);
-  }
-};
 
-const setPopoverRef = (orderId: number, el: HTMLElement | null) => {
-  popovers.value[orderId] = el;
-};
 
 const togglePhone = (event: any) => {
   opPhone.value.toggle(event);
@@ -225,31 +216,41 @@ const exportCSV = (event: any) => {
   dt.value.exportCSV();
 };
 
-async function updatePrice(closeCallback: () => void, order: any, orderId:number, orderServiceId:number) {
+async function updatePrice(closeCallback: () => void, order: any, orderId: number, orderServiceId: number) {
   let payload = {
     _method: "PATCH",
     qty: order.qty,
     price: order.price,
-    order_service_id : orderServiceId
+    order_service_id: orderServiceId
   }
 
   await $order.updateOrder(payload, orderId)
   closeCallback();
-  
+
   await $order.fetchOrder("monitoring", userLoginCity.value)
 }
 
-async function updateFeeProperties(closeCallback: () => void,fee_properties: any, orderId:number) {
+async function updateFeeProperties(closeCallback: () => void, fee_properties: any, orderId: number) {
   let payload = {
     _method: "PATCH",
     fee_properties: fee_properties
   }
-  
+
   await $order.updateOrder(payload, orderId)
   closeCallback();
-  
+
   await $order.fetchOrder("monitoring", userLoginCity.value)
 }
+
+const toggleStatus = (event: any) => {
+  opStatus.value.toggle(event);
+}
+
+const selectStatus = (status: string, itemStatus: string) => {
+  opStatus.value.hide();
+  status = itemStatus;
+}
+
 
 </script>
 <template>
@@ -421,7 +422,8 @@ async function updateFeeProperties(closeCallback: () => void,fee_properties: any
                 <div class="flex items-center gap-2">
                   <InputNumber v-model="data.fee_properties" type="text" placeholder="Cari Harga"
                     inputId="currency-indonesia" mode="currency" currency="IDR" locale="id-ID" :minFractionDigits="0" />
-                  <Button icon="pi pi-check" outlined severity="success" @click="updateFeeProperties(closeCallback,data.fee_properties, data.id)" />
+                  <Button icon="pi pi-check" outlined severity="success"
+                    @click="updateFeeProperties(closeCallback, data.fee_properties, data.id)" />
                 </div>
               </template>
             </Inplace>
@@ -443,7 +445,21 @@ async function updateFeeProperties(closeCallback: () => void,fee_properties: any
       </Column>
       <Column sortable header="Status" field="status" :filterMenuStyle="{ width: '18rem' }" class="min-w-[20rem]">
         <template #body="{ data }">
-          <Tag :value="getStatus(data.status)" :severity="getSeverity(data.status)" class="whitespace-nowrap" />
+          <Button :label="getStatus(data.status)" :severity="getSeverity(data.status)" @click="toggleStatus"
+            size="small" icon="pi pi-chevron-down" iconPos="right" />
+          <Popover ref="opStatus">
+            <div class="flex flex-col gap-4">
+              <div>
+                <span class="font-medium block mb-2">Ubah Status</span>
+                <ul class="list-none p-0 m-0 flex flex-col">
+                  <li v-for="(item, index) in statuses" :key="index" class="flex items-center gap-2 px-2 py-3">
+                    <Button :label="getStatus(item)" :severity="getSeverity(item)" size="small"
+                      @click="selectStatus(data.status, item)" />
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </Popover>
         </template>
         <template #filter="{ filterModel }">
           <Select v-model="filterModel.value" :options="statuses" placeholder="Pilih" showClear>
