@@ -14,23 +14,14 @@ import ConfirmPopup from "primevue/confirmpopup";
 import Popover from "primevue/popover";
 
 import { OrderStore } from '@/store/order'
-import { VendorStore } from '@/store/vendor'
 
 const opStatus = ref();
 const opPhone = ref();
-const opCancelConfirm = ref();
-const confirm = useConfirm();
-const toast = useToast();
 const dt = ref();
 const $order = OrderStore()
-const $vendor = VendorStore()
 
 const userLoginCity = ref<any>("")
-
-const query = reactive({
-  vendor: null,
-  reason: ""
-})
+const selectedStatus = ref<any>([])
 
 const reactiveKey = ref<number>(0);
 const filters = ref<any>({
@@ -99,27 +90,9 @@ function ladderStatus(status: number) {
   }
 }
 
-const vendorItems = computed(() => {
-  return $vendor.vendors.map((item: any) => ({
-    id: item.id,
-    code: item.id,
-    name: item.name,
-    location: item.address,
-    date: item.created_at,
-    status: item.deleted_at,
-    city: item.city,
-    services: item.vendor_service
-  }));
-});
-
 const items = computed(() => {
   return $order.allOrder || []
 });
-
-async function fetchVendor() {
-  await $vendor.fetchVendor()
-  reactiveKey.value += 1;
-}
 
 async function fetchOrder() {
   await $order.fetchOrder("monitoring", userLoginCity.value)
@@ -136,7 +109,6 @@ onMounted(async () => {
   }
 
   await $order.fetchOrder("monitoring", userLoginCity.value)
-  await $vendor.fetchVendor()
 })
 
 function formatDate(value: any) {
@@ -148,70 +120,11 @@ function formatDate(value: any) {
   });
 }
 
-const rejectOrder = (e: any) => {
-  confirm.require({
-    target: e.currentTarget,
-    message: "Yakin ingin membatalkan pesanan ini?",
-    icon: "pi pi-info-circle",
-    rejectProps: {
-      label: "Batal",
-      severity: "secondary",
-      outlined: true,
-    },
-    acceptProps: {
-      label: "Yakin",
-      severity: "danger",
-    },
-    accept: async () => {
-      // @ts-ignore
-      await $order.rejectOrder(query.vendor.id, e, query.reason)
-      await fetchOrder()
-    },
-    reject: () => {
-    },
-  });
-};
-
-const confirmOrder = (e: any) => {
-  // @ts-ignore
-  if (!query.vendor || !query.vendor.name) {
-    return toast.add({ severity: "error", summary: "Error", detail: "Vendor belum dipilih" })
-  }
-
-  confirm.require({
-    target: e.currentTarget,
-    // @ts-ignore
-    message: `Yakin ingin meneruskan pesanan ini kepada vendor '${query.vendor.name}'?`,
-    icon: "pi pi-info-circle",
-    rejectProps: {
-      label: "Batal",
-      severity: "secondary",
-      outlined: true,
-    },
-    acceptProps: {
-      label: "Teruskan",
-      severity: "success",
-    },
-    accept: async () => {
-      // @ts-ignore
-      await $order.acceptOrder(query.vendor.id, e)
-      await fetchOrder()
-    },
-    reject: () => {
-
-    },
-  });
-};
-
 
 
 const togglePhone = (event: any) => {
   opPhone.value.toggle(event);
 };
-const confirmReject = (e: any) => {
-  opCancelConfirm.value.toggle(event);
-};
-
 const exportCSV = (event: any) => {
   dt.value.exportCSV();
 };
@@ -246,9 +159,16 @@ const toggleStatus = (event: any) => {
   opStatus.value.toggle(event);
 }
 
-const selectStatus = (status: string, itemStatus: string) => {
+async function selectStatus(itemStatus: string, orderId: number){
+  
+  let payload = {
+    _method: "PATCH",
+    status: itemStatus
+  }
+  
+  await $order.updateOrder(payload, orderId)
   opStatus.value.hide();
-  status = itemStatus;
+  await $order.fetchOrder("monitoring", userLoginCity.value)
 }
 
 
@@ -454,7 +374,7 @@ const selectStatus = (status: string, itemStatus: string) => {
                 <ul class="list-none p-0 m-0 flex flex-col">
                   <li v-for="(item, index) in statuses" :key="index" class="flex items-center gap-2 px-2 py-3">
                     <Button :label="getStatus(item)" :severity="getSeverity(item)" size="small"
-                      @click="selectStatus(data.status, item)" />
+                      @click="selectStatus(item, data.id)" />
                   </li>
                 </ul>
               </div>

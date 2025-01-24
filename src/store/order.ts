@@ -85,7 +85,9 @@ export const OrderStore = defineStore('OrderStore', {
             this.isLoading = true
             try {
                 const res = await api.post(`/auth/orders/${orderId}`, data)
-                return res
+                
+                 // @ts-ignore
+                 toast.success('success', res.message)
             } catch (err) {
             } finally {
                 this.isLoading = false

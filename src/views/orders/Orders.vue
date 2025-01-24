@@ -245,9 +245,16 @@ const toggleStatus = (event: any) => {
   opStatus.value.toggle(event);
 }
 
-const selectStatus = (status: string, itemStatus: string) => {
+async function selectStatus(itemStatus: string, orderId: number){
+  
+  let payload = {
+    _method: "PATCH",
+    status: itemStatus
+  }
+  
+  await $order.updateOrder(payload, orderId)
   opStatus.value.hide();
-  status = itemStatus;
+  await $order.fetchOrder("order_confirmed", userLoginCity.value)
 }
 
 </script>
@@ -455,7 +462,7 @@ const selectStatus = (status: string, itemStatus: string) => {
                 <ul class="list-none p-0 m-0 flex flex-col">
                   <li v-for="(item, index) in statuses" :key="index" class="flex items-center gap-2 px-2 py-3">
                     <Button :label="getStatus(item)" :severity="getSeverity(item)" size="small"
-                      @click="selectStatus(data.status, item)" />
+                      @click="selectStatus(item, data.id)" />
                   </li>
                 </ul>
               </div>
