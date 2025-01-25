@@ -16,7 +16,6 @@ import Popover from "primevue/popover";
 import { OrderStore } from '@/store/order'
 import { VendorStore } from '@/store/vendor'
 
-const opStatus = ref();
 const opPhone = ref();
 const opCancelConfirm = ref();
 const confirm = useConfirm();
@@ -172,7 +171,7 @@ const rejectOrder = (e: any) => {
   });
 };
 
-const confirmOrder = (e: any, index:number) => {
+const confirmOrder = (e: any, index: number) => {
   // @ts-ignore
   if (!query.vendor) {
     return toast.add({ severity: "error", summary: "Error", detail: "Vendor belum dipilih" })
@@ -239,22 +238,6 @@ async function updateFeeProperties(closeCallback: () => void, fee_properties: an
   closeCallback();
 
   await $order.fetchOrder('order_confirmed', userLoginCity.value)
-}
-
-const toggleStatus = (event: any) => {
-  opStatus.value.toggle(event);
-}
-
-async function selectStatus(itemStatus: string, orderId: number){
-  
-  let payload = {
-    _method: "PATCH",
-    status: itemStatus
-  }
-  
-  await $order.updateOrder(payload, orderId)
-  opStatus.value.hide();
-  await $order.fetchOrder("order_confirmed", userLoginCity.value)
 }
 
 </script>
@@ -453,21 +436,7 @@ async function selectStatus(itemStatus: string, orderId: number){
       </Column>
       <Column sortable header="Status" field="status" :filterMenuStyle="{ width: '18rem' }" class="min-w-[20rem]">
         <template #body="{ data }">
-          <Button :label="getStatus(data.status)" :severity="getSeverity(data.status)" @click="toggleStatus"
-            size="small" icon="pi pi-chevron-down" iconPos="right" />
-          <Popover ref="opStatus">
-            <div class="flex flex-col gap-4">
-              <div>
-                <span class="font-medium block mb-2">Ubah Status</span>
-                <ul class="list-none p-0 m-0 flex flex-col">
-                  <li v-for="(item, index) in statuses" :key="index" class="flex items-center gap-2 px-2 py-3">
-                    <Button :label="getStatus(item)" :severity="getSeverity(item)" size="small"
-                      @click="selectStatus(item, data.id)" />
-                  </li>
-                </ul>
-              </div>
-            </div>
-          </Popover>
+          <Tag :value="getStatus(data.status)" :severity="getSeverity(data.status)" size="small" />
         </template>
         <template #filter="{ filterModel }">
           <Select v-model="filterModel.value" :options="statuses" placeholder="Pilih" showClear>
@@ -491,8 +460,8 @@ async function selectStatus(itemStatus: string, orderId: number){
       </Column>
       <Column sortable field="vendor" header="Vendor Pilihan" class="min-w-[15rem]">
         <template #body="{ data, index }">
-          <Select v-model="query.vendor[index]" :options="vendorItems" :value="data?.vendor_id?.name" filter optionLabel="name"
-            placeholder="Pilih Vendor" class="w-[15rem]" />
+          <Select v-model="query.vendor[index]" :options="vendorItems" :value="data?.vendor_id?.name" filter
+            optionLabel="name" placeholder="Pilih Vendor" class="w-[15rem]" />
         </template>
         <template #filter="{ filterModel }">
           <InputText v-model="filterModel.value" type="text" placeholder="Cari Vendor" />
