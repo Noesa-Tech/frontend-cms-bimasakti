@@ -29,7 +29,7 @@ const filters1 = ref({
   name: { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
   location: { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
   date: { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.DATE_IS }] },
-  status: { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.EQUALS }] },
+  status: { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.EQUALS }] },
 })
 
 const items = computed(() => {
@@ -59,14 +59,19 @@ function getSeverity(status: any) {
       return "danger";
     case 2:
       return "success";
+    default:
+      return "secondary";
   }
 }
 
 function getStatusName(status: any) {
-  if (status) {
-    return "Unactive";
-  } else {
-    return "Active";
+  switch (status) {
+    case 1:
+      return "Tidak Aktif";
+    case 2:
+      return "Aktif";
+    default:
+      return "Undefined";
   }
 }
 

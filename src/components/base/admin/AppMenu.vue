@@ -40,6 +40,11 @@ const model = ref([
             icon: "pi pi-fw pi-building",
             to: "/master/properti",
           },
+          {
+            label: "Lokasi",
+            icon: "pi pi-fw pi-map-marker",
+            to: "/master/lokasi",
+          },
         ],
       },
       { label: "Admin", icon: "pi pi-fw pi-id-card", to: "/admin" },
@@ -80,7 +85,7 @@ const model = ref([
 const query = reactive({
   name: "",
   email: "",
-  location:""
+  location: ""
 })
 
 onMounted(async () => {

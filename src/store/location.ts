@@ -35,6 +35,43 @@ export const LocationStore = defineStore('LocationStore', {
                 this.isLoadingProvince = false
             }
         },
+        async createProvince(data: any) {
+            this.isLoading = true
+            try {
+                const res = await api.post(`/auth/province`, data);
+
+                // @ts-ignore
+                return toast.success('success', res.message)
+            } catch (err) {
+            } finally {
+                this.isLoading = false
+            }
+        },
+        async updateProvince(payload: any, provinceId: any) {
+            this.isLoading = true
+            try {
+                const res = await api.post(`/auth/province/${provinceId}`, payload);
+
+                // @ts-ignore
+                return toast.success('success', res.message)
+            } catch (err) {
+            } finally {
+                this.isLoading = false
+            }
+        },
+        async deleteProvince(userId: Number) {
+            this.isLoading = true
+
+            try {
+                const res = await api.delete(`/auth/province/${userId}`);
+
+                // @ts-ignore
+                toast.success('success', res.message)
+            } catch (err) {
+            } finally {
+                this.isLoading = false
+            }
+        },
         async fetchCities(provinceId: number) {
             this.isLoadingCities = true
             try {

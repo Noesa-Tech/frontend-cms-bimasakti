@@ -77,6 +77,15 @@ const routes = [
     },
   },
   {
+    path: "/master/lokasi",
+    name: "master-location",
+    component: () => import("@/views/master/MasterLocation.vue"),
+    meta: {
+      requiresAuth: true,
+      title: "Data Lokasi",
+    },
+  },
+  {
     path: "/admin",
     name: "admins",
     component: () => import("@/views/admins/Admins.vue"),
