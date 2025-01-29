@@ -61,8 +61,8 @@ onMounted(async () => {
 </script>
 <template>
     <DataTable ref="dt" :value="provinceList" :paginator="true" :rows="10" dataKey="id" :rowHover="true"
-        v-model:filters="filters" filterDisplay="menu" :loading="isLoading"
-        :globalFilterFields="['name', 'email', 'phone']" showGridlines>
+        v-model:filters="filters" filterDisplay="menu" :loading="isLoading" :globalFilterFields="['name']"
+        showGridlines>
         <template #header>
             <div class="flex flex-col md:flex-row justify-between gap-4">
                 <Button type="button" icon="pi pi-plus" label="Tambah Provinsi" class="md:order-1 order-2"

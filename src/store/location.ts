@@ -59,11 +59,11 @@ export const LocationStore = defineStore('LocationStore', {
                 this.isLoading = false
             }
         },
-        async deleteProvince(userId: Number) {
+        async deleteProvince(provinceId: Number) {
             this.isLoading = true
 
             try {
-                const res = await api.delete(`/auth/province/${userId}`);
+                const res = await api.delete(`/auth/province/${provinceId}`);
 
                 // @ts-ignore
                 toast.success('success', res.message)
@@ -72,15 +72,52 @@ export const LocationStore = defineStore('LocationStore', {
                 this.isLoading = false
             }
         },
-        async fetchCities(provinceId: number) {
+        async fetchCities(provinceId: number | any) {
             this.isLoadingCities = true
             try {
-                const res = await api.get(`/get-city/${provinceId}`)
+                const res = await api.get(provinceId ? `/get-city/${provinceId}` : `/auth/city`)
                 this.cities = res.data
                 return res
             } catch (err) {
             } finally {
                 this.isLoadingCities = false
+            }
+        },
+        async createCity(data: any) {
+            this.isLoading = true
+            try {
+                const res = await api.post(`/auth/city`, data);
+
+                // @ts-ignore
+                return toast.success('success', res.message)
+            } catch (err) {
+            } finally {
+                this.isLoading = false
+            }
+        },
+        async updateCity(payload: any, cityId: any) {
+            this.isLoading = true
+            try {
+                const res = await api.post(`/auth/city/${cityId}`, payload);
+
+                // @ts-ignore
+                return toast.success('success', res.message)
+            } catch (err) {
+            } finally {
+                this.isLoading = false
+            }
+        },
+        async deleteCity(cityId: Number) {
+            this.isLoading = true
+
+            try {
+                const res = await api.delete(`/auth/city/${cityId}`);
+
+                // @ts-ignore
+                toast.success('success', res.message)
+            } catch (err) {
+            } finally {
+                this.isLoading = false
             }
         },
         async fetchDistricts(cityId: number) {
