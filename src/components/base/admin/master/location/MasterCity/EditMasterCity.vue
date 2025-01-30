@@ -10,11 +10,7 @@ const props = defineProps({
     },
 });
 
-
 const emit = defineEmits(["on-close", "on-save"]);
-
-
-
 const $location = LocationStore()
 
 async function fetchProvince() {
@@ -30,18 +26,17 @@ const provinceList = computed(() =>
 
 const query = reactive<Record<string, any>>({
     name: props.city.name,
-    provinceId: props.city.provinceId,
+    province: {
+        id: props.city.province.id,
+        name: props.city.province.nama,
+    }
 })
-
-onMounted(async () => {
-    await fetchProvince();
-});
 
 async function onSave() {
     const payload = {
         _method: "PATCH",
         nama: query.name,
-        id_provinsi: query.selectedProvince.id
+        id_provinsi: query.province.id
     };
 
     await $location.updateCity(payload, props.city.id)
@@ -52,7 +47,7 @@ async function onSave() {
 <template>
     <div class="flex flex-col gap-2 mb-4">
         <label for="code">Pilih Provinsi</label>
-        <Select v-model="query.selectedProvince" editable showClear :options="provinceList" optionLabel="name"
+        <Select v-model="query.province" editable showClear :options="provinceList" :value="query.province"   optionLabel="name" 
             placeholder="Pilih provinsi" fluid />
     </div>
     <div class="flex flex-col gap-2">

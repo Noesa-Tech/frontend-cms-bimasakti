@@ -28,17 +28,17 @@ const cityList = computed(() =>
 
 const query = reactive<Record<string, any>>({
     name: props.district.name,
-    cityId: props.district.cityId,
+    city: {
+        id: props.district.city.id,
+        name: props.district.city.nama,
+    },
 })
 
-onMounted(async () => {
-    await fetchCity();
-});
 async function onSave() {
     const payload = {
         _method: "PATCH",
         nama: query.name,
-        id_provinsi: query.selectedCity.id
+        id_provinsi: query.city.id
     };
 
     await $location.updateDistrict(payload, props.district.id)
@@ -49,7 +49,7 @@ async function onSave() {
 <template>
     <div class="flex flex-col gap-2 mb-4">
         <label for="code">Pilih Kota</label>
-        <Select v-model="query.selectedCity" editable showClear :options="cityList" optionLabel="name"
+        <Select v-model="query.city" editable showClear :options="cityList" :value="query.city" optionLabel="name"
             placeholder="Pilih kota" fluid />
     </div>
     <div class="flex flex-col gap-2">

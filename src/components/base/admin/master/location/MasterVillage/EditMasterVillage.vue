@@ -30,7 +30,10 @@ const query = reactive<Record<string, any>>({
     id: props.village.id,
     name: props.village.name,
     zipCode: props.village.zipCode,
-    seelctedDistrict: null,
+    subdistrict : {
+        id: props.village.subdistrict.id,
+        name: props.village.subdistrict.nama
+    }
 })
 
 onMounted(async () => {
@@ -40,19 +43,23 @@ async function onSave() {
     const payload = {
         _method: "PATCH",
         nama: query.name,
-        id_kecamatan: query.selectedDistrict.id,
+        id_kecamatan: query.subdistrict.id,
         zip_code: query.zipCode,
     };
 
     await $location.updateVillage(payload, props.village.id)
     emit('on-save')
 }
+
+watch(() => props.village, (newValue) => {
+    console.log(newValue)
+}, { immediate: true });
 </script>
 
 <template>
     <div class="flex flex-col gap-2 mb-4">
         <label for="code">Pilih Kecamatan</label>
-        <Select v-model="query.selectedDistrict" editable showClear :options="districtList" optionLabel="name"
+        <Select v-model="query.subdistrict" editable showClear :options="districtList" :value="query.subdistrict" optionLabel="name"
             placeholder="Pilih kecamatan" fluid />
     </div>
     <div class="flex flex-col gap-2 mb-4">

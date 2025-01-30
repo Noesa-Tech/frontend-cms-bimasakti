@@ -1,5 +1,6 @@
 import api from '@/api/api'
 import { defineStore } from 'pinia'
+import * as toast from '@/composables/toast'
 
 export const LocationStore = defineStore('LocationStore', {
     state: () => ({
@@ -51,7 +52,7 @@ export const LocationStore = defineStore('LocationStore', {
             this.isLoading = true
             try {
                 const res = await api.post(`/auth/province/${provinceId}`, payload);
-
+                
                 // @ts-ignore
                 return toast.success('success', res.message)
             } catch (err) {

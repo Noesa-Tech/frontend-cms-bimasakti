@@ -44,7 +44,8 @@ const districtList = computed(() =>
     $location.districts.map((district: any) => ({
         id: district.id,
         name: district.nama,
-        cityId: district.id_kota
+        cityId: district.id_kota,
+        city: district.citys
     }))
 );
 

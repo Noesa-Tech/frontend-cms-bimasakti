@@ -41,6 +41,7 @@ const cityList = computed(() =>
         name: city.nama,
         capitalsCityId: city.ibukota,
         provinceId: city.id_provinsi,
+        province: city.province
     }))
 );
 

@@ -46,6 +46,7 @@ const villageList = computed(() =>
         name: village.nama,
         districtId: village.id_kecamatan,
         zipCode: village.zip_code,
+        subdistrict: village.subdistrict
     }))
 );
 
