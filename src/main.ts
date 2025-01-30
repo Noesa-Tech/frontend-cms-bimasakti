@@ -18,6 +18,7 @@ import "core-js/stable";
 import Ripple from "primevue/ripple";
 import Toast from 'primevue/toast';
 import { isQueryInvalid } from './utils/helpers';
+import onlyNumeric from "./directives/onlyNumeric";
 
 
 const MyPreset = definePreset(Aura, {
@@ -54,6 +55,7 @@ app.config.globalProperties.toast = useToast();
 app.directive("tooltip", Tooltip);
 app.directive("animateonscroll", AnimateOnScroll);
 app.directive("ripple", Ripple);
+app.directive("only-numeric", onlyNumeric);
 app.mixin(mixins);
 app.use(PrimeVue, {
   theme: {

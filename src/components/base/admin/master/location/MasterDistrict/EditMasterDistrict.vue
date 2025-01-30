@@ -4,7 +4,7 @@ import { LocationStore } from '@/store/location'
 
 
 const props = defineProps({
-    city: {
+    district: {
         type: Object as PropType<Record<string, any>>,
         required: true,
     },
@@ -13,51 +13,48 @@ const props = defineProps({
 
 const emit = defineEmits(["on-close", "on-save"]);
 
-
-
 const $location = LocationStore()
 
-async function fetchProvince() {
-    await $location.fetchProvinces();
+async function fetchCity() {
+    await $location.fetchCities(null);
 }
 
-const provinceList = computed(() =>
-    $location.provinces.map((province: any) => ({
-        id: province.id,
-        name: province.nama,
+const cityList = computed(() =>
+    $location.cities.map((city: any) => ({
+        id: city.id,
+        name: city.nama,
     }))
 );
 
 const query = reactive<Record<string, any>>({
-    name: props.city.name,
-    provinceId: props.city.provinceId,
+    name: props.district.name,
+    cityId: props.district.cityId,
 })
 
 onMounted(async () => {
-    await fetchProvince();
+    await fetchCity();
 });
-
 async function onSave() {
     const payload = {
         _method: "PATCH",
         nama: query.name,
-        id_provinsi: query.selectedProvince.id
+        id_provinsi: query.selectedCity.id
     };
 
-    await $location.updateCity(payload, props.city.id)
+    await $location.updateDistrict(payload, props.district.id)
     emit('on-save')
 }
 </script>
 
 <template>
     <div class="flex flex-col gap-2 mb-4">
-        <label for="code">Pilih Provinsi</label>
-        <Select v-model="query.selectedProvince" editable showClear :options="provinceList" optionLabel="name"
-            placeholder="Pilih provinsi" fluid />
+        <label for="code">Pilih Kota</label>
+        <Select v-model="query.selectedCity" editable showClear :options="cityList" optionLabel="name"
+            placeholder="Pilih kota" fluid />
     </div>
     <div class="flex flex-col gap-2">
-        <label for="name">Nama Kabupaten/Kota</label>
-        <InputText v-model="query.name" id="name" placeholder="Masukkan nama kabupaten atau kota" />
+        <label for="name">Nama Kecamantan</label>
+        <InputText v-model="query.name" id="name" placeholder="Masukkan nama kecamatan" />
     </div>
     <div class="flex justify-end gap-2 mt-8">
         <Button type="button" label="Batal" text severity="secondary" @click="emit('on-close')"></Button>

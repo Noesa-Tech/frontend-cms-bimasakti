@@ -13,8 +13,8 @@ import TabPanel from 'primevue/tabpanel';
             <TabList>
                 <Tab value="0">Provinsi</Tab>
                 <Tab value="1">Kabupaten/Kota</Tab>
-                <Tab value="2">Kelurahan</Tab>
-                <Tab value="3">Kecamatan</Tab>
+                <Tab value="2">Kecamatan</Tab>
+                <Tab value="3">Kelurahan</Tab>
             </TabList>
             <TabPanels>
                 <TabPanel value="0">
@@ -24,24 +24,10 @@ import TabPanel from 'primevue/tabpanel';
                     <MasterCityTable />
                 </TabPanel>
                 <TabPanel value="2">
-                    <p class="m-0">
-                        At vero eos et accusamus et iusto odio dignissimos ducimus qui blanditiis praesentium voluptatum
-                        deleniti atque corrupti quos dolores et quas molestias excepturi sint occaecati cupiditate non
-                        provident, similique sunt in culpa
-                        qui officia deserunt mollitia animi, id est laborum et dolorum fuga. Et harum quidem rerum
-                        facilis est et expedita distinctio. Nam libero tempore, cum soluta nobis est eligendi optio
-                        cumque nihil impedit quo minus.
-                    </p>
+                    <MasterDistrictTable />
                 </TabPanel>
                 <TabPanel value="3">
-                    <p class="m-0">
-                        At vero eos et accusamus et iusto odio dignissimos ducimus qui blanditiis praesentium voluptatum
-                        deleniti atque corrupti quos dolores et quas molestias excepturi sint occaecati cupiditate non
-                        provident, similique sunt in culpa
-                        qui officia deserunt mollitia animi, id est laborum et dolorum fuga. Et harum quidem rerum
-                        facilis est et expedita distinctio. Nam libero tempore, cum soluta nobis est eligendi optio
-                        cumque nihil impedit quo minus.
-                    </p>
+                    <MasterVillageTable />
                 </TabPanel>
             </TabPanels>
         </Tabs>
