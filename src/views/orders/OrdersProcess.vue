@@ -208,10 +208,10 @@ async function selectStatus(itemStatus: string, orderId: number){
       <Column sortable field="user.name" header="Pelanggan" class="min-w-[15rem]">
         <template #body="{ data }">
           <div class="text-start ">
-            <h6 class="m-0">{{ data.user.name }}</h6>
-            <p class="m-0 text-sm text-muted-color">{{ data.user.email }}</p>
+            <h6 class="m-0">{{ data.order_name }}</h6>
+            <p class="m-0 text-sm text-muted-color">{{ data.order_email }}</p>
             <p class="m-0 text-sm text-primary  cursor-pointer  hover:text-primary-300 transition-all max-w-fit"
-              @click="togglePhone">{{ data.user.phone }}<i class="pi pi-angle-down ml-2" style="font-size: 0.8rem"></i>
+              @click="togglePhone">{{ data.order_phone }}<i class="pi pi-angle-down ml-2" style="font-size: 0.8rem"></i>
             </p>
             <Popover ref="opPhone">
               <div class="flex flex-col gap-4 w-[25rem]">

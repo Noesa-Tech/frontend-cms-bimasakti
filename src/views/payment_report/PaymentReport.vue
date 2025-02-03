@@ -169,9 +169,9 @@ const exportCSV = (event: any) => {
       <Column field="customer.name" header="Pelanggan" sortable>
         <template #body="{ data }">
           <div class="flex flex-col text-start w-full">
-            <h6 class="m-0">{{ data.user.name }}</h6>
-            <p class="m-0 text-sm text-muted-color">{{ data.user.phone }}</p>
-            <p class="m-0 text-sm text-muted-color">{{ data.user.email }}</p>
+            <h6 class="m-0">{{ data.order_name }}</h6>
+            <p class="m-0 text-sm text-muted-color">{{ data.order_phone }}</p>
+            <p class="m-0 text-sm text-muted-color">{{ data.order_email }}</p>
           </div>
         </template>
         <template #filter="{ filterModel }">

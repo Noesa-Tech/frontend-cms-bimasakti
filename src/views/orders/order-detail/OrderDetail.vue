@@ -93,9 +93,9 @@ onMounted(async () => {
   await $order.detailOrder(route.params.id)
 
   item.value.noInvoice = $order.detail.invoice
-  item.value.name = $order.detail.user.name
-  item.value.email = $order.detail.user.email
-  item.value.phone = $order.detail.user.phone
+  item.value.name = $order.detail.order_name
+  item.value.email = $order.detail.order_email
+  item.value.phone = $order.detail.order_phone
 
   item.value.vendor.name = $order.detail?.vendor_id?.name
   item.value.vendor.services = $order.detail.service.name
