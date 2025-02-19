@@ -3,7 +3,8 @@ import axios from 'axios'
 import eventBus from '@/composables/eventBus';
 
 const Api = axios.create({
-  baseURL: 'https://api-bimasakti.noesatech.com/api/v1',
+  // baseURL: 'https://api-bimasakti.noesatech.com/api/v1',
+  baseURL: 'http://localhost:8000/api/v1/',
 })
 
 Api.defaults.headers.common['Access-Control-Allow-Origin'] = '*'
@@ -55,7 +56,17 @@ Api.interceptors.response.use(
         eventBus.triggerRedirect('/');
       }
 
+      if (error.response.status === 422) {
+        console.log('okoasjd')
+        // Handle validation errors
+        for (const fieldName in error.response.data.errors) {
+          eventBus.showToast = { type: 'error', message: error.response.data.errors[fieldName][0] };
+        }
+        return Promise.reject(error.response.data.errors);
+      }
+
       if (error.response.status > 401) {
+        console.log('okoasjd')
         return Promise.reject(error.response.data.message)
       }
 
@@ -68,8 +79,10 @@ Api.interceptors.response.use(
       }
     } else if (error.request) {
       // No response received
+      console.log('okoasjd')
       return Promise.reject(error.request)
     } else {
+      console.log('okoasjd')
       // Other errors
       eventBus.showToast = { type: 'error', message: error.message };
       return Promise.reject(error.message)
