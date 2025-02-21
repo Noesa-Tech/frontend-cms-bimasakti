@@ -4,7 +4,8 @@ import eventBus from '@/composables/eventBus';
 
 const Api = axios.create({
   // baseURL: 'https://api-bimasakti.noesatech.com/api/v1',
-  baseURL: 'http://localhost:8000/api/v1/',
+  // baseURL: 'http://localhost:8000/api/v1/',
+  baseURL: 'https://api-bimasakti.bimaselindo.com/api/v1/',
 })
 
 Api.defaults.headers.common['Access-Control-Allow-Origin'] = '*'
