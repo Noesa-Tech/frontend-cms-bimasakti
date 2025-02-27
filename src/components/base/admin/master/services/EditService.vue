@@ -17,7 +17,7 @@ const src = ref<any>(null);
 
 const query = reactive<Record<string, any>>({
     name: props.service.name,
-    title: props.service.title,
+    title_page: props.service.title_page,
     description: props.service.description,
     status: props.service.status,
 })
@@ -94,7 +94,7 @@ watch(
     </div>
     <div class="flex flex-col gap-2 mb-4">
         <label for="name">Judul Layanan</label>
-        <InputText v-model="query.title" id="name" aria-describedby="name-help" placeholder="Judul Layanan" />
+        <InputText v-model="query.title_page" id="name" aria-describedby="name-help" placeholder="Judul Layanan" />
     </div>
     <div class="flex flex-col gap-2 mb-4">
         <label for="desc">Deskripsi</label>

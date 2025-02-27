@@ -122,7 +122,7 @@ const confirmDelete = (e: any) => {
       </Column>
       <Column sortable field="title" header="Judul" class="min-w-[20rem]">
         <template #body="{ data }">
-          <span>{{ data.title ?? '-' }}</span>
+          <span>{{ data.title_page ?? '-' }}</span>
         </template>
         <template #filter="{ filterModel }">
           <InputText v-model="filterModel.value" type="text" placeholder="Cari Judul" />
