@@ -14,6 +14,7 @@ const statuses = reactive([1, 0]);
 const filters = ref<any>({
   global: { value: null, matchMode: FilterMatchMode.CONTAINS },
   name: { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
+  title: { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
   description: { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
   updated_at: { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.DATE_IS }] },
   status: { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.EQUALS }] },
@@ -87,7 +88,7 @@ const confirmDelete = (e: any) => {
     <div class="font-semibold text-xl mb-4">Data Layanan</div>
     <DataTable ref="dt" :key="reactiveKey" :value="items" :paginator="true" :rows="10" dataKey="id" :rowHover="true"
       v-model:filters="filters" filterDisplay="menu" :loading="$service.isLoading"
-      :globalFilterFields="['name', 'description', 'status', 'updated_at']" showGridlines scrollable>
+      :globalFilterFields="['name', 'title', 'description', 'status', 'updated_at']" showGridlines scrollable>
       <template #header>
         <div class="flex flex-col md:flex-row justify-between gap-4">
           <Button type="button" icon="pi pi-plus" label="Tambah Layanan" class="md:order-1 order-2"
@@ -117,6 +118,14 @@ const confirmDelete = (e: any) => {
         </template>
         <template #filter="{ filterModel }">
           <InputText v-model="filterModel.value" type="text" placeholder="Cari Layanan" />
+        </template>
+      </Column>
+      <Column sortable field="title" header="Judul" class="min-w-[20rem]">
+        <template #body="{ data }">
+          <span>{{ data.title ?? '-' }}</span>
+        </template>
+        <template #filter="{ filterModel }">
+          <InputText v-model="filterModel.value" type="text" placeholder="Cari Judul" />
         </template>
       </Column>
       <Column sortable field="description" header="Deskripsi" class="min-w-[15rem]">

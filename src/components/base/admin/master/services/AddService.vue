@@ -9,9 +9,10 @@ const statuses = reactive([0, 1]);
 const src = ref<string>("");
 
 
-const query = reactive({
+const query = reactive<any>({
     image: null,
     name: "",
+    title: null,
     description: "",
     status: null,
 })
@@ -71,6 +72,10 @@ function onFileSelect(event: any) {
     <div class="flex flex-col gap-2 mb-4">
         <label for="name">Nama Layanan</label>
         <InputText v-model="query.name" id="name" aria-describedby="name-help" placeholder="Nama Layanan" />
+    </div>
+    <div class="flex flex-col gap-2 mb-4">
+        <label for="name">Judul Layanan</label>
+        <InputText v-model="query.title" id="name" aria-describedby="name-help" placeholder="Judul Layanan" />
     </div>
     <div class="flex flex-col gap-2 mb-4">
         <label for="desc">Deskripsi</label>

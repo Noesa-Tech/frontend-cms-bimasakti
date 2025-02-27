@@ -17,15 +17,16 @@ const src = ref<any>(null);
 
 const query = reactive<Record<string, any>>({
     name: props.service.name,
+    title: props.service.title,
     description: props.service.description,
     status: props.service.status,
 })
 
 async function onSave() {
-      const payload = {
+    const payload = {
         ...query,
         _method: "PATCH",
-      };
+    };
 
     await $service.updateServcice(props.service.id as number, payload)
     emit('on-save')
@@ -63,13 +64,13 @@ function onFileSelect(event: any) {
 }
 
 watch(
-  () => props.service,
-  (newValue) => {
-    if (newValue?.image_url) {
-      src.value = newValue.image_url
-    }
-  },
-  { immediate: true }
+    () => props.service,
+    (newValue) => {
+        if (newValue?.image_url) {
+            src.value = newValue.image_url
+        }
+    },
+    { immediate: true }
 )
 </script>
 
@@ -90,6 +91,10 @@ watch(
     <div class="flex flex-col gap-2 mb-4">
         <label for="name">Nama Layanan</label>
         <InputText v-model="query.name" id="name" aria-describedby="name-help" placeholder="Nama Layanan" />
+    </div>
+    <div class="flex flex-col gap-2 mb-4">
+        <label for="name">Judul Layanan</label>
+        <InputText v-model="query.title" id="name" aria-describedby="name-help" placeholder="Judul Layanan" />
     </div>
     <div class="flex flex-col gap-2 mb-4">
         <label for="desc">Deskripsi</label>

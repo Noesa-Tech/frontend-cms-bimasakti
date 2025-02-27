@@ -157,13 +157,13 @@ const toggleInplace = (index: number, e: boolean) => {
 
 async function setForm(e: any) {
     loadingForm.value = true
-    
+
     query.name = e.name;
     query.phone = e.phone;
     (query.email = e.email), (query.address = e.address);
     (query.province = e.selectedProvince), (query.city = e.selectedCity), (query.subdistrict = e.selectedSubdistrict);
     query.village = e.selectedVillage;
-    
+
     await onSubmit()
     loadingForm.value = false
 }
@@ -190,11 +190,11 @@ async function onSubmit() {
         properties_id: query?.selectedProperties?.id,
         village_id: query?.village?.id,
         isLadderRequired: query?.useLadder,
-        service_id : query.selectedService.id,
+        service_id: query.selectedService.id,
         location: `${query.address}, ${provinceName.value}, ${cityName.value}, ${subdistrictName.value}, ${villageName.value}`,
         order_service: JSON.stringify(fixService)
     }
-    
+
     await $order.createOrder(payload)
     router.push(`/pesanan`);
 }
@@ -297,7 +297,7 @@ watch(treeNodes, (newTreeNodes: any) => {
                                         </InputGroupAddon>
                                     </InputGroup>
                                     <span class="text-surface-400 dark:text-surface-400 text-sm mt-1">{{ category.desc
-                                        }}</span>
+                                    }}</span>
                                 </div>
                             </div>
 
