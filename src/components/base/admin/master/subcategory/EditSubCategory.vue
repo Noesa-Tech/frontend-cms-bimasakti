@@ -26,6 +26,7 @@ const query = reactive({
     name: props.data.name,
     description: props.data.description,
     status: props.data.status,
+    price: props.data.price
 })
 
 async function onSave() {
@@ -35,7 +36,8 @@ async function onSave() {
         problem_id: query?.problem_id?.id,
         name : query.name,
         description: query.description,
-        status: query.status
+        status: query.status,
+        price: query.price
       };
 
     $serviceSubCategory.updateServiceSubCategory(props.data.id, payload)
@@ -94,6 +96,11 @@ onMounted(async () => {
                 </div>
             </template>
         </Select>
+    </div>
+    <div class="flex flex-col gap-2 mb-4">
+        <label for="name">Harga</label>
+        <InputNumber v-model="query.price" type="text" placeholder="Harga" inputId="currency-indonesia" mode="currency"
+            currency="IDR" locale="id-ID" :minFractionDigits="0" />
     </div>
     <div class="flex flex-col gap-2 mb-4">
         <label for="desc">Status</label>

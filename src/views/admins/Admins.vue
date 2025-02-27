@@ -119,7 +119,7 @@ onMounted(async() => {
             </Column>
             <Column sortable field="location.name" header="Lokasi" class="min-w-[15rem]">
                 <template #body="{ data }">
-                    {{ data.city.nama }}
+                    {{ data.village.subdistrict.city.nama }}
                 </template>
                 <template #filter="{ filterModel }">
                     <InputText v-model="filterModel.value" type="text" placeholder="Cari Lokasi" />

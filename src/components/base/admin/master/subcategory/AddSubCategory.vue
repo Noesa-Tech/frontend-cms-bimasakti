@@ -15,6 +15,7 @@ const query = reactive({
     name: "",
     description: "",
     status: 1,
+    price: 0
 })
 
 async function onSave() {
@@ -23,10 +24,11 @@ async function onSave() {
         problem_id: query?.problem_id?.id,
         name : query.name,
         description: query.description,
-        status: query.status
+        status: query.status,
+        price: query.price
       };
 
-      $serviceSubCategory.createServiceSubCategory(payload)
+    $serviceSubCategory.createServiceSubCategory(payload)
     emit('on-save')
 }
 
@@ -83,11 +85,11 @@ onMounted(async () => {
             </template>
         </Select>
     </div>
-    <!-- <div class="flex flex-col gap-2 mb-4">
+    <div class="flex flex-col gap-2 mb-4">
         <label for="name">Harga</label>
         <InputNumber v-model="query.price" type="text" placeholder="Harga" inputId="currency-indonesia" mode="currency"
             currency="IDR" locale="id-ID" :minFractionDigits="0" />
-    </div> -->
+    </div>
     <div class="flex flex-col gap-2 mb-4">
         <label for="desc">Status</label>
         <Select v-model="query.status" :options="statuses" placeholder="Pilih Status">
