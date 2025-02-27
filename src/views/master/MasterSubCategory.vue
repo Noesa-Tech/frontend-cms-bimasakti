@@ -12,11 +12,12 @@ const confirm = useConfirm();
 const dt = ref();
 const filters = ref<any>({
   global: { value: null, matchMode: FilterMatchMode.CONTAINS },
-    'service_problem.name': { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
-    name: { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
-    price: { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
-    updated_at: { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.DATE_IS }] },
-    status: { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.EQUALS }] },
+  'service_problem.name': { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
+  name: { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
+  description: { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
+  price: { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
+  updated_at: { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.DATE_IS }] },
+  status: { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.EQUALS }] },
 });
 
 const selectedRow = ref<any>(null)
@@ -45,12 +46,12 @@ function getStatusName(status: number) {
   }
 }
 
-async function fetchServiceSubCategory(){
+async function fetchServiceSubCategory() {
   await $service.getServiceSubCategory()
   reactiveKey.value += 1;
 }
 
-onMounted(async() => {
+onMounted(async () => {
   await fetchServiceSubCategory()
 })
 
@@ -81,7 +82,7 @@ const confirmDelete = (e: any) => {
       label: "Yakin",
       severity: "danger",
     },
-    accept: async() => {
+    accept: async () => {
       await $service.delete(e)
       await fetchServiceSubCategory()
     },
@@ -95,9 +96,10 @@ const confirmDelete = (e: any) => {
   <TopBreadcrumb :breadcrumbItems="[{ label: 'Master' }, { label: 'Sub Kategori' }]" />
   <div class="card mt-8">
     <div class="font-semibold text-xl mb-4">Data Sub Kategori</div>
-    <DataTable ref="dt" :key="reactiveKey" :value="$service.serviceSubCategory" rowGroupMode="rowspan" groupRowsBy="service_problem.name"
-      :paginator="true" :rows="10" dataKey="id" :rowHover="true" v-model:filters="filters" filterDisplay="menu"
-      :loading="$service.isLoading" :globalFilterFields="['service_problem.name', 'name', 'price', 'status', 'updated_at']"
+    <DataTable ref="dt" :key="reactiveKey" :value="$service.serviceSubCategory" rowGroupMode="rowspan"
+      groupRowsBy="service_problem.name" :paginator="true" :rows="10" dataKey="id" :rowHover="true"
+      v-model:filters="filters" filterDisplay="menu" :loading="$service.isLoading"
+      :globalFilterFields="['service_problem.name', 'name', 'description', 'price', 'status', 'updated_at']"
       showGridlines>
       <template #header>
         <div class="flex flex-col md:flex-row justify-between gap-4">
@@ -118,11 +120,10 @@ const confirmDelete = (e: any) => {
       </template>
       <template #empty> Tidak ada data Sub Kategori. </template>
       <template #loading> Memuat data Sub Kategori. Mohon tunggu. </template>
-      <Column field="service_problem.name" header="Kategori">
+      <Column field="service_problem.name" header="Kategori" class="min-w-[20rem]">
         <template #body="{ data }">
           <div class="flex gap-4 items-center ">
-            <img :alt="data.service_problem.service.name" :src="data.image_url"
-              class=" align-middle w-10" />
+            <img :alt="data.service_problem.service.name" :src="data.image_url" class=" align-middle w-10" />
             <div>
               <h6 class="m-0">{{ data.isCustom > 0 ? 'Custom Request' : data.service_problem.name }}</h6>
               <p class="m-0 text-muted-color text-sm">{{ data.service_problem.service.name }}</p>
@@ -139,6 +140,22 @@ const confirmDelete = (e: any) => {
         </template>
         <template #filter="{ filterModel }">
           <InputText v-model="filterModel.value" type="text" placeholder="Cari Sub Kategori" />
+        </template>
+      </Column>
+      <Column field="description" header="Deskripsi" class="min-w-[25rem]">
+        <template #body="{ data }">
+          {{ data.description }}
+        </template>
+        <template #filter="{ filterModel }">
+          <InputText v-model="filterModel.value" type="text" placeholder="Cari Deskripsi" />
+        </template>
+      </Column>
+      <Column field="price" header="Harga" class="min-w-[25rem]">
+        <template #body="{ data }">
+          Rp{{ formatPrice(data.price) }}
+        </template>
+        <template #filter="{ filterModel }">
+          <InputText v-model="filterModel.value" type="text" placeholder="Cari Harga" />
         </template>
       </Column>
       <Column header="Status" field="status" :filterMenuStyle="{ width: '14rem' }">
@@ -177,8 +194,10 @@ const confirmDelete = (e: any) => {
       <Column field="id" header="Action" bodyClass="text-center" class="min-w-[10rem]">
         <template #body="{ data }">
           <div class="flex gap-4 items-center">
-            <Button icon="pi pi-pencil" severity="info" text v-tooltip.bottom="'Ubah'" @click="selectedRow = data, visibleEdit = true" />
-            <Button icon="pi pi-trash" severity="danger" text v-tooltip.bottom="'Hapus'" @click="confirmDelete(data.id)" />
+            <Button icon="pi pi-pencil" severity="info" text v-tooltip.bottom="'Ubah'"
+              @click="selectedRow = data, visibleEdit = true" />
+            <Button icon="pi pi-trash" severity="danger" text v-tooltip.bottom="'Hapus'"
+              @click="confirmDelete(data.id)" />
           </div>
         </template>
       </Column>
@@ -191,6 +210,7 @@ const confirmDelete = (e: any) => {
   </Dialog>
 
   <Dialog v-model:visible="visibleEdit" maximizable modal header="Ubah Sub Kategori" class=" sm:w-1/2 w-full ">
-    <EditSubCategory :data="selectedRow" @on-close="visibleEdit = false" @on-save="visibleEdit = false, fetchServiceSubCategory()" />
+    <EditSubCategory :data="selectedRow" @on-close="visibleEdit = false"
+      @on-save="visibleEdit = false, fetchServiceSubCategory()" />
   </Dialog>
 </template>
