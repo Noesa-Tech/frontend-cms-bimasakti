@@ -15,7 +15,7 @@ import Popover from "primevue/popover";
 
 import { OrderStore } from '@/store/order'
 
-const opStatus = ref();
+const opStatus = ref<{ [key: number]: any }>({});
 const opPhone = ref();
 const dt = ref();
 const $order = OrderStore()
@@ -155,11 +155,13 @@ async function updateFeeProperties(closeCallback: () => void, fee_properties: an
   await $order.fetchOrder("monitoring", userLoginCity.value)
 }
 
-const toggleStatus = (event: any) => {
-  opStatus.value.toggle(event);
+const toggleStatus = (event: any, index: number) => {
+  if (opStatus.value[index]) {
+    opStatus.value[index].toggle(event);
+  }
 }
 
-async function selectStatus(itemStatus: string, orderId: number){
+async function selectStatus(itemStatus: string, orderId: number, index: number){
   
   let payload = {
     _method: "PATCH",
@@ -167,7 +169,9 @@ async function selectStatus(itemStatus: string, orderId: number){
   }
   
   await $order.updateOrder(payload, orderId)
-  opStatus.value.hide();
+  if (opStatus.value[index]) {
+    opStatus.value[index].hide();
+  }
   await $order.fetchOrder("monitoring", userLoginCity.value)
 }
 
@@ -364,17 +368,17 @@ async function selectStatus(itemStatus: string, orderId: number){
         </template>
       </Column>
       <Column sortable header="Status" field="status" :filterMenuStyle="{ width: '18rem' }" class="min-w-[20rem]">
-        <template #body="{ data }">
-          <Button :label="getStatus(data.status)" :severity="getSeverity(data.status)" @click="toggleStatus"
+        <template #body="{ data, index }">
+          <Button :label="getStatus(data.status)" :severity="getSeverity(data.status)" @click="(e) => toggleStatus(e, index)"
             size="small" icon="pi pi-chevron-down" iconPos="right" />
-          <Popover ref="opStatus">
+          <Popover :ref="(el) => opStatus[index] = el">
             <div class="flex flex-col gap-4">
               <div>
                 <span class="font-medium block mb-2">Ubah Status</span>
                 <ul class="list-none p-0 m-0 flex flex-col">
-                  <li v-for="(item, index) in statuses" :key="index" class="flex items-center gap-2 px-2 py-3">
+                  <li v-for="(item, idx) in statuses" :key="idx" class="flex items-center gap-2 px-2 py-3">
                     <Button :label="getStatus(item)" :severity="getSeverity(item)" size="small"
-                      @click="selectStatus(item, data.id)" />
+                      @click="selectStatus(item, data.id, index)" />
                   </li>
                 </ul>
               </div>
