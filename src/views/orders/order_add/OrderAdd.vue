@@ -44,12 +44,12 @@ async function onServiceClicked(item: any) {
     query.selectedService = item;
     const res = await $service.fetchProblem(query.selectedService.id as number);
 
-    itemIssue.value = res?.data.map((e: any) => ({
+    itemIssue.value = (res?.data || []).map((e: any) => ({
         id: e.id,
         label: e.name,
         status: false,
         isDefault: true,
-        category: e.sub_problem.map((el: any) => ({
+        category: (e.sub_problem || e.sub_problems || []).map((el: any) => ({
             id: el.id,
             id_parent: e.id,
             label: el.name,

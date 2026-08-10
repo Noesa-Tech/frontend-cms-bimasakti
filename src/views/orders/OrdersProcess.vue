@@ -403,7 +403,7 @@ async function selectStatus(itemStatus: string, orderId: number){
       </Column>
       <Column sortable field="vendor" header="Vendor Pilihan" class="min-w-[15rem]">
         <template #body="{ data }">
-          <span>{{ data?.vendor_id?.name }}</span>
+          <span>{{ data.vendor?.name || data?.vendor_id?.name || '-' }}</span>
         </template>
         <template #filter="{ filterModel }">
           <InputText v-model="filterModel.value" type="text" placeholder="Cari Vendor" />

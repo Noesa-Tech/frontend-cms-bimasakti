@@ -11,8 +11,8 @@ async function onUpdate(closeCallback: () => void, item:any){
 
 const payload = {
       _method: "PATCH",
-      key: item.key,
-      value: item.value,
+      key: item.key || item.platform,
+      value: item.value || item.url,
   };
 
   await $social.update(payload, item.id)
@@ -30,8 +30,8 @@ const payload = {
                 <template #display>
                     <div class="flex items-center justify-between gap-4 ">
                         <div class="">
-                            <p class="m-0"> {{ item.key }}</p>
-                            <p class="m-0">Link: <span class=" font-semibold">{{ item.value }}</span></p>
+                            <p class="m-0"> {{ item.key || item.platform }}</p>
+                            <p class="m-0">Link: <span class=" font-semibold">{{ item.value || item.url }}</span></p>
                         </div>
                         <i class="pi pi-pencil" />
                     </div>

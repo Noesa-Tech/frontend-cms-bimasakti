@@ -30,23 +30,25 @@ const statuses = reactive([1, 0]);
 const visibleEdit = ref<boolean>(false);
 const visibleAdd = ref<boolean>(false);
 
-function getSeverity(e: number) {
-  switch (e) {
+function getSeverity(e: any) {
+  switch (Number(e)) {
     case 0:
       return "danger";
     case 1:
       return "success";
-
+    default:
+      return "secondary";
   }
 }
 
-function getStatusName(e: number) {
-  switch (e) {
+function getStatusName(e: any) {
+  switch (Number(e)) {
     case 0:
       return "Tidak Tersedia";
     case 1:
       return "Tersedia";
-
+    default:
+      return "-";
   }
 }
 
@@ -134,8 +136,8 @@ onMounted(async() => {
       <Column field="service.name" header="Layanan">
         <template #body="{ data }">
           <div class="flex flex-col items-center gap-2">
-            <img :alt="data.service.name" :src="data.image_url" width="32" style="vertical-align: middle" />
-            <span>{{ data.service.name }}</span>
+            <img v-if="data.service?.image_url || data.image_url" :alt="data.service?.name" :src="data.service?.image_url || data.image_url" width="32" style="vertical-align: middle" />
+            <span>{{ data.service?.name }}</span>
           </div>
         </template>
         <template #filter="{ filterModel }">

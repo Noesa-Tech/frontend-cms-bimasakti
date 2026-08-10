@@ -33,21 +33,21 @@ const filters1 = ref({
 })
 
 const items = computed(() => {
-  return $vendor.vendors.map((item: any) => ({
+  return ($vendor.vendors || []).map((item: any) => ({
     id: item.id,
     name: item.name,
-    location: item.address,
-    date: item.created_at,
-    status: item.deleted_at,
+    location: item.city?.nama || item.city?.name || item.address || '-',
+    date: item.joined_at || item.created_at,
+    status: item.status === 'active' || item.status === '2' || item.status === 2 ? 2 : 1,
     city: item.city,
-    services: item.vendor_service
+    services: item.vendor_service || (item.services || []).map((s: any) => ({ service: s }))
   }));
 });
 
 const allCity = computed(() => {
   return $location.city.map((item: any) => ({
     code: item.id,
-    name: item.nama,
+    name: item.nama || item.name,
   }));
 });
 
@@ -87,6 +87,7 @@ onMounted(async () => {
 });
 
 function formatDate(value: any) {
+  if (!value) return '-';
   const date = new Date(value);
   return date.toLocaleDateString("en-US", {
     day: "2-digit",
@@ -171,7 +172,7 @@ const setPopoverRef = (vendorId: number, el: HTMLElement | null) => {
       <Column sortable header="Lokasi" filterField="location">
         <template #body="{ data }">
           <div>
-            {{ data.city?.nama }}
+            {{ data.city?.nama || data.city?.name || '-' }}
           </div>
         </template>
         <template #filter="{ filterModel }">
@@ -186,12 +187,12 @@ const setPopoverRef = (vendorId: number, el: HTMLElement | null) => {
       </Column>
       <Column sortable header="Layanan" filterField="services" dataType="string" style="min-width: 10rem">
         <template #body="{ data }">
-          <Button @click="toggle($event, data.id)" :label="data.services.length + ' Layanan'" severity="info" outlined
+          <Button @click="toggle($event, data.id)" :label="(data.services ? data.services.length : 0) + ' Layanan'" severity="info" outlined
             icon="pi pi-angle-down" iconPos="right" />
           <Popover :ref="el => setPopoverRef(data.id, el as any)">
             <ul class="list-disc list-inside flex flex-col gap-4">
               <li v-for="(item, index) in data.services" :key="index">
-                {{ item.service.name }}
+                {{ item.service ? item.service.name : item.name }}
               </li>
             </ul>
           </Popover>

@@ -37,15 +37,15 @@ async function fetchDistrict() {
 const cityList = computed(() =>
     $location.cities.map((city: any) => ({
         id: city.id,
-        name: city.nama,
+        name: city.nama || city.name,
     }))
 );
 const districtList = computed(() =>
     $location.districts.map((district: any) => ({
         id: district.id,
-        name: district.nama,
-        cityId: district.id_kota,
-        city: district.citys
+        name: district.nama || district.name,
+        cityId: district.id_kota || district.city_id,
+        city: district.citys || district.city
     }))
 );
 

@@ -26,23 +26,25 @@ const reactiveKey = ref<number>(0)
 const visibleEdit = ref<boolean>(false);
 const visibleAdd = ref<boolean>(false);
 
-function getSeverity(status: number) {
-  switch (status) {
+function getSeverity(status: any) {
+  switch (Number(status)) {
     case 0:
       return "danger";
     case 1:
       return "success";
-
+    default:
+      return "secondary";
   }
 }
 
-function getStatusName(status: number) {
-  switch (status) {
+function getStatusName(status: any) {
+  switch (Number(status)) {
     case 0:
       return "Tidak Tersedia";
     case 1:
       return "Tersedia";
-
+    default:
+      return "-";
   }
 }
 
@@ -123,10 +125,10 @@ const confirmDelete = (e: any) => {
       <Column field="service_problem.name" header="Kategori" class="min-w-[20rem]">
         <template #body="{ data }">
           <div class="flex gap-4 items-center ">
-            <img :alt="data.service_problem.service.name" :src="data.image_url" class=" align-middle w-10" />
+            <img v-if="data.service_problem?.service?.image_url || data.service_problem?.image_url || data.image_url" :alt="data.service_problem?.service?.name" :src="data.service_problem?.service?.image_url || data.service_problem?.image_url || data.image_url" class=" align-middle w-10" />
             <div>
-              <h6 class="m-0">{{ data.isCustom > 0 ? 'Custom Request' : data.service_problem.name }}</h6>
-              <p class="m-0 text-muted-color text-sm">{{ data.service_problem.service.name }}</p>
+              <h6 class="m-0">{{ data.isCustom > 0 ? 'Custom Request' : data.service_problem?.name }}</h6>
+              <p class="m-0 text-muted-color text-sm">{{ data.service_problem?.service?.name }}</p>
             </div>
           </div>
         </template>
@@ -165,7 +167,7 @@ const confirmDelete = (e: any) => {
         <template #filter="{ filterModel }">
           <Select v-model="filterModel.value" :options="statuses" placeholder="Pilih" showClear>
             <template #value="slotProps">
-              <Tag v-if="slotProps.value" :value="getStatusName(slotProps.value)"
+              <Tag v-if="slotProps.value !== null && slotProps.value !== undefined" :value="getStatusName(slotProps.value)"
                 :severity="getSeverity(slotProps.value)" />
             </template>
             <template #option="slotProps">

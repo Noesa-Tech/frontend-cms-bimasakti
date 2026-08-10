@@ -16,28 +16,28 @@ const $location = LocationStore()
 const provinceList = computed(() =>
   $location.provinces.map((province: any) => ({
     id: province.id,
-    name: province.nama,
+    name: province.nama || province.name,
   }))
 );
 
 const cityList = computed(() =>
   $location.cities.map((city: any) => ({
     id: city.id,
-    name: city.nama,
+    name: city.nama || city.name,
   }))
 );
 
 const subdistrictList = computed(() =>
   $location.districts.map((city: any) => ({
     id: city.id,
-    name: city.nama,
+    name: city.nama || city.name,
   }))
 );
 
 const villageList = computed(() =>
   $location.villages.map((village: any) => ({
     id: village.id,
-    name: village.nama,
+    name: village.nama || village.name,
   }))
 );
 

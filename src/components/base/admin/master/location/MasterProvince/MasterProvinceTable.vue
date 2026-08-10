@@ -24,7 +24,7 @@ async function fetchProvince() {
 const provinceList = computed(() =>
     $location.provinces.map((province: any) => ({
         id: province.id,
-        name: province.nama,
+        name: province.nama || province.name,
         kode: province.kode,
         ibukota: province.ibukota,
     }))

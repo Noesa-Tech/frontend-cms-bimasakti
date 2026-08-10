@@ -94,9 +94,12 @@ onMounted(async () => {
   if (users) {
     const parsedData = JSON.parse(users);
     
-    query.name = parsedData.users.name;
-    query.email = parsedData.users.email;
-    query.location = parsedData.users.village.subdistrict.city.nama;
+    query.name = parsedData.users?.name || '';
+    query.email = parsedData.users?.email || '';
+    query.location = parsedData.users?.village?.subdistrict?.city?.nama || 
+                     parsedData.users?.village?.district?.city?.nama || 
+                     parsedData.users?.city?.nama || 
+                     'Pusat';
   } else {
 
     await $auth.logout()

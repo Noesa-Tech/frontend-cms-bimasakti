@@ -38,9 +38,9 @@ async function fetchProvince() {
 const cityList = computed(() =>
     $location.cities.map((city: any) => ({
         id: city.id,
-        name: city.nama,
+        name: city.nama || city.name,
         capitalsCityId: city.ibukota,
-        provinceId: city.id_provinsi,
+        provinceId: city.id_provinsi || city.province_id,
         province: city.province
     }))
 );
@@ -48,7 +48,7 @@ const cityList = computed(() =>
 const provinceList = computed(() =>
     $location.provinces.map((province: any) => ({
         id: province.id,
-        name: province.nama,
+        name: province.nama || province.name,
         kode: province.kode,
         ibukota: province.ibukota,
     }))

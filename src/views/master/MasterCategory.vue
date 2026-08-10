@@ -26,23 +26,25 @@ const statuses = reactive([1, 0]);
 const visibleEdit = ref<boolean>(false);
 const visibleAdd = ref<boolean>(false);
 
-function getSeverity(status: number) {
-  switch (status) {
+function getSeverity(status: any) {
+  switch (Number(status)) {
     case 0:
       return "danger";
     case 1:
       return "success";
-
+    default:
+      return "secondary";
   }
 }
 
-function getStatusName(status: number) {
-  switch (status) {
+function getStatusName(status: any) {
+  switch (Number(status)) {
     case 0:
       return "Tidak Tersedia";
     case 1:
       return "Tersedia";
-
+    default:
+      return "-";
   }
 }
 
@@ -125,8 +127,8 @@ onMounted(async() => {
       <Column field="service.name" header="Layanan">
         <template #body="{ data }">
           <div class="flex flex-col items-center gap-2">
-            <img :alt="data.service.name" :src="data.image_url" width="32" style="vertical-align: middle" />
-            <span>{{ data.service.name }}</span>
+            <img v-if="data.service?.image_url || data.image_url" :alt="data.service?.name" :src="data.service?.image_url || data.image_url" width="32" style="vertical-align: middle" />
+            <span>{{ data.service?.name }}</span>
           </div>
         </template>
         <template #filter="{ filterModel }">
@@ -148,7 +150,7 @@ onMounted(async() => {
         <template #filter="{ filterModel }">
           <Select v-model="filterModel.value" :options="statuses" placeholder="Pilih" showClear>
             <template #value="slotProps">
-              <Tag v-if="slotProps.value" :value="getStatusName(slotProps.value)"
+              <Tag v-if="slotProps.value !== null && slotProps.value !== undefined" :value="getStatusName(slotProps.value)"
                 :severity="getSeverity(slotProps.value)" />
             </template>
             <template #option="slotProps">

@@ -68,7 +68,7 @@ onMounted(async() => {
     <TopBreadcrumb :breadcrumbItems="[{ label: 'Admin' }]" />
     <div class="card mt-8">
         <div class="font-semibold text-xl mb-4">Data Admin</div>
-        <DataTable ref="dt" :value="$user.users" :paginator="true" :rows="10" dataKey="id" v-model:filters="filters"
+        <DataTable ref="dt" :key="reactiveKey" :value="$user.users" :paginator="true" :rows="10" dataKey="id" v-model:filters="filters"
             filterDisplay="menu" :loading="isLoading" :globalFilterFields="['name', 'email', 'phone', 'location.name']"
             showGridlines>
             <template #header>
@@ -119,7 +119,7 @@ onMounted(async() => {
             </Column>
             <Column sortable field="location.name" header="Lokasi" class="min-w-[15rem]">
                 <template #body="{ data }">
-                    {{ data.village.subdistrict.city.nama }}
+                    {{ data.village?.subdistrict?.city?.nama || data.village?.district?.city?.nama || data.city?.nama || '-' }}
                 </template>
                 <template #filter="{ filterModel }">
                     <InputText v-model="filterModel.value" type="text" placeholder="Cari Lokasi" />
